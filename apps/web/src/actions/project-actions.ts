@@ -37,17 +37,35 @@ export async function createProjectAction(
     };
   }
 
-  // Check if user already has a project (limit to one for now)
-  const existingProject = await prisma.site.findFirst({
-    where: { userId: session.user.id },
+  // Get user's current plan and project count
+  const dbUser = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    include: { _count: { select: { sites: true } } }, // Count existing sites (projects)
   });
 
-  if (existingProject) {
+  if (!dbUser) {
     return {
       success: false,
-      message: "You can only create one project at this time.",
+      message: "User not found.", // Should not happen if session is valid
     };
   }
+
+  const userPlan = dbUser.plan || "free";
+  const projectCount = dbUser._count.sites;
+
+  if (userPlan === "free" && projectCount >= 1) {
+    return {
+      success: false,
+      message:
+        "Free plan allows only 1 project. Please upgrade to create more.",
+    };
+  } else if (userPlan === "pro" && projectCount >= 5) {
+    return {
+      success: false,
+      message: "Pro plan allows up to 5 projects.",
+    };
+  }
+  // If other plans are added, extend this logic
 
   try {
     await prisma.site.create({
@@ -58,7 +76,7 @@ export async function createProjectAction(
       },
     });
 
-    revalidatePath("/dashboard"); // Revalidate dashboard to show new project
+    revalidatePath("/"); // Revalidate root path or a specific dashboard path if applicable
     return {
       success: true,
       message: "Project created successfully!",

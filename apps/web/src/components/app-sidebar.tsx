@@ -25,12 +25,13 @@ import {
 } from "@/components/ui/sidebar";
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-  user: NextAuthUser;
+  user: NextAuthUser & { plan?: string };
 }
 
 export function AppSidebar({ user, ...props }: AppSidebarProps) {
   const { currentSiteId, isLoadingSites, activeProject } = useProject();
   const pathname = usePathname();
+  const userPlan = user.plan || "free";
 
   const mainNavItems = React.useMemo(() => {
     if (isLoadingSites || !currentSiteId) {
@@ -83,7 +84,9 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
                   <span className="font-medium truncate">
                     {headerProjectName}
                   </span>
-                  <span className="text-xs truncate">Free</span>
+                  <span className="text-xs truncate capitalize">
+                    {userPlan} Plan
+                  </span>
                 </div>
               </a>
             </SidebarMenuButton>
