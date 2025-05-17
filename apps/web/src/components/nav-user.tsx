@@ -9,6 +9,8 @@ import {
   Sparkles,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
+import Link from "next/link";
+import { useProject } from "@/contexts/project-context";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -37,6 +39,10 @@ export function NavUser({
   };
 }) {
   const { isMobile } = useSidebar();
+  const { currentSiteId } = useProject();
+
+  const upgradeHref = currentSiteId ? `/${currentSiteId}/billing` : "/pricing";
+  const billingHref = currentSiteId ? `/${currentSiteId}/billing` : "/billing";
 
   return (
     <SidebarMenu>
@@ -78,29 +84,33 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
+              <DropdownMenuItem asChild>
+                <Link href={upgradeHref}>
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  Upgrade to Pro
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <BadgeCheck />
+                <BadgeCheck className="mr-2 h-4 w-4" />
                 Account
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
+              <DropdownMenuItem asChild>
+                <Link href={billingHref}>
+                  <CreditCard className="mr-2 h-4 w-4" />
+                  Billing
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Bell />
+                <Bell className="mr-2 h-4 w-4" />
                 Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })}>
-              <LogOut />
+              <LogOut className="mr-2 h-4 w-4" />
               Log out
             </DropdownMenuItem>
           </DropdownMenuContent>

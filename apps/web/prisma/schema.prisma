@@ -50,6 +50,8 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
+  plan          String    @default("free") // "free" or "pro"
+  polarSubscriptionId String? @unique // Store Polar subscription ID if they are on a paid plan
 
   accounts Account[]
   sessions Session[]
