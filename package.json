@@ -10,11 +10,12 @@
     "dev:web": "pnpm --filter tracker dev",
     "build:web": "pnpm --filter tracker build",
     "lint:web": "pnpm --filter tracker lint",
-    "prisma:generate:web": "pnpm --filter tracker prisma:generate",
-    "prisma:migrate:web": "pnpm --filter tracker prisma:migrate",
-    "prisma:studio:web": "pnpm --filter tracker prisma:studio"
+    "prisma:generate:web": "prisma generate --schema=./apps/web/prisma/schema.prisma",
+    "prisma:migrate:web": "prisma migrate dev --schema=./apps/web/prisma/schema.prisma",
+    "prisma:studio:web": "prisma studio --schema=./apps/web/prisma/schema.prisma"
   },
   "devDependencies": {
+    "prisma": "^6.8.2",
     "typescript": "^5.4.5"
   },
   "packageManager": "pnpm@9.15.0+sha512.76e2379760a4328ec4415815bcd6628dee727af3779aaa4c914e3944156c4299921a89f976381ee107d41f12cfa4b66681ca9c718f0668fa0831ed4c6d8ba56c"

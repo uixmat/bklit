@@ -7,6 +7,15 @@ settings:
 importers:
 
   .:
+    devDependencies:
+      prisma:
+        specifier: ^6.8.2
+        version: 6.8.2(typescript@5.8.3)
+      typescript:
+        specifier: ^5.4.5
+        version: 5.8.3
+
+  apps/web:
     dependencies:
       '@auth/prisma-adapter':
         specifier: ^2.9.1
@@ -25,7 +34,7 @@ importers:
         version: 1.2.2(@types/react@19.1.4)(react@19.1.0)
       bklit:
         specifier: workspace:*
-        version: link:packages/bklit-sdk
+        version: link:../../packages/bklit-sdk
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
