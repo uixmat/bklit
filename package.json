@@ -3,13 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "dev:all": "pnpm dev:sdk & pnpm --filter tracker dev:track & pnpm dev:playground",
     "dev": "pnpm --filter bklit dev & pnpm --filter tracker dev",
     "build": "pnpm --filter bklit build && pnpm --filter tracker build",
     "dev:sdk": "pnpm --filter bklit dev",
     "build:sdk": "pnpm --filter bklit build",
-    "dev:web": "pnpm --filter tracker dev",
+    "dev:web": "pnpm --filter tracker dev:track",
     "build:web": "pnpm --filter tracker build",
     "lint:web": "pnpm --filter tracker lint",
+    "dev:playground": "pnpm --filter playground dev",
+    "build:playground": "pnpm --filter playground build",
     "prisma:generate:web": "prisma generate --schema=./apps/web/prisma/schema.prisma",
     "prisma:migrate:web": "prisma migrate dev --schema=./apps/web/prisma/schema.prisma",
     "prisma:studio:web": "prisma studio --schema=./apps/web/prisma/schema.prisma"

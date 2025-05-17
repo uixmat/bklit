@@ -69,14 +69,17 @@ export default async function SiteAnalyticsPage({
     redirect("/"); // Redirect to home/login if not authenticated
   }
 
-  const site = await getSiteDetails(params.siteId, session.user.id);
+  // Explicitly get siteId after session check
+  const { siteId } = params;
+
+  const site = await getSiteDetails(siteId, session.user.id);
 
   if (!site) {
     // Optionally, redirect to dashboard or show a specific "not found or not authorized" page
     redirect("/dashboard?error=site_not_found");
   }
 
-  const trackingData = await getSiteTrackingData(params.siteId);
+  const trackingData = await getSiteTrackingData(siteId);
 
   const trackerScript = `
 <script async defer>
