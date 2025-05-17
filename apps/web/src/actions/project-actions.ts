@@ -1,7 +1,7 @@
 "use server";
 
 // import { z } from 'zod'; // Unused, schema is imported directly
-import { db } from "@/lib/db";
+import { prisma } from "@/lib/db";
 import { addProjectSchema } from "@/lib/schemas/project-schema";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getServerSession } from "next-auth/next";
@@ -38,7 +38,7 @@ export async function createProjectAction(
   }
 
   // Check if user already has a project (limit to one for now)
-  const existingProject = await db.site.findFirst({
+  const existingProject = await prisma.site.findFirst({
     where: { userId: session.user.id },
   });
 
@@ -50,7 +50,7 @@ export async function createProjectAction(
   }
 
   try {
-    await db.site.create({
+    await prisma.site.create({
       data: {
         name: validatedFields.data.name,
         domain: validatedFields.data.domain || null, // Ensure null if empty string for optional URL

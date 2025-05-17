@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import redis from "../../../lib/redis"; // Adjusted import path
+import redis from "@/lib/redis"; // Corrected path assuming redis.ts is in apps/web/src/lib
+import { getIoServer } from "@/lib/socketio-server"; // Import getIoServer
 
 interface TrackingPayload {
   url: string;
@@ -39,7 +40,23 @@ export async function POST(request: NextRequest) {
     await redis.rpush(redisKey, JSON.stringify(payload)); // Store the whole payload
     console.log(`Data pushed to Redis list: ${redisKey}`);
 
-    // We will add real-time updates (Socket.IO) here later.
+    // Emit event via Socket.IO
+    const io = getIoServer();
+    if (io) {
+      // We don't have the live user count here directly from siteViewers map without more complex state sharing.
+      // For now, let's just signal that a new event happened for that siteId.
+      // The client can then re-fetch or the server could push the new total if it calculated it.
+      // However, our socketio-server already updates live_users on join/leave.
+      // Let's emit a generic event, or perhaps we can make track endpoint also update the count.
+      // For simplicity, let's assume the existing join/leave in socketio-server is the primary source for live_users count.
+      // This emission can be for other real-time updates like "new_page_view".
+      io.to(payload.siteId).emit("new_page_view", payload); // Emit the new page view data
+      console.log(
+        `Socket event 'new_page_view' emitted to room: ${payload.siteId}`
+      );
+    } else {
+      console.warn("Socket.IO server instance not found. Cannot emit event.");
+    }
 
     return createCorsResponse({ message: "Data received and stored" }, 200);
   } catch (error) {

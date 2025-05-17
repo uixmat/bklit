@@ -3,14 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev:all": "pnpm dev:sdk & pnpm --filter tracker dev:track & pnpm dev:playground",
-    "dev": "pnpm --filter bklit dev & pnpm --filter tracker dev",
-    "build": "pnpm --filter bklit build && pnpm --filter tracker build",
+    "dev:all": "pnpm dev:sdk & pnpm dev:web & pnpm dev:playground",
+    "dev": "pnpm --filter bklit dev & pnpm dev:web",
+    "build": "pnpm --filter bklit build && pnpm build:web",
     "dev:sdk": "pnpm --filter bklit dev",
     "build:sdk": "pnpm --filter bklit build",
-    "dev:web": "pnpm --filter tracker dev:track",
-    "build:web": "pnpm --filter tracker build",
-    "lint:web": "pnpm --filter tracker lint",
+    "dev:web": "tsx server.ts",
+    "start:web": "NODE_ENV=production tsx server.ts",
+    "build:web": "pnpm --filter web build",
+    "lint:web": "pnpm --filter web lint",
     "dev:playground": "pnpm --filter playground dev",
     "build:playground": "pnpm --filter playground build",
     "prisma:generate:web": "prisma generate --schema=./apps/web/prisma/schema.prisma",
@@ -18,7 +19,10 @@
     "prisma:studio:web": "prisma studio --schema=./apps/web/prisma/schema.prisma"
   },
   "devDependencies": {
+    "next": "15.3.2",
     "prisma": "^6.8.2",
+    "tsx": "^4.7.0",
+    "@types/node": "^20.0.0",
     "typescript": "^5.4.5"
   },
   "packageManager": "pnpm@9.15.0+sha512.76e2379760a4328ec4415815bcd6628dee727af3779aaa4c914e3944156c4299921a89f976381ee107d41f12cfa4b66681ca9c718f0668fa0831ed4c6d8ba56c"

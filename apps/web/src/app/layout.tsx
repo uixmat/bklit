@@ -1,21 +1,15 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { GeistSans as geistSansFont } from "geist/font/sans";
+import { GeistMono as geistMonoFont } from "geist/font/mono";
 import "./globals.css";
 import AuthProvider from "@/components/providers/session-provider";
 import { Toaster } from "@/components/ui/sonner";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const geistSans = geistSansFont;
+const geistMono = geistMonoFont;
 
 export const metadata: Metadata = {
-  title: "Tracker App",
+  title: "Bklit Analytics",
   description: "Track your website analytics",
 };
 
