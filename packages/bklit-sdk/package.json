@@ -2,8 +2,8 @@
   "name": "bklit",
   "version": "0.1.0",
   "private": true,
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
@@ -11,6 +11,9 @@
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --clean",
     "dev": "tsup src/index.ts --format esm,cjs --dts --watch"
+  },
+  "dependencies": {
+    "socket.io-client": "^4.7.5"
   },
   "devDependencies": {
     "tsup": "^8.0.2",

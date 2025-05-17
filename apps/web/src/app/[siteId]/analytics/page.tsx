@@ -10,6 +10,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { LiveAnalyticsDisplay } from "@/components/live-analytics-display";
 
 interface PageView {
   url: string;
@@ -76,6 +79,7 @@ export default async function SiteAnalyticsPage({
   }
 
   const trackingData = await getSiteTrackingData(siteId);
+  const totalHistoricalViews = trackingData.length;
 
   return (
     <div className="space-y-6">
@@ -83,14 +87,19 @@ export default async function SiteAnalyticsPage({
         <div>
           <h1 className="text-3xl font-bold">{site.name} - Analytics</h1>
           <p className="text-muted-foreground">
-            Review captured page views for your project.
+            Review captured page views and live data for your project.
           </p>
         </div>
+        <Link href={`/${site.id}`}>
+          <Button variant="outline">← Back to Project Dashboard</Button>
+        </Link>
       </div>
+
+      <LiveAnalyticsDisplay totalHistoricalViews={totalHistoricalViews} />
 
       <Card>
         <CardHeader>
-          <CardTitle>Tracked Page Views</CardTitle>
+          <CardTitle>Historical Page Views ({totalHistoricalViews})</CardTitle>
           <CardDescription>
             A list of page views captured by the tracking script for &quot;
             {site.name}&quot;.
@@ -99,23 +108,25 @@ export default async function SiteAnalyticsPage({
         <CardContent>
           {trackingData.length > 0 ? (
             <ul className="space-y-2">
-              {trackingData.map((event: PageView, index: number) => (
-                <li
-                  key={index}
-                  className="p-3 border rounded-md bg-muted/50 text-sm"
-                >
-                  <p>
-                    <strong>URL:</strong> {event.url}
-                  </p>
-                  <p>
-                    <strong>Timestamp:</strong>{" "}
-                    {new Date(event.timestamp).toLocaleString()}
-                  </p>
-                </li>
-              ))}
+              {trackingData
+                .slice(0, 5)
+                .map((event: PageView, index: number) => (
+                  <li
+                    key={index}
+                    className="p-3 border rounded-md bg-muted/50 text-sm flex justify-between"
+                  >
+                    <div>
+                      <strong>URL:</strong> {event.url}
+                    </div>
+                    <div>
+                      <strong>Timestamp:</strong>{" "}
+                      {new Date(event.timestamp).toLocaleString()}
+                    </div>
+                  </li>
+                ))}
             </ul>
           ) : (
-            <p>No tracking data yet for this project.</p>
+            <p>No historical tracking data yet for this project.</p>
           )}
         </CardContent>
       </Card>

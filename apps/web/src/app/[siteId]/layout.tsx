@@ -16,6 +16,8 @@ export default async function SiteSpecificLayout({
   children: React.ReactNode;
   params: { siteId: string };
 }) {
+  const { siteId } = params; // Destructure siteId from params at the very top
+
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user || !session.user.id) {
@@ -32,12 +34,9 @@ export default async function SiteSpecificLayout({
     },
   });
 
-  // If no siteId is in params, or if the siteId from params doesn't belong to the user or doesn't exist,
-  // we might need to redirect. If userSites is empty, redirect to a project creation page.
-  // If userSites is not empty but params.siteId is problematic, redirect to the first available site.
-  const currentSiteExists = userSites.some((site) => site.id === params.siteId);
+  const currentSiteExists = userSites.some((site) => site.id === siteId);
 
-  if (userSites.length === 0 && !params.siteId) {
+  if (userSites.length === 0 && !siteId) {
     // No sites, and no specific site in URL (e.g. /create-project path)
     // This case needs careful handling. If this layout is ONLY for /siteId/* paths, then siteId must exist.
     // If the user has no sites, they might be redirected to a "create first project" page from a higher level route.
@@ -56,7 +55,7 @@ export default async function SiteSpecificLayout({
   // If userSites.length is 0 and they somehow landed on a /[siteId]/... route,
   // they should be redirected. Perhaps to a create project page or a general error.
   // This specific layout assumes a valid siteId (or will redirect to one if possible).
-  if (userSites.length === 0 && params.siteId) {
+  if (userSites.length === 0 && siteId) {
     // This means a URL with a siteId was accessed, but user has NO projects at all.
     // Or the siteId in URL is not theirs (covered by !currentSiteExists if they had other projects).
     // Redirect to a page where they can create a project, or a general dashboard if such a page exists.
@@ -65,7 +64,7 @@ export default async function SiteSpecificLayout({
   }
 
   return (
-    <ProjectProvider sites={userSites} initialSiteIdFromUrl={params.siteId}>
+    <ProjectProvider sites={userSites} initialSiteIdFromUrl={siteId}>
       <SidebarProvider>
         {/* AppSidebar now only needs the user prop */}
         <AppSidebar user={session.user as User} />

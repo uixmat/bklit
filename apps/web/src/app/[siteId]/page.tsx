@@ -96,11 +96,9 @@ export default function ProjectDashboardPage() {
       </div>
 
       {/* 
-        If you still need a way to add projects, consider a dedicated page or modal 
-        accessible from your new project switcher dropdown or a button in the UI.
-        <div className="mt-8">
-          <AddProjectForm /> 
-        </div>
+        The AddProjectForm and its related logic (actions, schemas) are currently unused.
+        If project creation UI is needed, it should be integrated via a dedicated page or modal.
+        For now, this commented out section will be removed.
       */}
     </div>
   );
