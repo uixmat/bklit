@@ -89,7 +89,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
       <CardFooter>
         {product.id ? (
           <Button asChild className="w-full">
-            <Link href={`/checkout?productId=${product.id}`}>
+            <Link href={`/checkout?products=${product.id}`}>
               {product.type === "free" ? "Get Started" : "Upgrade"}
             </Link>
           </Button>

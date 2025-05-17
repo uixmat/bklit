@@ -1,206 +1,250 @@
-import { NextRequest, NextResponse } from "next/server";
-// Using any for Webhook-related imports due to persistent type resolution issues
-// import { Webhook, WebhookHandler } from "@polar-sh/nextjs/webhook";
-// import type {
-//   CheckoutUpdatedEvent,
-//   SubscriptionCreatedEvent,
-//   SubscriptionUpdatedEvent,
-//   OrderCreatedEvent,
-//   OrderUpdatedEvent,
-// } from "@polar-sh/sdk/models/webhooks"; // Adjust import if types are elsewhere
+import { Webhooks } from "@polar-sh/nextjs";
 import { prisma } from "@/lib/db"; // Your Prisma client
 
-// Cast to any to bypass type errors for now
-const Webhook =
-  (global as any).polar?.Webhook ||
-  function () {
-    return { handle: async () => {} };
-  };
-const WebhookHandler =
-  (global as any).polar?.WebhookHandler ||
-  function (handlers: any) {
-    return handlers;
-  };
+// Removed problematic import for webhook types - to be investigated later.
 
-const webhookInstance = Webhook({
-  secret: process.env.POLAR_WEBHOOK_SECRET!,
-});
+export const POST = Webhooks({
+  webhookSecret: process.env.POLAR_WEBHOOK_SECRET!,
 
-const handler = WebhookHandler({
-  async onCheckoutUpdated(event: any) {
-    console.log("Webhook: CheckoutUpdatedEvent received", event.payload);
-    const checkout = event.payload;
+  // Assuming payload is the 'data' part of the event, or the event object itself
+  async onCheckoutUpdated(payload: any) {
+    console.log(
+      "Webhook: CheckoutUpdatedEvent (RAW PAYLOAD) received",
+      payload
+    );
+    // Access actual checkout data via payload.data
+    const checkout = payload.data;
+    if (!checkout) {
+      console.warn("onCheckoutUpdated: payload.data is undefined!");
+      return;
+    }
+
+    if (checkout.status === "succeeded" && checkout.customer_email) {
+      console.log(
+        `Webhook: Checkout succeeded for ${checkout.customer_email}. Subscription ID in this event: ${checkout.subscription_id}. Product ID: ${checkout.productId}`
+      );
+      // If you absolutely need to do something with checkout *before* subscription events,
+      // you could attempt a user lookup by email here, but avoid setting plan/subId
+      // if subscription_id is null, as the subscription.updated event is more reliable.
+      // Example:
+      // const user = await prisma.user.findUnique({ where: { email: checkout.customer_email } });
+      // if (user) { console.log("User found during checkout.updated:", user.id); }
+    }
+  },
+
+  async onSubscriptionCreated(payload: any) {
+    console.log(
+      "Webhook: SubscriptionCreatedEvent (RAW PAYLOAD) received",
+      payload
+    );
+    // Access actual subscription data via payload.data
+    const subscription = payload.data;
+    if (!subscription) {
+      console.warn("onSubscriptionCreated: payload.data is undefined!");
+      return;
+    }
+
     if (
-      checkout.status === "succeeded" &&
-      checkout.customer_email &&
-      checkout.subscription_id
+      subscription && // This check is now on payload.data
+      subscription.id &&
+      subscription.customer?.email &&
+      subscription.status === "active"
     ) {
-      // Checkout succeeded, find user by email and update their plan and Polar subscription ID
+      console.log(
+        "onSubscriptionCreated: Entered main logic block. About to try Prisma operations."
+      );
       try {
         const user = await prisma.user.findUnique({
-          where: { email: checkout.customer_email },
+          where: { email: subscription.customer.email },
         });
-        if (user) {
-          // Determine the plan based on the product ID or some other logic
-          // For simplicity, let's assume any successful subscription checkout maps to "pro"
-          // You'll need to map Polar product IDs to your internal plan names if you have multiple paid plans.
-          // const polarProductId = checkout.line_items?.[0]?.product_id;
-          // const newPlan = getPlanFromPolarProductId(polarProductId); // Implement this logic
 
-          await prisma.user.update({
-            where: { id: user.id },
-            data: {
-              plan: "pro", // Or a dynamically determined plan
-              polarSubscriptionId: checkout.subscription_id,
-            },
-          });
-          console.log(
-            `User ${user.email} plan updated to 'pro' and subscription ID set.`
-          );
-        } else {
-          console.warn(
-            `Webhook: User with email ${checkout.customer_email} not found for successful checkout.`
-          );
-        }
-      } catch (error) {
-        console.error("Webhook: Error processing CheckoutUpdatedEvent:", error);
-        // Optionally, return a 500 to signal an error to Polar for potential retry
-        // throw error;
-      }
-    }
-  },
-  async onSubscriptionCreated(event: any) {
-    console.log("Webhook: SubscriptionCreatedEvent received", event.payload);
-    const subscription = event.payload;
-    // You might want to link the subscription to a user here if not already done by checkout.updated
-    // This often happens if a subscription is created manually or by other means.
-    if (subscription.customer_email && subscription.id) {
-      try {
-        const user = await prisma.user.findUnique({
-          where: { email: subscription.customer_email },
-        });
-        if (user && !user.polarSubscriptionId) {
-          // Only update if not already set by checkout
-          // Determine plan based on subscription.product_id
-          await prisma.user.update({
-            where: { id: user.id },
-            data: {
-              plan: "pro", // Or map from subscription.product_id
-              polarSubscriptionId: subscription.id,
-            },
-          });
-          console.log(
-            `User ${user.email} subscription ID set from SubscriptionCreatedEvent.`
-          );
-        }
-      } catch (error) {
-        console.error(
-          "Webhook: Error processing SubscriptionCreatedEvent:",
-          error
-        );
-      }
-    }
-  },
-  async onSubscriptionUpdated(event: any) {
-    console.log("Webhook: SubscriptionUpdatedEvent received", event.payload);
-    const subscription = event.payload;
-    // Handle subscription changes, e.g., plan changes, cancellations, payment failures.
-    // Update user's plan in your DB based on subscription.status or product_id.
-    if (subscription.id) {
-      try {
-        const user = await prisma.user.findFirst({
-          where: { polarSubscriptionId: subscription.id },
-        });
         if (user) {
-          let newPlan = user.plan;
-          if (subscription.status === "active") {
-            // Potentially update plan if product_id changed
-            // newPlan = getPlanFromPolarProductId(subscription.product_id);
-            newPlan = "pro"; // Simplified
-          } else if (
-            ["canceled", "ended", "past_due", "unpaid"].includes(
-              subscription.status
-            )
+          if (
+            user.plan !== "pro" ||
+            user.polarSubscriptionId !== subscription.id
           ) {
-            newPlan = "free"; // Downgrade on cancellation or payment failure
-          }
-
-          if (newPlan !== user.plan) {
             await prisma.user.update({
               where: { id: user.id },
-              data: { plan: newPlan },
+              data: {
+                plan: "pro",
+                polarSubscriptionId: subscription.id,
+              },
             });
             console.log(
-              `User ${user.email} plan updated to '${newPlan}' due to subscription update.`
+              `User ${user.email} DB updated from onSubscriptionCreated: plan='pro', polarSubscriptionId='${subscription.id}'.`
+            );
+          } else {
+            console.log(
+              `User ${user.email} already up-to-date during onSubscriptionCreated.`
             );
           }
         } else {
           console.warn(
-            `Webhook: User with Polar subscription ID ${subscription.id} not found.`
+            `Webhook (onSubscriptionCreated): User with email ${subscription.customer.email} (from subscription ${subscription.id}) not found.`
           );
         }
       } catch (error) {
         console.error(
-          "Webhook: Error processing SubscriptionUpdatedEvent:",
-          error
+          "Webhook: Error in onSubscriptionCreated:",
+          error,
+          subscription
         );
       }
     }
   },
-  async onOrderCreated(event: any) {
-    console.log("Webhook: OrderCreatedEvent received", event.payload);
-    // Handle one-time purchase orders if you have them
-  },
-  async onOrderUpdated(event: any) {
-    console.log("Webhook: OrderUpdatedEvent received", event.payload);
-    const order = event.payload;
+
+  async onSubscriptionUpdated(payload: any) {
+    console.log(
+      "Webhook: SubscriptionUpdatedEvent (RAW PAYLOAD) received",
+      payload
+    );
+    // Access actual subscription data via payload.data
+    const subscription = payload.data;
+    if (!subscription) {
+      console.warn("onSubscriptionUpdated: payload.data is undefined!");
+      return;
+    }
+
+    // Debugging the guard clause (now on subscription which is payload.data)
+    const subExists = !!subscription;
+    const subIdExists = !!(subscription && subscription.id);
+    const customerExists = !!(subscription && subscription.customer);
+    const customerEmailExists = !!(
+      subscription &&
+      subscription.customer &&
+      subscription.customer.email
+    );
+
+    console.log("onSubscriptionUpdated - Guard Debug (on payload.data):", {
+      subExists,
+      subIdExists,
+      customerExists,
+      customerEmailExists,
+      rawCustomerObject: subscription
+        ? subscription.customer
+        : "subscription is null",
+      rawCustomerEmail:
+        subscription && subscription.customer
+          ? subscription.customer.email
+          : "customer or subscription is null",
+    });
+
     if (
-      order.status === "succeeded" &&
-      order.customer_email /* && one_time_product_logic */
+      !subscription || // This check is now on payload.data
+      !subscription.id ||
+      !subscription.customer ||
+      !subscription.customer.email
     ) {
-      // Logic for one-time purchases, e.g., granting access to a digital product
-      // This might not involve changing a 'plan' but could update other user attributes.
+      console.warn(
+        "Webhook: SubscriptionUpdated event missing critical data (id, customer, or customer.email) - POST-DEBUGGING",
+        subscription
+      );
+      return;
     }
-  },
-  // You can add handlers for other events as needed:
-  // onDisputeCreated, onDisputeUpdated, etc.
-});
+    console.log(
+      "onSubscriptionUpdated: Guard clause passed. Proceeding to try block."
+    );
 
-export async function POST(req: NextRequest) {
-  try {
-    const payload = await req.text(); // Read raw body
-    const sig = req.headers.get("polar-signature") as string; // Get signature header
+    try {
+      let user = await prisma.user.findFirst({
+        where: { polarSubscriptionId: subscription.id },
+      });
 
-    if (!sig) {
-      console.warn("Webhook: Missing polar-signature header");
-      return NextResponse.json({ error: "Missing signature" }, { status: 400 });
-    }
-    if (!process.env.POLAR_WEBHOOK_SECRET) {
-      console.error("Webhook: POLAR_WEBHOOK_SECRET is not set.");
-      return NextResponse.json(
-        { error: "Webhook secret not configured." },
-        { status: 500 }
+      if (!user) {
+        console.log(
+          `Webhook (onSubscriptionUpdated): User not found by polarSubscriptionId ${subscription.id}, trying email ${subscription.customer.email}`
+        );
+        user = await prisma.user.findUnique({
+          where: { email: subscription.customer.email },
+        });
+      }
+
+      if (user) {
+        let newPlan = user.plan;
+        let newPolarSubscriptionId = user.polarSubscriptionId;
+
+        if (subscription.status === "active") {
+          newPlan = "pro";
+          newPolarSubscriptionId = subscription.id;
+          console.log(
+            `Webhook: Subscription ${subscription.id} is active for user ${user.email}. Setting plan to pro.`
+          );
+        } else if (
+          ["canceled", "ended", "past_due", "unpaid"].includes(
+            subscription.status
+          )
+        ) {
+          newPlan = "free";
+          // newPolarSubscriptionId = null; // Decide if you want to clear this or keep for history
+          console.log(
+            `Webhook: Subscription ${subscription.id} is ${subscription.status} for user ${user.email}. Setting plan to free.`
+          );
+        }
+
+        if (
+          newPlan !== user.plan ||
+          newPolarSubscriptionId !== user.polarSubscriptionId
+        ) {
+          await prisma.user.update({
+            where: { id: user.id },
+            data: {
+              plan: newPlan,
+              polarSubscriptionId: newPolarSubscriptionId,
+            },
+          });
+          console.log(
+            `User ${
+              user.email
+            } DB updated from onSubscriptionUpdated: plan='${newPlan}', polarSubscriptionId='${
+              newPolarSubscriptionId || "cleared"
+            }'.`
+          );
+        } else {
+          console.log(
+            `User ${user.email} plan and subscriptionId already up-to-date (onSubscriptionUpdated).`
+          );
+        }
+      } else {
+        console.warn(
+          `Webhook (onSubscriptionUpdated): User with email ${subscription.customer.email} (from subscription ${subscription.id}) not found.`
+        );
+      }
+    } catch (error) {
+      console.error(
+        "Webhook: Error in onSubscriptionUpdated:",
+        error,
+        subscription
       );
     }
+  },
 
-    // Verify and handle the webhook
-    // The `webhook.handle` method will call the appropriate `onEventType` function from `handler`
-    await webhookInstance.handle(
-      { body: payload, headers: { "polar-signature": sig } },
-      handler
-    );
+  async onOrderCreated(payload: any) {
+    console.log("Webhook: OrderCreatedEvent (RAW PAYLOAD) received", payload);
+    const order = payload.data; // Access actual order data via payload.data
+    if (!order) {
+      console.warn("onOrderCreated: payload.data is undefined!");
+      return;
+    }
+    // Handle one-time purchase orders if you have them
+  },
 
-    return NextResponse.json({ received: true }, { status: 200 });
-  } catch (err: any) {
-    // Type Webhook.SignatureVerificationError might need to be imported if specific handling is needed
-    // if (err instanceof Webhook.SignatureVerificationError) {
-    //   console.warn('Webhook: Signature verification failed:', err.message);
-    //   return NextResponse.json({ error: 'Signature verification failed' }, { status: 400 });
-    // }
-    console.error("Webhook: Error handling webhook:", err);
-    return NextResponse.json(
-      { error: `Webhook Error: ${err.message || "Unknown error"}` },
-      { status: err.statusCode || 500 }
-    );
-  }
-}
+  async onOrderUpdated(payload: any) {
+    console.log("Webhook: OrderUpdatedEvent (RAW PAYLOAD) received", payload);
+    const order = payload.data; // Access actual order data via payload.data
+    if (!order) {
+      console.warn("onOrderUpdated: payload.data is undefined!");
+      return;
+    }
+
+    if (order.status === "succeeded" && order.customer_email) {
+      // Logic for one-time purchases
+    }
+  },
+
+  // Fallback for any other event types not explicitly handled above
+  async onPayload(payload: any) {
+    console.log("Webhook: Generic onPayload received (via SDK util):", payload);
+    // You could add a switch(payload.type) here if you want to handle
+    // other specific events without dedicated handlers.
+  },
+});

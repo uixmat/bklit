@@ -1,24 +1,57 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+"use client"; // Make it a client component
+
+// import Link from "next/link"; // No longer used
+// import { Button } from "@/components/ui/button"; // No longer used
 import { CheckCircleIcon } from "lucide-react";
-import type { Metadata } from "next";
+import { useEffect } from "react";
+import { useSession, signOut } from "next-auth/react";
+// import { useRouter } from "next/navigation"; // No longer using useRouter for this redirect
 
-export const metadata: Metadata = {
-  title: "Order Confirmation - Thank You!",
-  description: "Your checkout is being processed.",
-};
+// export const metadata: Metadata = { // Metadata must be exported from Server Components
+//   title: "Order Confirmation - Thank You!",
+//   description: "Your checkout is being processed.",
+// };
 
-export default function ConfirmationPage({
-  searchParams,
-}: {
-  searchParams: {
-    checkoutId?: string;
-    // Polar might also return subscriptionId or orderId, depending on the product type
-    subscription_id?: string;
-    order_id?: string;
-  };
-}) {
-  const { checkoutId, subscription_id, order_id } = searchParams;
+export default function ConfirmationPage() {
+// No props needed now as searchParams are not used
+// {
+//   searchParams,
+// }: {
+//   searchParams: {
+//     checkoutId?: string;
+//     subscription_id?: string;
+//     order_id?: string;
+//   };
+// }
+  // const { checkoutId, subscription_id, order_id } = searchParams; // No longer used
+  const { update: updateSession } = useSession();
+  // const router = useRouter(); // No longer using useRouter
+
+  useEffect(() => {
+    const refreshSessionAndRedirect = async () => {
+      console.log(
+        "ConfirmationPage: Attempting to update session (best effort)..."
+      );
+      await updateSession();
+
+      console.log(
+        "ConfirmationPage: Initiating sign-out and sign-in to refresh session fully..."
+      );
+
+      const finalRedirectUrl = "/billing";
+
+      signOut({
+        redirect: true,
+        callbackUrl: `/api/auth/signin?callbackUrl=${encodeURIComponent(
+          finalRedirectUrl
+        )}`,
+      });
+    };
+
+    const timer = setTimeout(refreshSessionAndRedirect, 2500);
+
+    return () => clearTimeout(timer);
+  }, [updateSession]);
 
   // Note: The Polar documentation states:
   // "The checkout is not considered "successful" yet however.
@@ -32,35 +65,24 @@ export default function ConfirmationPage({
       <div className="mx-auto flex w-full max-w-md flex-col items-center gap-6 text-center">
         <CheckCircleIcon className="h-16 w-16 text-green-500" />
         <h1 className="text-3xl font-bold leading-[1.1] tracking-tighter sm:text-4xl">
-          Thank You!
+          Thank You! Finalizing Your Account...
         </h1>
         <p className="text-lg text-muted-foreground">
-          Your checkout has been initiated and is now being processed. You will
-          receive an email confirmation shortly.
+          Your purchase is confirmed. We are refreshing your session to update
+          your plan. You will be redirected momentarily.
         </p>
-        {checkoutId && (
-          <p className="text-sm text-muted-foreground">
-            Checkout ID: {checkoutId}
-          </p>
-        )}
-        {(subscription_id || order_id) && (
-          <p className="text-sm text-muted-foreground">
-            {subscription_id ? `Subscription ID: ${subscription_id}` : ""}
-            {order_id ? `Order ID: ${order_id}` : ""}
-          </p>
-        )}
-        <p className="text-sm text-muted-foreground">
-          Your plan will be updated once the payment is successfully confirmed.
-          This might take a few moments.
+        {/* Omit ID display for this version as user will be redirected quickly */}
+        {/* {checkoutId && (...)} */}
+        {/* {(subscription_id || order_id) && (...)} */}
+        <p className="text-sm text-muted-foreground mt-4">
+          Please wait while we update your session...
         </p>
-        <div className="mt-6 flex flex-col sm:flex-row gap-4 w-full">
+        {/* Optional: Link to dashboard if something goes wrong, though auto-redirect should handle it */}
+        {/* <div className="mt-6">
           <Button asChild className="w-full">
-            <Link href="/">Go to Dashboard</Link>
+            <Link href="/">Go to Dashboard if not redirected</Link>
           </Button>
-          <Button variant="outline" asChild className="w-full">
-            <Link href="/billing">View Billing</Link>
-          </Button>
-        </div>
+        </div> */}
       </div>
     </section>
   );
