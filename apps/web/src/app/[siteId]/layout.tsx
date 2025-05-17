@@ -1,5 +1,6 @@
 import { AppSidebar } from "@/components/app-sidebar";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SiteHeader } from "@/components/site-header";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
@@ -68,13 +69,16 @@ export default async function SiteSpecificLayout({
       <SidebarProvider>
         {/* AppSidebar now only needs the user prop */}
         <AppSidebar user={session.user as User} />
-        <div className="lg:pl-72">
-          {/* This div is a common pattern for main content when using a fixed sidebar */}
-          {/* You might need to adjust based on your exact sidebar width and styling (e.g. from shadcn sidebar-08) */}
-          <main className="py-10">
-            <div className="px-4 sm:px-6 lg:px-8">{children}</div>
-          </main>
-        </div>
+        <SidebarInset>
+          <SiteHeader />
+          <div className="flex flex-1 flex-col px-4">
+            <div className="@container/main flex flex-1 flex-col gap-2">
+              <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+                {children}
+              </div>
+            </div>
+          </div>
+        </SidebarInset>
       </SidebarProvider>
     </ProjectProvider>
   );

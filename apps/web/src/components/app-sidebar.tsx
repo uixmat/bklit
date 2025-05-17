@@ -29,7 +29,7 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 }
 
 export function AppSidebar({ user, ...props }: AppSidebarProps) {
-  const { currentSiteId, isLoadingSites } = useProject();
+  const { currentSiteId, isLoadingSites, activeProject } = useProject();
   const pathname = usePathname();
 
   const mainNavItems = React.useMemo(() => {
@@ -65,19 +65,25 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
     ];
   }, [currentSiteId, isLoadingSites, pathname]);
 
+  const headerProjectName =
+    isLoadingSites || !activeProject ? "Loading..." : activeProject.name;
+  const headerLink = currentSiteId ? `/${currentSiteId}` : "/";
+
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href={currentSiteId ? `/${currentSiteId}` : "/"}>
+              <a href={headerLink}>
                 <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                   <Command className="size-4" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="font-medium truncate">Acme Inc</span>
-                  <span className="text-xs truncate">Enterprise</span>
+                  <span className="font-medium truncate">
+                    {headerProjectName}
+                  </span>
+                  <span className="text-xs truncate">Free</span>
                 </div>
               </a>
             </SidebarMenuButton>

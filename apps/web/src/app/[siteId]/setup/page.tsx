@@ -8,11 +8,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 
 export default function ProjectSetupPage() {
-  const { activeProject, isLoadingSites, currentSiteId } = useProject();
+  const { activeProject, isLoadingSites } = useProject();
 
   if (isLoadingSites) {
     return <div>Loading project details...</div>;
@@ -48,9 +46,6 @@ initBklit({
             Integrate Bklit into your website.
           </p>
         </div>
-        <Link href={`/${currentSiteId}`}>
-          <Button variant="outline">← Back to Project Dashboard</Button>
-        </Link>
       </div>
 
       <Card>

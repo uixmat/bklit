@@ -10,8 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 
 interface PageView {
   url: string;
@@ -88,11 +86,6 @@ export default async function SiteAnalyticsPage({
             Review captured page views for your project.
           </p>
         </div>
-        <Link href={`/${site.id}`}>
-          {" "}
-          {/* Updated back link */}
-          <Button variant="outline">← Back to Project Dashboard</Button>
-        </Link>
       </div>
 
       <Card>
