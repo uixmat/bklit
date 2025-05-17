@@ -1,7 +1,7 @@
 import NextAuth, { AuthOptions } from "next-auth";
 import GitHubProvider from "next-auth/providers/github";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import { db } from "@/lib/db"; // Assuming your Prisma client is exported as db from @/lib/db.ts
+import { prisma } from "@/lib/db"; // Assuming your Prisma client is exported as prisma from @/lib/db.ts
 
 if (!process.env.GITHUB_ID) {
   throw new Error("Missing GITHUB_ID in .env");
@@ -14,7 +14,7 @@ if (!process.env.NEXTAUTH_SECRET) {
 }
 
 export const authOptions: AuthOptions = {
-  adapter: PrismaAdapter(db as any), // Cast to any due to potential minor type mismatches with specific Prisma versions
+  adapter: PrismaAdapter(prisma as any), // Cast to any due to potential minor type mismatches with specific Prisma versions
   providers: [
     GitHubProvider({
       clientId: process.env.GITHUB_ID,
