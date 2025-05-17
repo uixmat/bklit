@@ -81,38 +81,23 @@ export default async function SiteAnalyticsPage({
 
   const trackingData = await getSiteTrackingData(siteId);
 
-  const trackerScript = `
-<script async defer>
-(function () {
-  async function trackPageView() {
-    try {
-      const data = {
-        url: window.location.href,
-        timestamp: new Date().toISOString(),
-        siteId: "${site.id}", // Your specific Site ID
-      };
-      // IMPORTANT: Replace with your deployed app's URL in production
-      const response = await fetch("http://localhost:3000/api/track", { 
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) console.error("Failed to track page view:", response.statusText);
-    } catch (error) { console.error("Error tracking page view:", error); }
-  }
-  trackPageView();
-  // Consider adding SPA navigation tracking if needed for single-page applications.
-  // Example for history changes (may need adjustment based on router):
-  // window.addEventListener('popstate', trackPageView);
-  // const originalPushState = history.pushState;
-  // history.pushState = function() {
-  //   originalPushState.apply(this, arguments);
-  //   window.dispatchEvent(new CustomEvent('locationchange', { detail: { type: 'pushState' } }));
-  // };
-  // window.addEventListener('locationchange', trackPageView);
-})();
-</script>
-`;
+  // --- New/Updated Tracking Setup Information ---
+  const siteIdForDisplay = site.id;
+  const defaultApiHost = "http://localhost:3000/api/track"; // Used for placeholders
+
+  const npmInstallCommand = "pnpm add bklit"; // or: npm install bklit / yarn add bklit
+  const npmUsageExample = `\
+import { initBklit } from 'bklit';
+
+// In your application client-side code (e.g., main component or layout effects):
+initBklit({
+  siteId: "${siteIdForDisplay}",
+  // By default, the SDK will try to send data to '${defaultApiHost}'.
+  // If your Bklit instance gets deployed elsewhere, provide the correct apiHost:
+  // apiHost: "https://your-bklit-instance.com/api/track"
+});`;
+
+  // --- End New/Updated Tracking Setup Information ---
 
   return (
     <div className="container mx-auto py-10">
@@ -176,28 +161,46 @@ export default async function SiteAnalyticsPage({
         <CardHeader>
           <CardTitle>Tracking Setup</CardTitle>
           <CardDescription>
-            Copy and paste this snippet into the {"<head>"} or {"<body>"} of
-            your website.
+            Integrate Bklit into your website using the recommended NPM package
+            method.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="mb-4">
-            <p className="text-sm font-medium">Your Project ID (Site ID):</p>
-            <p className="text-lg font-mono p-2 bg-muted rounded-md inline-block">
-              {site.id}
+        <CardContent className="space-y-6">
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Setup Instructions</h3>
+            <p className="text-sm text-muted-foreground mb-2">
+              Install the Bklit SDK into your project:
+            </p>
+            <pre className="p-3 bg-muted rounded-md text-sm overflow-x-auto">
+              <code>{npmInstallCommand}</code>
+            </pre>
+            <p className="text-sm text-muted-foreground mt-3 mb-2">
+              Then, initialize it in your application&apos;s client-side
+              JavaScript:
+            </p>
+            <pre className="p-3 bg-muted rounded-md text-sm overflow-x-auto">
+              <code>{npmUsageExample}</code>
+            </pre>
+          </div>
+
+          <div className="pt-4 border-t">
+            <h4 className="text-md font-semibold mb-1">
+              Important: API Endpoint Configuration
+            </h4>
+            <p className="text-sm text-muted-foreground">
+              The Bklit SDK defaults to sending data to{" "}
+              <code>{defaultApiHost}</code>. If your Bklit analytics server
+              (this application) is deployed to a different URL, ensure you
+              configure the <code>apiHost</code> in the SDK when initializing it
+              to point to your production Bklit instance (e.g.,{" "}
+              <code>https://your-bklit-app.com/api/track</code>).
             </p>
           </div>
-          <div>
-            <p className="text-sm font-medium mb-1">
-              Embeddable Tracker Script:
-            </p>
-            <pre className="p-4 bg-muted rounded-md text-sm overflow-x-auto">
-              <code>{trackerScript}</code>
-            </pre>
-            <p className="text-xs text-muted-foreground mt-2">
-              Ensure the <code>fetch</code> URL in the script (currently{" "}
-              <code>http://localhost:3000/api/track</code>) is updated to your
-              application&apos;s production URL when you deploy.
+
+          <div className="pt-4">
+            <p className="text-sm font-medium">Your Project ID (Site ID):</p>
+            <p className="text-lg font-mono p-2 bg-muted rounded-md inline-block">
+              {siteIdForDisplay}
             </p>
           </div>
         </CardContent>
