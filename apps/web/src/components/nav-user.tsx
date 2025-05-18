@@ -36,10 +36,13 @@ export function NavUser({
     name: string;
     email: string;
     avatar: string;
+    plan?: string;
   };
 }) {
   const { isMobile } = useSidebar();
   const { currentSiteId } = useProject();
+
+  const userPlan = user.plan || "free";
 
   const upgradeHref = currentSiteId ? `/${currentSiteId}/billing` : "/pricing";
   const billingHref = currentSiteId ? `/${currentSiteId}/billing` : "/billing";
@@ -83,15 +86,19 @@ export function NavUser({
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem asChild>
-                <Link href={upgradeHref}>
-                  <Sparkles className="mr-2 h-4 w-4" />
-                  Upgrade to Pro
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
+            {userPlan !== "pro" && (
+              <>
+                <DropdownMenuGroup>
+                  <DropdownMenuItem asChild>
+                    <Link href={upgradeHref}>
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      Upgrade to Pro
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+              </>
+            )}
             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <BadgeCheck className="mr-2 h-4 w-4" />

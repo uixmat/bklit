@@ -102,6 +102,7 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
             name: user.name ?? "User",
             email: user.email ?? "",
             avatar: user.image ?? "",
+            plan: userPlan,
           }}
         />
       </SidebarFooter>
