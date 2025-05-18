@@ -19,6 +19,8 @@ import { useProject } from "@/contexts/project-context";
 import { useUserPlanStatus } from "@/hooks/use-user-plan-status";
 import { PlanType } from "@/lib/plans";
 import type { Site } from "@prisma/client";
+import { useSession } from "next-auth/react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import {
   DropdownMenu,
@@ -66,6 +68,8 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
   const { planId, planDetails, isLoadingPlanDetails } = useUserPlanStatus();
   const pathname = usePathname();
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const { data: clientSession } = useSession();
   const { theme, resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
   const { isMobile } = useSidebar();
@@ -187,11 +191,10 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
                 align="start"
                 sideOffset={4}
               >
-                <DropdownMenuLabel className="text-xs text-muted-foreground">
-                  Projects
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
                 <DropdownMenuGroup>
+                  <DropdownMenuLabel className="text-xs text-muted-foreground">
+                    Projects
+                  </DropdownMenuLabel>
                   {projects.map((project: Site) => (
                     <DropdownMenuItem
                       key={project.id}
@@ -256,11 +259,19 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
           </DialogHeader>
           <div className="py-4">
             <AddProjectForm
-              onSuccess={(newSiteId) => {
+              onSuccess={async (_newSiteId) => {
                 setIsAddProjectDialogOpen(false);
                 router.refresh();
-                if (newSiteId) {
-                  router.push(`/${newSiteId}`);
+
+                const userIdToInvalidate = clientSession?.user?.id || user.id;
+                if (userIdToInvalidate) {
+                  await queryClient.invalidateQueries({
+                    queryKey: ["userProjectCount", userIdToInvalidate],
+                  });
+                }
+
+                if (_newSiteId) {
+                  router.push(`/${_newSiteId}`);
                 }
               }}
             />
