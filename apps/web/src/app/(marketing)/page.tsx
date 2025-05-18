@@ -22,7 +22,7 @@ export default async function MarketingHomePage() {
     if (userSites.length > 0) {
       redirect(`/${userSites[0].id}`);
     } else {
-      redirect("/dashboard");
+      redirect("/");
     }
   }
 

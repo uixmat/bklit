@@ -63,6 +63,36 @@ export const authOptions: AuthOptions = {
   pages: {
     signIn: "/signin", // Using the new signin page
   },
+  events: {
+    async createUser(message) {
+      // When a new user is created, automatically create their first project.
+      // The PrismaAdapter has already created the user record in the DB.
+      // message.user contains the user object (id, email, name, etc.)
+      if (message.user.id) {
+        try {
+          await prisma.site.create({
+            data: {
+              name: "Your first project", // Default project name
+              userId: message.user.id,
+              // domain can be null/optional by default
+            },
+          });
+          console.log(
+            `Created default project for new user: ${message.user.id}`
+          );
+        } catch (error) {
+          console.error(
+            `Failed to create default project for user ${message.user.id}:`,
+            error
+          );
+          // Decide on error handling:
+          // - Log and continue (user will have no project initially, marketing page logic will apply)
+          // - Throw error (might impact user creation flow, depending on NextAuth handling)
+          // For now, logging and continuing.
+        }
+      }
+    },
+  },
 };
 
 const handler = NextAuth(authOptions);
