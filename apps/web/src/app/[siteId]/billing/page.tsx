@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getPublishedPolarProducts } from "@/lib/polar";
+import { PageHeader } from "@/components/page-header";
 import { ProductCard } from "@/components/polar/product-card";
 import { BillingSuccessDialog } from "@/components/billing-success-dialog";
 
@@ -35,19 +36,14 @@ export default async function BillingPage({
   const showSuccessMessage = searchParams?.purchase === "success";
 
   return (
-    <div className="container mx-auto max-w-4xl py-12 px-4 sm:px-6 lg:px-8">
+    <div className="space-y-6 prose dark:prose-invert max-w-none">
+      <PageHeader
+        title="Billing"
+        description="Manage your subscription and billing information."
+      />
       <BillingSuccessDialog isOpenInitially={showSuccessMessage} />
 
-      <div className="text-center mb-10">
-        <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">
-          Billing & Subscription
-        </h1>
-        <p className="mt-3 text-xl text-muted-foreground">
-          Manage your subscription and billing details.
-        </p>
-      </div>
-
-      <Card>
+      <Card className="card">
         <CardHeader>
           <CardTitle>Current Plan</CardTitle>
         </CardHeader>

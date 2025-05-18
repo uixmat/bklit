@@ -5,6 +5,10 @@ import "./globals.css";
 import AuthProvider from "@/components/providers/session-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
+import { QueryClientProvider } from "@/components/providers/query-provider";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+
 const geistSans = geistSansFont;
 const geistMono = geistMonoFont;
 
@@ -13,11 +17,13 @@ export const metadata: Metadata = {
   description: "Track your website analytics",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getServerSession(authOptions);
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -29,10 +35,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AuthProvider>
-            {children}
-            <Toaster />
-          </AuthProvider>
+          <QueryClientProvider>
+            <AuthProvider session={session}>
+              {children}
+              <Toaster />
+            </AuthProvider>
+          </QueryClientProvider>
         </ThemeProvider>
       </body>
     </html>

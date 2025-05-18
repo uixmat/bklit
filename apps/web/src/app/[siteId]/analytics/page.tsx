@@ -10,9 +10,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { LiveAnalyticsDisplay } from "@/components/live-analytics-display";
+import { PageHeader } from "@/components/page-header";
 
 interface PageView {
   url: string;
@@ -82,22 +81,15 @@ export default async function SiteAnalyticsPage({
   const totalHistoricalViews = trackingData.length;
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">{site.name} - Analytics</h1>
-          <p className="text-muted-foreground">
-            Review captured page views and live data for your project.
-          </p>
-        </div>
-        <Link href={`/${site.id}`}>
-          <Button variant="outline">← Back to Project Dashboard</Button>
-        </Link>
-      </div>
+    <div className="space-y-6 prose dark:prose-invert max-w-none">
+      <PageHeader
+        title={`${site.name} - Analytics`}
+        description="Review captured page views and live data for your project."
+      />
 
       <LiveAnalyticsDisplay totalHistoricalViews={totalHistoricalViews} />
 
-      <Card>
+      <Card className="card">
         <CardHeader>
           <CardTitle>Historical Page Views ({totalHistoricalViews})</CardTitle>
           <CardDescription>
