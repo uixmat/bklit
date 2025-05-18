@@ -1,6 +1,7 @@
 "use client";
 
 import { useProject } from "@/contexts/project-context";
+import { useEffect, useState, type JSX } from "react";
 import {
   Card,
   CardContent,
@@ -8,9 +9,41 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { NPM_INSTALL_COMMAND } from "@/lib/setup-snippets/npm-install";
+import { getSdkUsageSnippet } from "@/lib/setup-snippets/sdk-usage";
+import { highlightCode } from "@/lib/shiki-highlighter";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ProjectSetupPage() {
   const { activeProject, isLoadingSites } = useProject();
+  const [highlightedInstallCmd, setHighlightedInstallCmd] =
+    useState<JSX.Element | null>(null);
+  const [highlightedUsageSnippet, setHighlightedUsageSnippet] =
+    useState<JSX.Element | null>(null);
+  const [isLoadingSnippets, setIsLoadingSnippets] = useState(true);
+
+  const siteIdForDisplay = activeProject?.id;
+  const defaultApiHost =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/api/track`
+      : "/api/track";
+
+  useEffect(() => {
+    if (siteIdForDisplay) {
+      setIsLoadingSnippets(true);
+      const usageSnippet = getSdkUsageSnippet(siteIdForDisplay, defaultApiHost);
+      Promise.all([
+        highlightCode(NPM_INSTALL_COMMAND, "bash"),
+        highlightCode(usageSnippet, "javascript"),
+      ])
+        .then(([installCmdHtml, usageSnippetHtml]) => {
+          setHighlightedInstallCmd(installCmdHtml);
+          setHighlightedUsageSnippet(usageSnippetHtml);
+        })
+        .catch(console.error)
+        .finally(() => setIsLoadingSnippets(false));
+    }
+  }, [siteIdForDisplay, defaultApiHost]);
 
   if (isLoadingSites) {
     return <div>Loading project details...</div>;
@@ -20,23 +53,8 @@ export default function ProjectSetupPage() {
     return <div>Project not found or you do not have access.</div>;
   }
 
-  const siteIdForDisplay = activeProject.id;
-  const defaultApiHost = "http://localhost:3000/api/track"; // Adjust if your API route changes
-  const npmInstallCommand = "pnpm add bklit"; // or: npm install bklit / yarn add bklit
-
-  const npmUsageExample = `\
-import { initBklit } from 'bklit';
-
-// In your application client-side code (e.g., main component or layout effects):
-initBklit({
-  siteId: "${siteIdForDisplay}",
-  // By default, the SDK will try to send data to '${defaultApiHost}'.
-  // If your Bklit instance gets deployed elsewhere, provide the correct apiHost:
-  // apiHost: "https://your-bklit-instance.com/api/track"
-});`;
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 prose dark:prose-invert max-w-none">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">
@@ -60,16 +78,20 @@ initBklit({
             <p className="text-sm text-muted-foreground mb-2">
               1. Install the Bklit SDK into your project:
             </p>
-            <pre className="p-3 bg-muted rounded-md text-sm overflow-x-auto">
-              <code>{npmInstallCommand}</code>
-            </pre>
+            {isLoadingSnippets || !highlightedInstallCmd ? (
+              <Skeleton className="h-20 w-full rounded-md bg-muted" />
+            ) : (
+              highlightedInstallCmd
+            )}
             <p className="text-sm text-muted-foreground mt-3 mb-2">
               2. Then, initialize it in your application&apos;s client-side
               JavaScript:
             </p>
-            <pre className="p-3 bg-muted rounded-md text-sm overflow-x-auto">
-              <code>{npmUsageExample}</code>
-            </pre>
+            {isLoadingSnippets || !highlightedUsageSnippet ? (
+              <Skeleton className="h-40 w-full rounded-md bg-muted" />
+            ) : (
+              highlightedUsageSnippet
+            )}
           </div>
 
           <div className="pt-4 border-t">
