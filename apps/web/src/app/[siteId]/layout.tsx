@@ -21,7 +21,7 @@ export default async function SiteSpecificLayout({
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user || !session.user.id) {
-    redirect("/"); // Or your login page
+    redirect("/login"); // Changed to redirect to /login
   }
 
   // Fetch all sites for the user to populate the project switcher and context

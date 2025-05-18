@@ -2,6 +2,7 @@ import NextAuth, { AuthOptions } from "next-auth";
 import GitHubProvider from "next-auth/providers/github";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/db"; // Assuming your Prisma client is exported as prisma from @/lib/db.ts
+import { PrismaClient } from "@prisma/client";
 
 if (!process.env.GITHUB_ID) {
   throw new Error("Missing GITHUB_ID in .env");
@@ -14,7 +15,7 @@ if (!process.env.NEXTAUTH_SECRET) {
 }
 
 export const authOptions: AuthOptions = {
-  adapter: PrismaAdapter(prisma as any), // Cast to any due to potential minor type mismatches with specific Prisma versions
+  adapter: PrismaAdapter(prisma as PrismaClient), // Cast to PrismaClient
   providers: [
     GitHubProvider({
       clientId: process.env.GITHUB_ID,
@@ -34,6 +35,7 @@ export const authOptions: AuthOptions = {
       }
       return session;
     },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async jwt({ token, user, account, profile, isNewUser }) {
       if (user) {
         // user object is available on sign-in or when JWT is first created
@@ -58,9 +60,9 @@ export const authOptions: AuthOptions = {
     },
   },
   // Optional: Add custom pages for sign-in, sign-out, error, etc.
-  // pages: {
-  //   signIn: '/auth/signin',
-  // },
+  pages: {
+    signIn: "/signin", // Using the new signin page
+  },
 };
 
 const handler = NextAuth(authOptions);

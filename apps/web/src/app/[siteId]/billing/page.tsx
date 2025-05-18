@@ -25,7 +25,9 @@ export default async function BillingPage({
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user?.id) {
-    redirect(`/api/auth/signin?callbackUrl=/${params.siteId}/billing`);
+    redirect(
+      `/login?callbackUrl=${encodeURIComponent(`/${params.siteId}/billing`)}`
+    );
   }
 
   const userPlan = await getUserPlan(session.user.id);
