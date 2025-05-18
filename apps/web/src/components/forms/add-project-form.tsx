@@ -7,7 +7,7 @@ import {
   AddProjectFormValues,
 } from "@/lib/schemas/project-schema";
 import { createProjectAction, FormState } from "@/actions/project-actions";
-import { useActionState } from "react"; // Correct for useActionState
+import { useActionState, useTransition, useEffect } from "react"; // Added useTransition
 import { useFormStatus } from "react-dom"; // Correct for useFormStatus
 
 import {
@@ -21,16 +21,22 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useEffect } from "react"; // Removed useRef as it might not be needed with handleSubmit
 import { toast } from "sonner"; // Assuming you'll add sonner for toasts
+
+interface AddProjectFormProps {
+  onSuccess?: (newSiteId?: string) => void; // Added onSuccess prop
+}
 
 const initialState: FormState = {
   success: false,
   message: "",
+  newSiteId: undefined, // Ensure newSiteId is part of initial state if used in FormState
 };
 
 function SubmitButton() {
   const { pending } = useFormStatus();
+  // const [isPendingTransition, startTransition] = useTransition(); // Local transition pending state
+  // We rely on useFormStatus which should work once action is in a transition
   return (
     <Button type="submit" disabled={pending} className="w-full sm:w-auto">
       {pending ? "Creating Project..." : "Create Project"}
@@ -38,9 +44,10 @@ function SubmitButton() {
   );
 }
 
-export default function AddProjectForm() {
+export default function AddProjectForm({ onSuccess }: AddProjectFormProps) {
+  // Added onSuccess to props
   const [state, formAction] = useActionState(createProjectAction, initialState);
-  // const formRef = useRef<HTMLFormElement>(null); // Potentially remove if form.handleSubmit is used
+  const [isPending, startTransition] = useTransition(); // Add useTransition here
 
   const form = useForm<AddProjectFormValues>({
     resolver: zodResolver(addProjectSchema),
@@ -54,6 +61,9 @@ export default function AddProjectForm() {
     if (state.success) {
       toast.success(state.message);
       form.reset(); // Reset form fields on successful submission
+      if (onSuccess) {
+        onSuccess(state.newSiteId); // Call onSuccess callback with newSiteId
+      }
       // Optionally, you could redirect or close a modal here
     } else if (state.message && !state.success && state.errors) {
       // Display field-specific errors if available
@@ -68,7 +78,7 @@ export default function AddProjectForm() {
     } else if (state.message && !state.success) {
       toast.error(state.message);
     }
-  }, [state, form]);
+  }, [state, form, onSuccess]); // Added onSuccess to dependency array
 
   // This is the actual function that will be called on submit by react-hook-form
   const onSubmit = (data: AddProjectFormValues) => {
@@ -79,17 +89,17 @@ export default function AddProjectForm() {
         formData.append(key, String(value));
       }
     });
-    formAction(formData); // Call the server action with FormData
+    startTransition(() => {
+      // Wrap formAction call in startTransition
+      formAction(formData);
+    });
   };
 
   return (
     <Form {...form}>
       {/* Pass react-hook-form's handleSubmit to the form's onSubmit event */}
       {/* The server action (formAction) is now called within onSubmit */}
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-6 max-w-lg mx-auto p-4 sm:p-6 border rounded-lg shadow-sm"
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
           name="name"
