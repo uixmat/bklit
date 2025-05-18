@@ -10,13 +10,21 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useUserPlanStatus } from "@/hooks/use-user-plan-status";
+import { PlanType } from "@/lib/plans";
 // import AddProjectForm from "@/components/forms/add-project-form"; // For now, this page assumes a project is selected.
 // Logic for creating a project should ideally be on a separate page e.g. /create-project
 
 export default function ProjectDashboardPage() {
   const { activeProject, isLoadingSites, currentSiteId } = useProject();
+  const {
+    planId,
+    planDetails,
+    hasReachedLimit,
+    isLoading: isLoadingPlanStatus,
+  } = useUserPlanStatus();
 
-  if (isLoadingSites) {
+  if (isLoadingSites || isLoadingPlanStatus) {
     return <div>Loading project details...</div>;
   }
 
@@ -37,10 +45,35 @@ export default function ProjectDashboardPage() {
 
   return (
     <div>
+      {hasReachedLimit && (
+        <div
+          className="mb-6 p-4 border rounded-md bg-yellow-50 border-yellow-300 text-yellow-700 dark:bg-yellow-900/30 dark:border-yellow-700 dark:text-yellow-300"
+          role="alert"
+        >
+          <h4 className="font-bold text-yellow-700 dark:text-yellow-300">
+            Project Limit Reached
+          </h4>
+          <p className="text-sm">
+            You have reached the maximum of {planDetails.projectLimit}{" "}
+            project(s) allowed for the {planDetails.name} plan.{" "}
+            {planId.toLowerCase() === PlanType.FREE && (
+              <>
+                Please{" "}
+                <Link
+                  href={`/${currentSiteId}/billing`}
+                  className="font-semibold underline hover:text-yellow-600 dark:hover:text-yellow-200"
+                >
+                  upgrade your plan
+                </Link>{" "}
+                to add more projects.
+              </>
+            )}
+          </p>
+        </div>
+      )}
+
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">{activeProject.name} - Dashboard</h1>
-        {/* <SignOutButton /> */}
-        {/* Consider moving to NavUser or a shared header */}
       </div>
 
       <Card className="mb-6">

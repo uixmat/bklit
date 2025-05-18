@@ -11,6 +11,8 @@ import {
 import { User as NextAuthUser } from "next-auth";
 import { usePathname } from "next/navigation";
 import { useProject } from "@/contexts/project-context";
+import { useUserPlanStatus } from "@/hooks/use-user-plan-status";
+import { PlanType } from "@/lib/plans";
 
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
@@ -30,8 +32,13 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 
 export function AppSidebar({ user, ...props }: AppSidebarProps) {
   const { currentSiteId, isLoadingSites, activeProject } = useProject();
+  const { planId, planDetails, isLoading: isLoadingPlan } = useUserPlanStatus();
   const pathname = usePathname();
-  const userPlan = user.plan || "free";
+
+  const displayPlanName = isLoadingPlan ? "Loading..." : planDetails.name;
+  const navUserPlanId = isLoadingPlan
+    ? (user.plan as PlanType) || PlanType.FREE
+    : planId;
 
   const mainNavItems = React.useMemo(() => {
     if (isLoadingSites || !currentSiteId) {
@@ -84,8 +91,8 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
                   <span className="font-medium truncate">
                     {headerProjectName}
                   </span>
-                  <span className="text-xs truncate capitalize">
-                    {userPlan} Plan
+                  <span className="text-xs truncate">
+                    {displayPlanName} Plan
                   </span>
                 </div>
               </a>
@@ -102,7 +109,7 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
             name: user.name ?? "User",
             email: user.email ?? "",
             avatar: user.image ?? "",
-            plan: userPlan,
+            plan: navUserPlanId,
           }}
         />
       </SidebarFooter>
