@@ -79,7 +79,7 @@ export function LiveAnalyticsDisplay({
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
-      <Card>
+      <Card className="card">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Live Users</CardTitle>
           <svg
@@ -104,7 +104,7 @@ export function LiveAnalyticsDisplay({
           </p>
         </CardContent>
       </Card>
-      <Card>
+      <Card className="card">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Location Info</CardTitle>
           {/* Placeholder Icon */}
@@ -129,7 +129,7 @@ export function LiveAnalyticsDisplay({
           </p>
         </CardContent>
       </Card>
-      <Card>
+      <Card className="card">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
             Placeholder Card
@@ -156,7 +156,7 @@ export function LiveAnalyticsDisplay({
           </p>
         </CardContent>
       </Card>
-      <Card>
+      <Card className="card">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
             Total Page Views

@@ -48,7 +48,7 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 
 export function AppSidebar({ user, ...props }: AppSidebarProps) {
   const { currentSiteId, isLoadingSites, activeProject } = useProject();
-  const { planId, planDetails, isLoading: isLoadingPlan } = useUserPlanStatus();
+  const { planId, planDetails, isLoadingPlanDetails } = useUserPlanStatus();
   const pathname = usePathname();
   const { theme, resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
@@ -57,8 +57,7 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
     setMounted(true);
   }, []);
 
-  const displayPlanName = isLoadingPlan ? "Loading..." : planDetails.name;
-  const navUserPlanId = isLoadingPlan
+  const navUserPlanId = isLoadingPlanDetails
     ? (user.plan as PlanType) || PlanType.FREE
     : planId;
 
@@ -124,7 +123,6 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
 
   const headerProjectName =
     isLoadingSites || !activeProject ? "Loading..." : activeProject.name;
-  // const headerLink = currentSiteId ? `/${currentSiteId}` : "/";
 
   return (
     <Sidebar variant="inset" {...props}>
@@ -148,10 +146,10 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
                     )}
                   </span>
                   <span className="text-xs truncate">
-                    {isLoadingPlan ? (
+                    {isLoadingPlanDetails ? (
                       <Skeleton className="w-16 h-3" />
                     ) : (
-                      `${displayPlanName} Plan`
+                      `${planDetails.name} Plan`
                     )}
                   </span>
                 </div>

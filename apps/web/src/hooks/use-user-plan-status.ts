@@ -1,61 +1,72 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { getPlanDetails, PlanDetails, PlanType } from "@/lib/plans";
-import { getUserProjectCount } from "@/actions/user-actions"; // Server action to fetch count
+import { getUserProjectCount } from "@/actions/user-actions";
 
 interface UserPlanStatus {
-  planId: PlanType; // e.g., PlanType.FREE or PlanType.PRO
-  planDetails: PlanDetails; // The detailed object for the plan
+  planId: PlanType;
+  planDetails: PlanDetails;
   projectCount: number;
-  isLoading: boolean;
+  isLoading: boolean; // Overall loading for the hook
+  isLoadingPlanDetails: boolean; // Specific loading for session/plan data
   hasReachedLimit: boolean;
   error?: string;
 }
 
 export function useUserPlanStatus(): UserPlanStatus {
-  const { data: session, status } = useSession();
-  const [projectCount, setProjectCount] = useState<number>(0);
-  const [isLoadingDetails, setIsLoadingDetails] = useState<boolean>(true); // Renamed for clarity
-  const [error, setError] = useState<string | undefined>();
+  const { data: session, status: sessionStatus } = useSession();
+  const userId = session?.user?.id;
 
-  // Determine planId from session, default to FREE
+  let calculatedIsLoadingPlanDetails = false;
+  if (sessionStatus === "loading") {
+    if (!session) {
+      calculatedIsLoadingPlanDetails = true;
+    }
+  } else if (sessionStatus === "unauthenticated") {
+    calculatedIsLoadingPlanDetails = true;
+  }
+
+  const {
+    data: projectCountData,
+    isLoading: isLoadingProjectCount,
+    error: projectCountError,
+  } = useQuery<number | null, Error>({
+    queryKey: ["userProjectCount", userId],
+    queryFn: async () => {
+      if (!userId) return 0;
+      const count = await getUserProjectCount();
+      if (count === null) {
+        return 0;
+      }
+      return count;
+    },
+    enabled: !!userId && sessionStatus === "authenticated",
+    staleTime: 1000 * 60 * 5,
+  });
+
   const currentPlanId = (session?.user?.plan as PlanType) || PlanType.FREE;
   const currentPlanDetails = getPlanDetails(currentPlanId);
 
-  useEffect(() => {
-    if (status === "authenticated" && session?.user?.id) {
-      setIsLoadingDetails(true);
-      getUserProjectCount()
-        .then((count) => {
-          if (count !== null) {
-            setProjectCount(count);
-          } else {
-            setError("Could not fetch project count.");
-          }
-        })
-        .catch(() => {
-          setError("Error fetching project count.");
-        })
-        .finally(() => {
-          setIsLoadingDetails(false);
-        });
-    } else if (status === "unauthenticated") {
-      setIsLoadingDetails(false);
-      setProjectCount(0); // Reset project count if unauthenticated
-    }
-    // For "loading" status of session, overall isLoading will cover it
-  }, [session, status]);
+  const finalProjectCount = projectCountData ?? 0;
+  const hasReachedLimit = finalProjectCount >= currentPlanDetails.projectLimit;
 
-  const hasReachedLimit = projectCount >= currentPlanDetails.projectLimit;
+  const errorMessage = projectCountError?.message;
+
+  const initialSessionTrulyLoading = sessionStatus === "loading" && !session;
+  const projectCountIsInitiallyLoading =
+    isLoadingProjectCount && projectCountData === undefined;
+  const combinedIsLoading =
+    initialSessionTrulyLoading || projectCountIsInitiallyLoading;
 
   return {
     planId: currentPlanId,
     planDetails: currentPlanDetails,
-    projectCount,
-    isLoading: status === "loading" || isLoadingDetails,
+    projectCount: finalProjectCount,
+    isLoading: combinedIsLoading,
+    isLoadingPlanDetails: calculatedIsLoadingPlanDetails,
     hasReachedLimit,
-    error,
+    error: errorMessage,
   };
 }

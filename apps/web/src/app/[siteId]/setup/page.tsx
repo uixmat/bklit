@@ -13,6 +13,7 @@ import { NPM_INSTALL_COMMAND } from "@/lib/setup-snippets/npm-install";
 import { getSdkUsageSnippet } from "@/lib/setup-snippets/sdk-usage";
 import { highlightCode } from "@/lib/shiki-highlighter";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PageHeader } from "@/components/page-header";
 
 export default function ProjectSetupPage() {
   const { activeProject, isLoadingSites } = useProject();
@@ -59,18 +60,12 @@ export default function ProjectSetupPage() {
 
   return (
     <div className="space-y-6 prose dark:prose-invert max-w-none">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">
-            {activeProject.name} - Tracking Setup
-          </h1>
-          <p className="text-muted-foreground">
-            Integrate Bklit into your website.
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title="Tracking setup"
+        description="Integrate Bklit into your website."
+      />
 
-      <Card>
+      <Card className="card">
         <CardHeader>
           <CardTitle>Setup Instructions</CardTitle>
           <CardDescription>

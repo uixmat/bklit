@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { useUserPlanStatus } from "@/hooks/use-user-plan-status";
 import { PlanType } from "@/lib/plans";
+import { PageHeader } from "@/components/page-header";
 // import AddProjectForm from "@/components/forms/add-project-form"; // For now, this page assumes a project is selected.
 // Logic for creating a project should ideally be on a separate page e.g. /create-project
 
@@ -44,7 +45,7 @@ export default function ProjectDashboardPage() {
   // For now, keeping it simple here.
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 prose dark:prose-invert max-w-none">
       {hasReachedLimit && (
         <div
           className="mb-6 p-4 border rounded-md bg-yellow-50 border-yellow-300 text-yellow-700 dark:bg-yellow-900/30 dark:border-yellow-700 dark:text-yellow-300"
@@ -72,11 +73,12 @@ export default function ProjectDashboardPage() {
         </div>
       )}
 
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">{activeProject.name} - Dashboard</h1>
-      </div>
+      <PageHeader
+        title={`${activeProject.name} - Dashboard`}
+        description="Overview of your project and analytics."
+      />
 
-      <Card className="shadow-none border-border/30">
+      <Card className="card">
         <CardHeader>
           <CardTitle>Project Overview</CardTitle>
           <CardDescription>Details for your selected project.</CardDescription>
@@ -100,7 +102,7 @@ export default function ProjectDashboardPage() {
       </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <Card className="shadow-none border-border/30">
+        <Card className="card">
           <CardHeader>
             <CardTitle>View Analytics</CardTitle>
             <CardDescription>
@@ -114,7 +116,7 @@ export default function ProjectDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="shadow-none border-border/30">
+        <Card className="card">
           <CardHeader>
             <CardTitle>Tracking Setup</CardTitle>
             <CardDescription>
