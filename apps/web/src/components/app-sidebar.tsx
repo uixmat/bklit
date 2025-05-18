@@ -9,6 +9,7 @@ import {
   Settings2,
   Moon,
   Sun,
+  ChevronsUpDown,
 } from "lucide-react";
 import { User as NextAuthUser } from "next-auth";
 import { usePathname } from "next/navigation";
@@ -17,6 +18,15 @@ import { useProject } from "@/contexts/project-context";
 import { useUserPlanStatus } from "@/hooks/use-user-plan-status";
 import { PlanType } from "@/lib/plans";
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
 import { NavUser } from "@/components/nav-user";
@@ -27,9 +37,11 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
+
 import { Skeleton } from "@/components/ui/skeleton";
+
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   user: NextAuthUser & { plan?: string };
 }
@@ -39,6 +51,11 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
   const { planId, planDetails, isLoading: isLoadingPlan } = useUserPlanStatus();
   const pathname = usePathname();
   const { theme, resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
+  const { isMobile } = useSidebar();
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const displayPlanName = isLoadingPlan ? "Loading..." : planDetails.name;
   const navUserPlanId = isLoadingPlan
@@ -79,6 +96,9 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
   }, [currentSiteId, isLoadingSites, pathname]);
 
   const secondaryNavItems = React.useMemo(() => {
+    if (!mounted) {
+      return [];
+    }
     const currentActualTheme = resolvedTheme || theme;
 
     if (currentActualTheme === "dark") {
@@ -100,19 +120,22 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
         },
       ];
     }
-  }, [resolvedTheme, theme, setTheme]);
+  }, [mounted, resolvedTheme, theme, setTheme]);
 
   const headerProjectName =
     isLoadingSites || !activeProject ? "Loading..." : activeProject.name;
-  const headerLink = currentSiteId ? `/${currentSiteId}` : "/";
+  // const headerLink = currentSiteId ? `/${currentSiteId}` : "/";
 
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
         <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <a href={headerLink}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <SidebarMenuButton
+                size="lg"
+                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              >
                 <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                   <Command className="size-4" />
                 </div>
@@ -132,14 +155,37 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
                     )}
                   </span>
                 </div>
-              </a>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
+                <ChevronsUpDown className="ml-auto size-4" />
+              </SidebarMenuButton>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+              side={isMobile ? "bottom" : "right"}
+              align="start"
+              sideOffset={4}
+            >
+              <DropdownMenuLabel className="text-xs text-muted-foreground">
+                Projects
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuItem>Project 1</DropdownMenuItem>
+                <DropdownMenuItem>Project 2</DropdownMenuItem>
+                <DropdownMenuItem>Project 3</DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={mainNavItems} />
-        <NavSecondary items={secondaryNavItems} className="mt-auto" />
+        {mounted ? (
+          <NavSecondary items={secondaryNavItems} className="mt-auto" />
+        ) : (
+          <div className="mt-auto">
+            <Skeleton className="h-8 w-full" />
+          </div>
+        )}
       </SidebarContent>
       <SidebarFooter>
         <NavUser

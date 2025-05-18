@@ -44,7 +44,7 @@ export default function ProjectDashboardPage() {
   // For now, keeping it simple here.
 
   return (
-    <div>
+    <div className="space-y-8">
       {hasReachedLimit && (
         <div
           className="mb-6 p-4 border rounded-md bg-yellow-50 border-yellow-300 text-yellow-700 dark:bg-yellow-900/30 dark:border-yellow-700 dark:text-yellow-300"
@@ -72,11 +72,11 @@ export default function ProjectDashboardPage() {
         </div>
       )}
 
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">{activeProject.name} - Dashboard</h1>
       </div>
 
-      <Card className="mb-6">
+      <Card className="shadow-none border-border/30">
         <CardHeader>
           <CardTitle>Project Overview</CardTitle>
           <CardDescription>Details for your selected project.</CardDescription>
@@ -99,8 +99,8 @@ export default function ProjectDashboardPage() {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <Card className="shadow-none border-border/30">
           <CardHeader>
             <CardTitle>View Analytics</CardTitle>
             <CardDescription>
@@ -113,7 +113,8 @@ export default function ProjectDashboardPage() {
             </Link>
           </CardContent>
         </Card>
-        <Card>
+
+        <Card className="shadow-none border-border/30">
           <CardHeader>
             <CardTitle>Tracking Setup</CardTitle>
             <CardDescription>

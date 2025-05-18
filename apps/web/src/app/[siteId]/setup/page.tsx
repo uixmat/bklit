@@ -20,6 +20,8 @@ export default function ProjectSetupPage() {
     useState<JSX.Element | null>(null);
   const [highlightedUsageSnippet, setHighlightedUsageSnippet] =
     useState<JSX.Element | null>(null);
+  const [highlightedSiteId, setHighlightedSiteId] =
+    useState<JSX.Element | null>(null);
   const [isLoadingSnippets, setIsLoadingSnippets] = useState(true);
 
   const siteIdForDisplay = activeProject?.id;
@@ -35,10 +37,12 @@ export default function ProjectSetupPage() {
       Promise.all([
         highlightCode(NPM_INSTALL_COMMAND, "bash"),
         highlightCode(usageSnippet, "javascript"),
+        highlightCode(siteIdForDisplay, "bash"),
       ])
-        .then(([installCmdHtml, usageSnippetHtml]) => {
+        .then(([installCmdHtml, usageSnippetHtml, siteIdHtml]) => {
           setHighlightedInstallCmd(installCmdHtml);
           setHighlightedUsageSnippet(usageSnippetHtml);
+          setHighlightedSiteId(siteIdHtml);
         })
         .catch(console.error)
         .finally(() => setIsLoadingSnippets(false));
@@ -110,9 +114,11 @@ export default function ProjectSetupPage() {
 
           <div className="pt-4">
             <p className="text-sm font-medium">Your Project ID (Site ID):</p>
-            <p className="text-lg font-mono p-2 bg-muted rounded-md inline-block">
-              {siteIdForDisplay}
-            </p>
+            {isLoadingSnippets || !highlightedSiteId ? (
+              <Skeleton className="h-10 w-full rounded-md bg-muted" />
+            ) : (
+              highlightedSiteId
+            )}
           </div>
         </CardContent>
       </Card>
