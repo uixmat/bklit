@@ -93,3 +93,74 @@ export async function createProjectAction(
     };
   }
 }
+
+// New action to delete a project
+export async function deleteProjectAction(
+  prevState: FormState,
+  formData: FormData
+): Promise<FormState> {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user || !session.user.id) {
+    return {
+      success: false,
+      message: "User not authenticated.",
+    };
+  }
+
+  const siteId = formData.get("siteId") as string;
+  const confirmedProjectName = formData.get("confirmedProjectName") as string;
+
+  if (!siteId || !confirmedProjectName) {
+    return {
+      success: false,
+      message: "Missing site ID or project name for confirmation.",
+    };
+  }
+
+  try {
+    const project = await prisma.site.findUnique({
+      where: {
+        id: siteId,
+        userId: session.user.id, // Ensure the user owns this project
+      },
+    });
+
+    if (!project) {
+      return {
+        success: false,
+        message:
+          "Project not found or you do not have permission to delete it.",
+      };
+    }
+
+    if (project.name !== confirmedProjectName) {
+      return {
+        success: false,
+        message: "The entered project name does not match. Deletion cancelled.",
+      };
+    }
+
+    await prisma.site.delete({
+      where: {
+        id: siteId,
+      },
+    });
+
+    revalidatePath("/"); // Revalidate paths after deletion
+    // Consider revalidating specific paths if more targeted revalidation is beneficial
+    // e.g., revalidatePath('/dashboard') or a user-specific projects list page.
+
+    return {
+      success: true,
+      message: `Project \"${project.name}\" deleted successfully.`,
+      // newSiteId is not relevant here, but FormState includes it as optional
+    };
+  } catch (error) {
+    console.error("Error deleting project:", error);
+    return {
+      success: false,
+      message: "Failed to delete project. Please try again.",
+    };
+  }
+}

@@ -1,7 +1,6 @@
 "use client";
 
 import { useProject } from "@/contexts/project-context";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import {
   Card,
@@ -13,8 +12,8 @@ import {
 import { useUserPlanStatus } from "@/hooks/use-user-plan-status";
 import { PlanType } from "@/lib/plans";
 import { PageHeader } from "@/components/page-header";
-// import AddProjectForm from "@/components/forms/add-project-form"; // For now, this page assumes a project is selected.
-// Logic for creating a project should ideally be on a separate page e.g. /create-project
+import { DeleteProjectForm } from "@/components/forms/delete-project-form";
+import { Button } from "@/components/ui/button";
 
 export default function ProjectDashboardPage() {
   const { activeProject, isLoadingSites, currentSiteId } = useProject();
@@ -30,19 +29,12 @@ export default function ProjectDashboardPage() {
   }
 
   if (!activeProject) {
-    // This case should ideally be handled by layout redirects if a siteId is in the URL but invalid,
-    // or if user has no projects and is redirected to a create page.
     return (
       <div>
         <p>No project selected or found.</p>
-        {/* Consider a link to a project creation page if appropriate */}
-        {/* <Link href="/create-project"><Button>Create a New Project</Button></Link> */}
       </div>
     );
   }
-
-  // The SignOutButton and Welcome message might be better placed in the layout or a header component
-  // For now, keeping it simple here.
 
   return (
     <div className="space-y-6 prose dark:prose-invert max-w-none">
@@ -131,11 +123,12 @@ export default function ProjectDashboardPage() {
         </Card>
       </div>
 
-      {/* 
-        The AddProjectForm and its related logic (actions, schemas) are currently unused.
-        If project creation UI is needed, it should be integrated via a dedicated page or modal.
-        For now, this commented out section will be removed.
-      */}
+      <div className="pt-6 mt-6 border-t">
+        <DeleteProjectForm
+          siteId={activeProject.id}
+          projectName={activeProject.name}
+        />
+      </div>
     </div>
   );
 }
