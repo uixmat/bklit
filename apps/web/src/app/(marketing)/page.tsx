@@ -3,13 +3,27 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
+import { prisma } from "@/lib/db";
+import type { Site } from "@prisma/client";
 
 export default async function MarketingHomePage() {
   const session = await getServerSession(authOptions);
 
   if (session && session.user?.id) {
-    // TODO: Redirect correctly to [siteId]
-    redirect("/dashboard");
+    const userSites: Site[] = await prisma.site.findMany({
+      where: {
+        userId: session.user.id,
+      },
+      orderBy: {
+        name: "asc",
+      },
+    });
+
+    if (userSites.length > 0) {
+      redirect(`/${userSites[0].id}`);
+    } else {
+      redirect("/dashboard");
+    }
   }
 
   return (
