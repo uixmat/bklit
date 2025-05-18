@@ -7,14 +7,18 @@ import {
   LayoutDashboard,
   LineChart,
   Settings2,
+  Moon,
+  Sun,
 } from "lucide-react";
 import { User as NextAuthUser } from "next-auth";
 import { usePathname } from "next/navigation";
+import { useTheme } from "next-themes";
 import { useProject } from "@/contexts/project-context";
 import { useUserPlanStatus } from "@/hooks/use-user-plan-status";
 import { PlanType } from "@/lib/plans";
 
 import { NavMain } from "@/components/nav-main";
+import { NavSecondary } from "@/components/nav-secondary";
 import { NavUser } from "@/components/nav-user";
 import {
   Sidebar,
@@ -34,6 +38,7 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
   const { currentSiteId, isLoadingSites, activeProject } = useProject();
   const { planId, planDetails, isLoading: isLoadingPlan } = useUserPlanStatus();
   const pathname = usePathname();
+  const { theme, resolvedTheme, setTheme } = useTheme();
 
   const displayPlanName = isLoadingPlan ? "Loading..." : planDetails.name;
   const navUserPlanId = isLoadingPlan
@@ -73,6 +78,30 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
     ];
   }, [currentSiteId, isLoadingSites, pathname]);
 
+  const secondaryNavItems = React.useMemo(() => {
+    const currentActualTheme = resolvedTheme || theme;
+
+    if (currentActualTheme === "dark") {
+      return [
+        {
+          title: "Light mode",
+          url: "#",
+          icon: Sun,
+          onClick: () => setTheme("light"),
+        },
+      ];
+    } else {
+      return [
+        {
+          title: "Dark mode",
+          url: "#",
+          icon: Moon,
+          onClick: () => setTheme("dark"),
+        },
+      ];
+    }
+  }, [resolvedTheme, theme, setTheme]);
+
   const headerProjectName =
     isLoadingSites || !activeProject ? "Loading..." : activeProject.name;
   const headerLink = currentSiteId ? `/${currentSiteId}` : "/";
@@ -110,6 +139,7 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={mainNavItems} />
+        <NavSecondary items={secondaryNavItems} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser
