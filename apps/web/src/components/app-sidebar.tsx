@@ -25,7 +25,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-
+import { Skeleton } from "@/components/ui/skeleton";
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   user: NextAuthUser & { plan?: string };
 }
@@ -89,10 +89,18 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="font-medium truncate">
-                    {headerProjectName}
+                    {isLoadingSites ? (
+                      <Skeleton className="w-20 h-4" />
+                    ) : (
+                      headerProjectName
+                    )}
                   </span>
                   <span className="text-xs truncate">
-                    {displayPlanName} Plan
+                    {isLoadingPlan ? (
+                      <Skeleton className="w-16 h-3" />
+                    ) : (
+                      `${displayPlanName} Plan`
+                    )}
                   </span>
                 </div>
               </a>
