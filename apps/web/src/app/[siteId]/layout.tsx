@@ -4,30 +4,27 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
-import { User } from "next-auth";
+import { User as NextAuthUser } from "next-auth"; // Aliased to avoid conflict if Site type was named User
 import { prisma } from "@/lib/db";
 import { ProjectProvider } from "@/contexts/project-context";
 import type { Site } from "@prisma/client"; // Site type for fetching all sites
 
-export default async function SiteSpecificLayout({
+// Helper async function to contain the core logic
+async function getLayoutDataAndRender({
   children,
   params,
+  session,
 }: {
   children: React.ReactNode;
   params: { siteId: string };
+  session: NextAuthUser & { id: string }; // Assuming session.user.id is always present after check
 }) {
-  const { siteId } = params; // Destructure siteId from params at the very top
+  const { siteId } = params;
+  const userId = session.id; // Use session.id directly as passed
 
-  const session = await getServerSession(authOptions);
-
-  if (!session || !session.user || !session.user.id) {
-    redirect("/login"); // Changed to redirect to /login
-  }
-
-  // Fetch all sites for the user to populate the project switcher and context
   const userSites: Site[] = await prisma.site.findMany({
     where: {
-      userId: session.user.id,
+      userId: userId,
     },
     orderBy: {
       name: "asc",
@@ -36,38 +33,31 @@ export default async function SiteSpecificLayout({
 
   const currentSiteExists = userSites.some((site) => site.id === siteId);
 
-  if (userSites.length === 0 && !siteId) {
-    // No sites, and no specific site in URL (e.g. /create-project path)
-    // This case needs careful handling. If this layout is ONLY for /siteId/* paths, then siteId must exist.
-    // If the user has no sites, they might be redirected to a "create first project" page from a higher level route.
-    // For now, if this layout is reached without a valid siteId for the user, it's an issue.
-    // Let's assume for now that if userSites is empty, they should be elsewhere (e.g. a page to create a project).
-    // If they land here via a direct URL with a siteId that's not theirs, the check below handles it.
-  }
-
   if (userSites.length > 0 && !currentSiteExists) {
-    // If a siteId is provided but invalid, or no siteId provided but user has sites,
-    // redirect to the first available site for this user.
-    // This makes sure the user always lands on a valid project page if they have projects.
     redirect(`/${userSites[0].id}`);
   }
 
-  // If userSites.length is 0 and they somehow landed on a /[siteId]/... route,
-  // they should be redirected. Perhaps to a create project page or a general error.
-  // This specific layout assumes a valid siteId (or will redirect to one if possible).
   if (userSites.length === 0 && siteId) {
-    // This means a URL with a siteId was accessed, but user has NO projects at all.
-    // Or the siteId in URL is not theirs (covered by !currentSiteExists if they had other projects).
-    // Redirect to a page where they can create a project, or a general dashboard if such a page exists.
-    // For now, redirecting to root, but ideally a specific onboarding/create page.
     redirect("/?error=no_sites_found");
+  }
+
+  // If user has no sites at all and somehow lands here directly via a URL not caught by above,
+  // they might still see an error if no siteId is valid.
+  // Consider a more robust redirect to a "create project" page if userSites.length is 0.
+  // For instance, if they land on / (which shouldn't use this layout usually) or /some-non-existent-site
+  if (userSites.length === 0 && !siteId) {
+    // This case should ideally be handled by a higher-level layout or middleware
+    // if the user has no projects and is trying to access a generic path.
+    // For now, if they have no sites, and no siteId is in params (e.g. bad URL),
+    // redirecting to marketing page.
+    redirect("/");
   }
 
   return (
     <ProjectProvider sites={userSites} initialSiteIdFromUrl={siteId}>
       <SidebarProvider>
-        {/* AppSidebar now only needs the user prop */}
-        <AppSidebar user={session.user as User} />
+        <AppSidebar user={session as NextAuthUser} />{" "}
+        {/* Cast back if AppSidebar expects original User type */}
         <SidebarInset>
           <SiteHeader />
           <div className="flex flex-1 flex-col p-8 py-2">
@@ -81,4 +71,28 @@ export default async function SiteSpecificLayout({
       </SidebarProvider>
     </ProjectProvider>
   );
+}
+
+export default async function SiteSpecificLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: { siteId: string };
+}) {
+  // const { siteId } = params; // This line was reported as the error source. Deferring destructuring.
+
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user || !session.user.id) {
+    redirect("/login");
+  }
+
+  // Pass the full session.user object which should include the id
+  // and the params object to the helper.
+  return getLayoutDataAndRender({
+    children,
+    params,
+    session: session.user as NextAuthUser & { id: string },
+  });
 }

@@ -5,6 +5,8 @@ import { useActionState } from "react";
 import { deleteProjectAction, FormState } from "@/actions/project-actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -39,6 +41,8 @@ export function DeleteProjectForm({
   const [state, formAction] = useActionState(deleteProjectAction, initialState);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const { data: session } = useSession();
 
   useEffect(() => {
     if (state.message) {
@@ -46,14 +50,25 @@ export function DeleteProjectForm({
         toast.success(state.message);
         setIsOpen(false); // Close dialog on success
         setConfirmationInput(""); // Reset input
+
+        // Refresh the current route's data and components
+        router.refresh();
+
+        // Invalidate the userProjectCount query
+        if (session?.user?.id) {
+          // No need to await, invalidation is synchronous marking, refetch is async
+          queryClient.invalidateQueries({
+            queryKey: ["userProjectCount", session.user.id],
+          });
+        }
+
         // Redirect after successful deletion
-        // router.refresh(); // Already called by revalidatePath in action
         router.push("/"); // Redirect to homepage or a general dashboard
       } else {
         toast.error(state.message);
       }
     }
-  }, [state, router]);
+  }, [state, router, queryClient, session]);
 
   const handleSubmitDeletion = () => {
     if (confirmationInput === projectName) {

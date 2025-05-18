@@ -1,7 +1,6 @@
 "use client";
 
 import { useProject } from "@/contexts/project-context";
-import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -10,19 +9,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useUserPlanStatus } from "@/hooks/use-user-plan-status";
-import { PlanType } from "@/lib/plans";
 import { PageHeader } from "@/components/page-header";
 import { DeleteProjectForm } from "@/components/forms/delete-project-form";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function ProjectDashboardPage() {
   const { activeProject, isLoadingSites, currentSiteId } = useProject();
-  const {
-    planId,
-    planDetails,
-    hasReachedLimit,
-    isLoading: isLoadingPlanStatus,
-  } = useUserPlanStatus();
+  const { isLoading: isLoadingPlanStatus } = useUserPlanStatus();
 
   if (isLoadingSites || isLoadingPlanStatus) {
     return <div>Loading project details...</div>;
@@ -38,33 +32,6 @@ export default function ProjectDashboardPage() {
 
   return (
     <div className="space-y-6 prose dark:prose-invert max-w-none">
-      {hasReachedLimit && (
-        <div
-          className="mb-6 p-4 border rounded-md bg-yellow-50 border-yellow-300 text-yellow-700 dark:bg-yellow-900/30 dark:border-yellow-700 dark:text-yellow-300"
-          role="alert"
-        >
-          <h4 className="font-bold text-yellow-700 dark:text-yellow-300">
-            Project Limit Reached
-          </h4>
-          <p className="text-sm">
-            You have reached the maximum of {planDetails.projectLimit}{" "}
-            project(s) allowed for the {planDetails.name} plan.{" "}
-            {planId.toLowerCase() === PlanType.FREE && (
-              <>
-                Please{" "}
-                <Link
-                  href={`/${currentSiteId}/billing`}
-                  className="font-semibold underline hover:text-yellow-600 dark:hover:text-yellow-200"
-                >
-                  upgrade your plan
-                </Link>{" "}
-                to add more projects.
-              </>
-            )}
-          </p>
-        </div>
-      )}
-
       <PageHeader
         title={`${activeProject.name} - Dashboard`}
         description="Overview of your project and analytics."
