@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import redis from "@/lib/redis"; // Corrected path assuming redis.ts is in apps/web/src/lib
 import { getIoServer } from "@/lib/socketio-server"; // Import getIoServer
+import { prisma } from "@/lib/db"; // Import Prisma client
+import { getLocationFromIP, extractClientIP } from "@/lib/ip-geolocation";
 
 interface TrackingPayload {
   url: string;
@@ -22,7 +24,7 @@ function createCorsResponse(
 }
 
 // Handle OPTIONS requests for CORS preflight
-export async function OPTIONS(_request: NextRequest) {
+export async function OPTIONS() {
   return createCorsResponse({ message: "CORS preflight OK" }, 200);
 }
 
@@ -35,10 +37,60 @@ export async function POST(request: NextRequest) {
       return createCorsResponse({ message: "siteId is required" }, 400);
     }
 
-    // Store data in Redis, using siteId in the key
+    // Extract client IP and get location data
+    const clientIP = extractClientIP(request);
+    let locationData = null;
+
+    if (clientIP) {
+      try {
+        locationData = await getLocationFromIP(clientIP);
+        if (locationData) {
+          console.log(
+            `Location data retrieved for IP ${clientIP}: ${locationData.city}, ${locationData.country}`
+          );
+        }
+      } catch (locationError) {
+        console.warn("Error fetching location data:", locationError);
+        // Continue without location data
+      }
+    }
+
+    // Store data in Redis for real-time features
     const redisKey = `events:${payload.siteId}`;
-    await redis.rpush(redisKey, JSON.stringify(payload)); // Store the whole payload
+    const eventData = {
+      ...payload,
+      location: locationData,
+    };
+    await redis.rpush(redisKey, JSON.stringify(eventData)); // Store the whole payload with location
     console.log(`Data pushed to Redis list: ${redisKey}`);
+
+    // Save page view to database for historical persistence
+    try {
+      await prisma.pageViewEvent.create({
+        data: {
+          url: payload.url,
+          timestamp: new Date(payload.timestamp),
+          siteId: payload.siteId,
+          // Location data
+          ip: locationData?.ip,
+          country: locationData?.country,
+          countryCode: locationData?.countryCode,
+          region: locationData?.region,
+          regionName: locationData?.regionName,
+          city: locationData?.city,
+          zip: locationData?.zip,
+          lat: locationData?.lat,
+          lon: locationData?.lon,
+          timezone: locationData?.timezone,
+          isp: locationData?.isp,
+          mobile: locationData?.mobile,
+        },
+      });
+      console.log(`Page view saved to database for site: ${payload.siteId}`);
+    } catch (dbError) {
+      console.error("Error saving page view to database:", dbError);
+      // Continue execution - Redis storage succeeded, so real-time features still work
+    }
 
     // Emit event via Socket.IO
     const io = getIoServer();

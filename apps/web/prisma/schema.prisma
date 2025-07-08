@@ -89,11 +89,27 @@ model PageViewEvent {
   timestamp DateTime // The timestamp from the tracking event itself
   createdAt DateTime @default(now()) // When this record was created in our DB
 
+  // Location data from IP geolocation
+  ip          String?
+  country     String?
+  countryCode String?
+  region      String?
+  regionName  String?
+  city        String?
+  zip         String?
+  lat         Float?
+  lon         Float?
+  timezone    String?
+  isp         String?
+  mobile      Boolean?
+
   siteId String
   site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
 
   @@index([siteId, timestamp])
   @@index([createdAt])
+  @@index([country])
+  @@index([city])
 }
 
 model EventDefinition {

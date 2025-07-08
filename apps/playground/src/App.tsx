@@ -5,7 +5,7 @@ import "./App.css";
 import { initBklit } from "bklit";
 
 // IMPORTANT: Replace with a real Site ID from your main tracker application dashboard
-const YOUR_SITE_ID = "cmase2cj00001510wrxmy9p5h";
+const YOUR_SITE_ID = "cmcuk7myh00022k0xgh1kh599";
 
 // Get the ngrok URL from environment variable
 const NGROK_URL = import.meta.env.VITE_NGROK_URL;

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "dev:track": "brew services start redis && pnpm run dev",
+    "dev:track": "brew services start redis && cd ../.. && pnpm run dev:web",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
