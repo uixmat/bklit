@@ -34,10 +34,11 @@ export async function getTopCountries(
       }
 
       const topCountries = await prisma.pageViewEvent.groupBy({
-        by: ["country"],
+        by: ["country", "countryCode"],
         where: {
           siteId,
           country: { not: null },
+          countryCode: { not: null },
         },
         _count: {
           country: true,
@@ -52,6 +53,7 @@ export async function getTopCountries(
 
       return topCountries.map((c) => ({
         country: c.country,
+        countryCode: c.countryCode,
         views: c._count.country,
       }));
     },

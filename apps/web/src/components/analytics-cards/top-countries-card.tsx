@@ -7,6 +7,8 @@ import {
 } from "@/components/ui/card";
 import { getTopCountries } from "@/actions/analytics-actions";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CircleFlag } from "react-circle-flags";
+import { Badge } from "@/components/ui/badge";
 
 interface TopCountriesCardProps {
   siteId: string;
@@ -33,12 +35,16 @@ export async function TopCountriesCard({
                 key={i}
                 className="flex flex-row justify-between items-center h-6"
               >
-                <span className="font-medium">
-                  {country.country || "Unknown"}
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  {country.views}
-                </span>
+                <div className="flex items-center gap-2">
+                  <CircleFlag
+                    countryCode={country.countryCode?.toLowerCase() || "us"}
+                    className="size-4"
+                  />
+                  <span className="font-medium text-xs">
+                    {country.country || "Unknown"}
+                  </span>
+                </div>
+                <Badge variant="secondary">{country.views}</Badge>
               </div>
             ))}
           </div>
