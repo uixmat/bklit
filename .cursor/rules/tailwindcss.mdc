@@ -1,0 +1,12 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+When using TailwindCSS, always use v4.1^
+- Ref: https://tailwindcss.com/docs/installation/using-vite
+
+Example: tailwing.config.js is depracated and now not required.
+Example: w-4 h-4 has been replaced with size-4
+
+Always adhere to good standards

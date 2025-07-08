@@ -155,12 +155,6 @@ Note: This runs all services but requires `.ngrok-url` to be populated first.
 
 ## API Endpoints
 
-### Analytics
-
-- `GET /api/analytics/page-views?siteId={id}&limit=100&offset=0` - Get historical page views with location data
-- `GET /api/analytics/stats?siteId={id}&days=7` - Get analytics statistics including top countries
-- `GET /api/analytics/live-users?siteId={id}` - Get live user locations (last 5 minutes)
-
 ### Tracking
 
 - `POST /api/track` - Track page views with IP geolocation (used by SDK)

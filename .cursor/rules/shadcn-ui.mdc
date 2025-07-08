@@ -1,0 +1,14 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Always check to see if we have the available shadcn/ui component available in our components/ui directory.
+
+If we dont have the required shadcn component use the cmd line to install.
+`pnpm dlx shadcn@latest add ...`
+
+Under the hood shadcn/ui  components use radix primitives. We always have access to the default radix props with our shadcn components.
+
+ref: https://ui.shadcn.com/docs/components
+ref: https://www.radix-ui.com/primitives

@@ -9,7 +9,7 @@
     "build": "pnpm --filter bklit build && pnpm build:web",
     "dev:sdk": "pnpm --filter bklit dev",
     "build:sdk": "pnpm --filter bklit build",
-    "dev:web": "tsx server.ts",
+    "dev:web": "dotenv -e ./apps/web/.env tsx server.ts",
     "start:web": "NODE_ENV=production tsx server.ts",
     "build:web": "pnpm --filter tracker build",
     "lint:web": "pnpm --filter tracker lint",

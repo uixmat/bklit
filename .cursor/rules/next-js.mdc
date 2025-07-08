@@ -1,0 +1,10 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+When working with Next.js we are always using typescript and the latest versions. 
+
+ref: https://nextjs.org/docs
+
+Always use most up-to-date next.js practices and techniques when possible.
