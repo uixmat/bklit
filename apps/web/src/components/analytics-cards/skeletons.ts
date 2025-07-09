@@ -1,4 +1,5 @@
 export * from "./recent-page-views-card";
 export * from "./top-countries-card";
-export * from "./total-views-card";
+export * from "./views-card";
 export * from "./world-map-card";
+export * from "./mobile-desktop-card";

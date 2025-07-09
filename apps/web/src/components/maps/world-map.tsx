@@ -109,15 +109,15 @@ export function WorldMap({ siteId, userId }: WorldMapProps) {
           .append("path")
           .attr("class", "country")
           .attr("d", (d) => path(d as d3.GeoPermissibleObjects) || "")
-          .attr("fill", "var(--primary)")
-          .attr("stroke", "var(--primary)")
+          .attr("fill", "var(--color-region)")
+          .attr("stroke", "var(--color-region)")
           .attr("stroke-width", 0)
-          .attr("opacity", 0.33)
+          // .attr("opacity", 0.33)
           .on("mouseover", function () {
-            d3.select(this).attr("opacity", 0.38);
+            d3.select(this).attr("fill", "var(--color-region-hover)");
           })
           .on("mouseout", function () {
-            d3.select(this).attr("opacity", 0.33);
+            d3.select(this).attr("fill", "var(--color-region)");
           });
 
         // Add circle markers for countries with visits
@@ -173,15 +173,14 @@ export function WorldMap({ siteId, userId }: WorldMapProps) {
             d3.select(this)
               .transition()
               .duration(200)
-              .attr("r", Math.sqrt(d.totalVisits / 10) + 6)
-              .attr("opacity", 0.8);
+              .attr("r", Math.sqrt(d.totalVisits / 10) + 6);
+            // .attr("fill", "var(--color-region)");
 
             // Restore all countries to normal opacity and color
             g.selectAll(".country")
               .transition()
               .duration(200)
-              .attr("opacity", 0.33)
-              .attr("fill", "var(--primary)");
+              .attr("fill", "var(--color-region)");
 
             // Hide tooltip
             setTooltipData(null);

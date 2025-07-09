@@ -99,29 +99,39 @@ export async function getAnalyticsStats(
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - days);
 
-      const [totalViews, recentViews, uniquePages] = await Promise.all([
-        prisma.pageViewEvent.count({
-          where: { siteId },
-        }),
-        prisma.pageViewEvent.count({
-          where: {
-            siteId,
-            timestamp: {
-              gte: startDate,
+      const [totalViews, recentViews, uniquePages, uniqueVisits] =
+        await Promise.all([
+          prisma.pageViewEvent.count({
+            where: { siteId },
+          }),
+          prisma.pageViewEvent.count({
+            where: {
+              siteId,
+              timestamp: {
+                gte: startDate,
+              },
             },
-          },
-        }),
-        prisma.pageViewEvent.findMany({
-          where: { siteId },
-          distinct: ["url"],
-          select: { url: true },
-        }),
-      ]);
+          }),
+          prisma.pageViewEvent.findMany({
+            where: { siteId },
+            distinct: ["url"],
+            select: { url: true },
+          }),
+          prisma.pageViewEvent.findMany({
+            where: {
+              siteId,
+              ip: { not: null },
+            },
+            distinct: ["ip"],
+            select: { ip: true },
+          }),
+        ]);
 
       return {
         totalViews,
         recentViews,
         uniquePages: uniquePages.length,
+        uniqueVisits: uniqueVisits.length,
       };
     },
     [`${siteId}-analytics-stats`],
@@ -455,4 +465,72 @@ export async function debugCountryCodes(
   );
 
   return uniqueCountryCodes;
+}
+
+const getMobileDesktopStatsSchema = z.object({
+  siteId: z.string(),
+  userId: z.string(),
+});
+
+export async function getMobileDesktopStats(
+  params: z.infer<typeof getMobileDesktopStatsSchema>
+) {
+  const validation = getMobileDesktopStatsSchema.safeParse(params);
+
+  if (!validation.success) {
+    throw new Error(validation.error.message);
+  }
+
+  const { siteId, userId } = validation.data;
+
+  return await cache(
+    async () => {
+      const site = await prisma.site.findFirst({
+        where: {
+          id: siteId,
+          userId: userId,
+        },
+      });
+
+      if (!site) {
+        throw new Error("Site not found or access denied");
+      }
+
+      // Get unique mobile visits by IP
+      const uniqueMobileVisits = await prisma.pageViewEvent.groupBy({
+        by: ["ip"],
+        where: {
+          siteId,
+          mobile: true,
+          ip: { not: null },
+        },
+        _count: {
+          ip: true,
+        },
+      });
+
+      // Get unique desktop visits by IP
+      const uniqueDesktopVisits = await prisma.pageViewEvent.groupBy({
+        by: ["ip"],
+        where: {
+          siteId,
+          mobile: false,
+          ip: { not: null },
+        },
+        _count: {
+          ip: true,
+        },
+      });
+
+      return {
+        mobile: uniqueMobileVisits.length,
+        desktop: uniqueDesktopVisits.length,
+      };
+    },
+    [`${siteId}-mobile-desktop-stats`],
+    {
+      revalidate: 300, // 5 minutes
+      tags: [`${siteId}-analytics`],
+    }
+  )();
 }

@@ -1,18 +1,18 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
-import { PageHeader } from "@/components/page-header";
-import { TotalViewsCard } from "@/components/analytics-cards/total-views-card";
+import { ViewsCard } from "@/components/analytics-cards/views-card";
 import { TopCountriesCard } from "@/components/analytics-cards/top-countries-card";
 import { RecentPageViewsCard } from "@/components/analytics-cards/recent-page-views-card";
 import { Suspense } from "react";
 import {
   TopCountriesCardSkeleton,
-  TotalViewsCardSkeleton,
   RecentPageViewsCardSkeleton,
   WorldMapCardSkeleton,
+  MobileDesktopCardSkeleton,
 } from "@/components/analytics-cards/skeletons";
 import { WorldMapCard } from "@/components/analytics-cards/world-map-card";
+import { MobileDesktopCard } from "@/components/analytics-cards/mobile-desktop-card";
 
 export default async function AnalyticsPage({
   params,
@@ -28,17 +28,11 @@ export default async function AnalyticsPage({
 
   return (
     <>
-      <PageHeader
-        title="Analytics"
-        description="Here are your site's analytics."
-      />
       <div
         className="grid gap-4 
       md:grid-cols-2 lg:grid-cols-3"
       >
-        <Suspense fallback={<TotalViewsCardSkeleton />}>
-          <TotalViewsCard siteId={siteId} userId={session.user.id} />
-        </Suspense>
+        <ViewsCard userId={session.user.id} />
         <Suspense fallback={<TopCountriesCardSkeleton />}>
           <TopCountriesCard siteId={siteId} userId={session.user.id} />
         </Suspense>
@@ -46,7 +40,15 @@ export default async function AnalyticsPage({
           <RecentPageViewsCard siteId={siteId} userId={session.user.id} />
         </Suspense>
       </div>
-      <div className="grid gap-4 mt-4">
+      <div
+        className="grid gap-4 
+      md:grid-cols-2 lg:grid-cols-3"
+      >
+        <Suspense fallback={<MobileDesktopCardSkeleton />}>
+          <MobileDesktopCard />
+        </Suspense>
+      </div>
+      <div className="grid gap-4">
         <Suspense fallback={<WorldMapCardSkeleton />}>
           <WorldMapCard />
         </Suspense>
