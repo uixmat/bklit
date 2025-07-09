@@ -5,8 +5,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getRecentPageViews } from "@/actions/analytics-actions";
+import { getTopPages } from "@/actions/analytics-actions";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 
 interface RecentPageViewsCardProps {
   siteId: string;
@@ -17,35 +18,37 @@ export async function RecentPageViewsCard({
   siteId,
   userId,
 }: RecentPageViewsCardProps) {
-  const recentViews = await getRecentPageViews({
+  const topPages = await getTopPages({
     siteId,
     userId,
+    limit: 5,
   });
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Recent Page Views</CardTitle>
-        <CardDescription>
-          A list of the most recent page views captured.
-        </CardDescription>
+        <CardTitle>Popular Pages</CardTitle>
+        <CardDescription>The most popular pages by views.</CardDescription>
       </CardHeader>
       <CardContent>
-        {recentViews.length > 0 ? (
+        {topPages.length > 0 ? (
           <div className="flex flex-col gap-1">
-            {recentViews.map((event, index) => (
+            {topPages.map((page, index) => (
               <div
                 key={index}
-                className="border-b border-border text-sm flex gap-2 h-6 items-center last-of-type:border-none "
+                className="border-b border-border text-sm flex gap-2 h-6 items-center justify-between last-of-type:border-none "
               >
                 <div className="text-muted-foreground text-xs font-mono whitespace-nowrap overflow-hidden text-ellipsis">
-                  {event.url}
+                  {page.path}
                 </div>
+                <Badge variant="secondary">
+                  {page.count} view{page.count !== 1 ? "s" : ""}
+                </Badge>
               </div>
             ))}
           </div>
         ) : (
-          <p>No recent page views yet for this project.</p>
+          <p>No page views yet for this project.</p>
         )}
       </CardContent>
     </Card>

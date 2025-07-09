@@ -534,3 +534,63 @@ export async function getMobileDesktopStats(
     }
   )();
 }
+
+const getTopPagesSchema = z.object({
+  siteId: z.string(),
+  userId: z.string(),
+  limit: z.number().default(5),
+});
+
+export async function getTopPages(params: z.input<typeof getTopPagesSchema>) {
+  const validation = getTopPagesSchema.safeParse(params);
+
+  if (!validation.success) {
+    throw new Error(validation.error.message);
+  }
+
+  const { siteId, userId, limit } = validation.data;
+
+  return await cache(
+    async () => {
+      const site = await prisma.site.findFirst({
+        where: {
+          id: siteId,
+          userId: userId,
+        },
+      });
+
+      if (!site) {
+        throw new Error("Site not found or access denied");
+      }
+
+      // Fetch all page view events for the site
+      const events = await prisma.pageViewEvent.findMany({
+        where: { siteId },
+        select: { url: true },
+      });
+
+      // Count occurrences by pathname
+      const pathCounts: Record<string, number> = {};
+      for (const event of events) {
+        let path = event.url;
+        try {
+          path = new URL(event.url).pathname;
+        } catch {}
+        pathCounts[path] = (pathCounts[path] || 0) + 1;
+      }
+
+      // Sort and take top N
+      const topPages = Object.entries(pathCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, limit)
+        .map(([path, count]) => ({ path, count }));
+
+      return topPages;
+    },
+    [`${siteId}-top-pages`],
+    {
+      revalidate: 60, // 1 minute
+      tags: [`${siteId}-analytics`],
+    }
+  )();
+}

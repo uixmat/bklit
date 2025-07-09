@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getPublishedPolarProducts } from "@/lib/polar";
 import { PageHeader } from "@/components/page-header";
 import { ProductCard } from "@/components/polar/product-card";
-import { BillingSuccessDialog } from "@/components/billing-success-dialog";
+import { BillingSuccessDialog } from "@/components/dialogs/billing-success-dialog";
 
 async function getUserPlan(userId: string) {
   const user = await prisma.user.findUnique({
