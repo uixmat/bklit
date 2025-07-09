@@ -32,22 +32,18 @@ export async function RecentPageViewsCard({
       </CardHeader>
       <CardContent>
         {recentViews.length > 0 ? (
-          <ul className="space-y-2">
+          <div className="flex flex-col gap-1">
             {recentViews.map((event, index) => (
-              <li
+              <div
                 key={index}
-                className="p-3 border rounded-md bg-muted/50 text-sm flex justify-between"
+                className="border-b border-border text-sm flex gap-2 h-6 items-center last-of-type:border-none "
               >
-                <div>
-                  <strong>URL:</strong> {event.url}
+                <div className="text-muted-foreground text-xs font-mono whitespace-nowrap overflow-hidden text-ellipsis">
+                  {event.url}
                 </div>
-                <div>
-                  <strong>Timestamp:</strong>{" "}
-                  {new Date(event.timestamp).toLocaleString()}
-                </div>
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         ) : (
           <p>No recent page views yet for this project.</p>
         )}

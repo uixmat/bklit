@@ -1,79 +1,58 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { PageHeader } from "@/components/page-header";
+import { TotalViewsCard } from "@/components/analytics-cards/total-views-card";
+import { TopCountriesCard } from "@/components/analytics-cards/top-countries-card";
+import { RecentPageViewsCard } from "@/components/analytics-cards/recent-page-views-card";
 import { Suspense } from "react";
 import {
-  RecentPageViewsCard,
-  RecentPageViewsCardSkeleton,
-} from "@/components/analytics-cards/recent-page-views-card";
-import { LiveAnalyticsDisplay } from "@/components/live-analytics-display";
-import {
-  TopCountriesCard,
   TopCountriesCardSkeleton,
-} from "@/components/analytics-cards/top-countries-card";
-import {
-  TotalViewsCard,
   TotalViewsCardSkeleton,
-} from "@/components/analytics-cards/total-views-card";
+  RecentPageViewsCardSkeleton,
+  WorldMapCardSkeleton,
+} from "@/components/analytics-cards/skeletons";
+import { WorldMapCard } from "@/components/analytics-cards/world-map-card";
 
-async function getSiteDetails(siteId: string, userId: string) {
-  const site = await prisma.site.findUnique({
-    where: {
-      id: siteId,
-      userId: userId,
-    },
-  });
-  return site;
-}
-
-interface SiteAnalyticsPageProps {
-  params: {
-    siteId: string;
-  };
-}
-
-export default async function SiteAnalyticsPage({
+export default async function AnalyticsPage({
   params,
-}: SiteAnalyticsPageProps) {
+}: {
+  params: { siteId: string };
+}) {
   const session = await getServerSession(authOptions);
 
-  if (!session || !session.user || !session.user.id) {
-    redirect("/");
-  }
-  const userId = session.user.id;
-
-  const { siteId } = params;
-  const site = await getSiteDetails(siteId, userId);
-
-  if (!site) {
-    redirect(`/?error=site_not_found_or_unauthorized`);
+  if (!session || !session.user) {
+    redirect("/signin");
   }
 
   return (
-    <div className="space-y-6">
+    <>
       <PageHeader
-        title={`${site.name} - Analytics`}
-        description="Review captured page views and live data for your project."
+        title="Analytics"
+        description="Here are your site's analytics."
       />
-
-      <LiveAnalyticsDisplay
-        analyticsCards={
-          <>
-            <Suspense fallback={<TopCountriesCardSkeleton />}>
-              <TopCountriesCard siteId={siteId} userId={userId} />
-            </Suspense>
-            <Suspense fallback={<TotalViewsCardSkeleton />}>
-              <TotalViewsCard siteId={siteId} userId={userId} />
-            </Suspense>
-          </>
-        }
-      />
-
-      <Suspense fallback={<RecentPageViewsCardSkeleton />}>
-        <RecentPageViewsCard siteId={siteId} userId={userId} />
-      </Suspense>
-    </div>
+      <div
+        className="grid gap-4 
+      md:grid-cols-2 lg:grid-cols-3"
+      >
+        <Suspense fallback={<TotalViewsCardSkeleton />}>
+          <TotalViewsCard siteId={params.siteId} userId={session.user.id} />
+        </Suspense>
+        <Suspense fallback={<TopCountriesCardSkeleton />}>
+          <TopCountriesCard siteId={params.siteId} userId={session.user.id} />
+        </Suspense>
+        <Suspense fallback={<RecentPageViewsCardSkeleton />}>
+          <RecentPageViewsCard
+            siteId={params.siteId}
+            userId={session.user.id}
+          />
+        </Suspense>
+      </div>
+      <div className="grid gap-4 mt-4">
+        <Suspense fallback={<WorldMapCardSkeleton />}>
+          <WorldMapCard />
+        </Suspense>
+      </div>
+    </>
   );
 }

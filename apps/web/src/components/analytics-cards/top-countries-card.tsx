@@ -33,7 +33,7 @@ export async function TopCountriesCard({
             {topCountries.map((country, i) => (
               <div
                 key={i}
-                className="flex flex-row justify-between items-center h-6"
+                className="flex flex-row justify-between items-center"
               >
                 <div className="flex items-center gap-2">
                   <CircleFlag

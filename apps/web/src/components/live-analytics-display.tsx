@@ -13,6 +13,7 @@ import {
 import { useProject } from "@/contexts/project-context";
 import { TopCountriesCardSkeleton } from "./analytics-cards/top-countries-card";
 import { TotalViewsCardSkeleton } from "./analytics-cards/total-views-card";
+import { RecentPageViewsCardSkeleton } from "./analytics-cards/recent-page-views-card";
 
 interface LiveAnalyticsDisplayProps {
   analyticsCards: React.ReactNode;
@@ -89,7 +90,7 @@ export function LiveAnalyticsDisplay({
 
   if (!activeProject || !currentSiteId) {
     return (
-      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-3 mb-6">
+      <div className="grid gap-4 md:grid-cols-4 lg:grid-cols-4 mb-6">
         <Card>
           <CardHeader>
             <CardTitle>Live Users</CardTitle>
@@ -103,6 +104,7 @@ export function LiveAnalyticsDisplay({
         </Card>
         <TopCountriesCardSkeleton />
         <TotalViewsCardSkeleton />
+        <RecentPageViewsCardSkeleton />
       </div>
     );
   }

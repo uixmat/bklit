@@ -180,3 +180,93 @@ export async function getRecentPageViews(
     }
   )();
 }
+
+const getVisitsByCountrySchema = z.object({
+  siteId: z.string(),
+  userId: z.string(),
+});
+
+export async function getVisitsByCountry(
+  params: z.infer<typeof getVisitsByCountrySchema>
+) {
+  const validation = getVisitsByCountrySchema.safeParse(params);
+
+  if (!validation.success) {
+    throw new Error(validation.error.message);
+  }
+
+  const { siteId, userId } = validation.data;
+
+  return await cache(
+    async () => {
+      const site = await prisma.site.findFirst({
+        where: {
+          id: siteId,
+          userId: userId,
+        },
+      });
+
+      if (!site) {
+        throw new Error("Site not found or access denied");
+      }
+
+      // Get all countries with visits
+      const countriesWithVisits = await prisma.pageViewEvent.groupBy({
+        by: ["country", "countryCode", "lat", "lon"],
+        where: {
+          siteId,
+          country: { not: null },
+          countryCode: { not: null },
+        },
+        _count: {
+          country: true,
+        },
+      });
+
+      // Get city breakdown for each country
+      const countriesWithCities = await Promise.all(
+        countriesWithVisits.map(async (country) => {
+          const cities = await prisma.pageViewEvent.groupBy({
+            by: ["city"],
+            where: {
+              siteId,
+              country: country.country,
+              city: { not: null },
+            },
+            _count: {
+              city: true,
+            },
+            orderBy: {
+              _count: {
+                city: "desc",
+              },
+            },
+          });
+
+          return {
+            country: country.country!,
+            countryCode: country.countryCode!,
+            totalVisits: country._count.country,
+            coordinates:
+              country.lat && country.lon
+                ? ([country.lon, country.lat] as [number, number])
+                : null,
+            cities: cities.map((city) => ({
+              name: city.city!,
+              visits: city._count.city,
+            })),
+          };
+        })
+      );
+
+      return countriesWithCities.filter(
+        (country) => country.coordinates !== null
+      );
+    },
+    [`${siteId}-visits-by-country`],
+    {
+      revalidate: 300, // 5 minutes
+      tags: [`${siteId}-analytics`],
+    }
+  )();
+}
