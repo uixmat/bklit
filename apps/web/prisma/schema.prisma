@@ -102,6 +102,9 @@ model PageViewEvent {
   timezone    String?
   isp         String?
   mobile      Boolean?
+  
+  // Browser data
+  userAgent   String? @db.Text
 
   siteId String
   site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)

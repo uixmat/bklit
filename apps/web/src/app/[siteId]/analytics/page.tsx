@@ -13,6 +13,7 @@ import {
 } from "@/components/analytics-cards/skeletons";
 import { WorldMapCard } from "@/components/analytics-cards/world-map-card";
 import { MobileDesktopCard } from "@/components/analytics-cards/mobile-desktop-card";
+import { BrowserStatsCard } from "@/components/analytics-cards/browser-stats-card";
 
 export default async function AnalyticsPage({
   params,
@@ -47,6 +48,7 @@ export default async function AnalyticsPage({
         <Suspense fallback={<MobileDesktopCardSkeleton />}>
           <MobileDesktopCard />
         </Suspense>
+        <BrowserStatsCard />
       </div>
       <div className="grid gap-4">
         <Suspense fallback={<WorldMapCardSkeleton />}>

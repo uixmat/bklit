@@ -594,3 +594,89 @@ export async function getTopPages(params: z.input<typeof getTopPagesSchema>) {
     }
   )();
 }
+
+const getBrowserStatsSchema = z.object({
+  siteId: z.string(),
+  userId: z.string(),
+});
+
+export async function getBrowserStats(
+  params: z.infer<typeof getBrowserStatsSchema>
+) {
+  const validation = getBrowserStatsSchema.safeParse(params);
+
+  if (!validation.success) {
+    throw new Error(validation.error.message);
+  }
+
+  const { siteId, userId } = validation.data;
+
+  return await cache(
+    async () => {
+      const site = await prisma.site.findFirst({
+        where: {
+          id: siteId,
+          userId: userId,
+        },
+      });
+
+      if (!site) {
+        throw new Error("Site not found or access denied");
+      }
+
+      // Get all page views with user agent data
+      const pageViews = await prisma.pageViewEvent.findMany({
+        where: {
+          siteId,
+          userAgent: { not: null },
+        },
+        select: {
+          userAgent: true,
+        },
+      });
+
+      // Parse user agents to extract browser information
+      const browserStats: Record<string, number> = {};
+
+      pageViews.forEach((view) => {
+        const userAgent = view.userAgent || "";
+        let browser = "Unknown";
+
+        // Simple browser detection logic
+        if (userAgent.includes("Chrome")) {
+          browser = "Chrome";
+        } else if (userAgent.includes("Firefox")) {
+          browser = "Firefox";
+        } else if (
+          userAgent.includes("Safari") &&
+          !userAgent.includes("Chrome")
+        ) {
+          browser = "Safari";
+        } else if (userAgent.includes("Edge")) {
+          browser = "Edge";
+        } else if (userAgent.includes("Opera")) {
+          browser = "Opera";
+        } else if (
+          userAgent.includes("MSIE") ||
+          userAgent.includes("Trident")
+        ) {
+          browser = "Internet Explorer";
+        }
+
+        browserStats[browser] = (browserStats[browser] || 0) + 1;
+      });
+
+      // Convert to array format for easier consumption
+      const browserData = Object.entries(browserStats)
+        .map(([browser, count]) => ({ browser, count }))
+        .sort((a, b) => b.count - a.count);
+
+      return browserData;
+    },
+    [`${siteId}-browser-stats`],
+    {
+      revalidate: 300, // 5 minutes
+      tags: [`${siteId}-analytics`],
+    }
+  )();
+}

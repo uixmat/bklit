@@ -8,6 +8,7 @@ interface TrackingPayload {
   url: string;
   timestamp: string;
   siteId: string; // Added siteId
+  userAgent?: string; // Add user agent to payload
   // other potential fields
 }
 
@@ -71,6 +72,7 @@ export async function POST(request: NextRequest) {
           url: payload.url,
           timestamp: new Date(payload.timestamp),
           siteId: payload.siteId,
+          userAgent: payload.userAgent, // Store user agent
           // Location data
           ip: locationData?.ip,
           country: locationData?.country,

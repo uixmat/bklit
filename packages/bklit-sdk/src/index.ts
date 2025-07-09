@@ -28,6 +28,7 @@ export function initBklit(options: BklitOptions): void {
         url: window.location.href,
         timestamp: new Date().toISOString(),
         siteId: siteId,
+        userAgent: navigator.userAgent, // Add user agent
       };
 
       const response = await fetch(apiHost, {
