@@ -14,10 +14,32 @@ import { useProject } from "@/contexts/project-context";
 import { getBrowserStats } from "@/actions/analytics-actions";
 import { Skeleton } from "@/components/ui/skeleton";
 
+import { SafariIcon } from "@/components/icons/safari";
+import { ChromeIcon } from "@/components/icons/chrome";
+import { FirefoxIcon } from "@/components/icons/firefox";
+import { EdgeIcon } from "@/components/icons/edge";
+import { BrowserIcon } from "@/components/icons/browser";
+
 // BrowserStat interface is used in the component logic
 interface BrowserStat {
   browser: string;
   count: number;
+}
+
+// Function to get the appropriate icon for each browser
+function getBrowserIcon(browser: string) {
+  switch (browser.toLowerCase()) {
+    case "chrome":
+      return <ChromeIcon size={16} />;
+    case "firefox":
+      return <FirefoxIcon size={16} />;
+    case "safari":
+      return <SafariIcon size={16} />;
+    case "edge":
+      return <EdgeIcon size={16} />;
+    default:
+      return <BrowserIcon size={16} />;
+  }
 }
 
 export function BrowserStatsCard() {
@@ -58,7 +80,7 @@ export function BrowserStatsCard() {
                 className="flex items-center justify-between"
               >
                 <div className="flex items-center space-x-2">
-                  <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                  {getBrowserIcon(stat.browser)}
                   <span className="text-sm font-medium">{stat.browser}</span>
                 </div>
                 <div className="flex items-center space-x-2">
