@@ -5,9 +5,17 @@ import * as d3 from "d3";
 import * as topojson from "topojson-client";
 
 import { getCountryVisitStats } from "@/actions/analytics-actions";
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CircleFlag } from "react-circle-flags";
+import { Monitor, Smartphone } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 
 interface CountryVisitData {
   country: string;
@@ -86,29 +94,30 @@ export function WorldMap({ siteId, userId }: WorldMapProps) {
     svg.call(zoom);
 
     // Load and render world map
-    // @ts-expect-error - D3.js world atlas types are complex
     d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .then((world: any) => {
         if (!world) return;
 
         const countries = topojson.feature(world, world.objects.countries);
 
         // Draw countries
-        // @ts-expect-error - D3.js feature collection types are complex
         g.selectAll(".country")
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .data((countries as any).features)
           .enter()
           .append("path")
           .attr("class", "country")
           .attr("d", (d) => path(d as d3.GeoPermissibleObjects) || "")
-          .attr("fill", "#e5e7eb")
-          .attr("stroke", "#ffffff")
-          .attr("stroke-width", 0.5)
+          .attr("fill", "var(--primary)")
+          .attr("stroke", "var(--primary)")
+          .attr("stroke-width", 0)
+          .attr("opacity", 0.33)
           .on("mouseover", function () {
-            d3.select(this).attr("fill", "#d1d5db");
+            d3.select(this).attr("opacity", 0.38);
           })
           .on("mouseout", function () {
-            d3.select(this).attr("fill", "#e5e7eb");
+            d3.select(this).attr("opacity", 0.33);
           });
 
         // Add circle markers for countries with visits
@@ -132,7 +141,7 @@ export function WorldMap({ siteId, userId }: WorldMapProps) {
           .transition()
           .duration(1000)
           .delay((d, i) => i * 100)
-          .attr("r", (d) => Math.sqrt(d.totalVisits / 10) + 3);
+          .attr("r", (d) => Math.sqrt(d.totalVisits / 10) + 6);
 
         // Add tooltip interactions
         markers
@@ -141,26 +150,8 @@ export function WorldMap({ siteId, userId }: WorldMapProps) {
             d3.select(this)
               .transition()
               .duration(200)
-              .attr("r", Math.sqrt(d.totalVisits / 10) + 6)
+              .attr("r", Math.sqrt(d.totalVisits / 10) + 8)
               .attr("opacity", 1);
-
-            // Dim all countries except the one this marker belongs to
-            g.selectAll(".country")
-              .transition()
-              .duration(200)
-              .attr("opacity", (countryFeature) => {
-                // Check if this country matches the marker's country
-                const feature = countryFeature as d3.GeoPermissibleObjects & {
-                  properties?: {
-                    ISO_A2?: string;
-                    ADM0_A3?: string;
-                  };
-                };
-                const countryIso =
-                  feature.properties?.ISO_A2 || feature.properties?.ADM0_A3;
-                return countryIso === d.countryCode ? 1 : 0.3; // Keep target country at full opacity, dim others
-              })
-              .attr("fill", "#e5e7eb"); // Keep all countries at their original color
 
             // Show tooltip
             const svgRect = svgRef.current!.getBoundingClientRect();
@@ -182,15 +173,15 @@ export function WorldMap({ siteId, userId }: WorldMapProps) {
             d3.select(this)
               .transition()
               .duration(200)
-              .attr("r", Math.sqrt(d.totalVisits / 10) + 3)
+              .attr("r", Math.sqrt(d.totalVisits / 10) + 6)
               .attr("opacity", 0.8);
 
             // Restore all countries to normal opacity and color
             g.selectAll(".country")
               .transition()
               .duration(200)
-              .attr("opacity", 1)
-              .attr("fill", "#e5e7eb");
+              .attr("opacity", 0.33)
+              .attr("fill", "var(--primary)");
 
             // Hide tooltip
             setTooltipData(null);
@@ -203,14 +194,6 @@ export function WorldMap({ siteId, userId }: WorldMapProps) {
         setIsLoading(false);
       });
   }, [visitData]);
-
-  const getFlagEmoji = (countryCode: string) => {
-    const codePoints = countryCode
-      .toUpperCase()
-      .split("")
-      .map((char) => 127397 + char.charCodeAt(0));
-    return String.fromCodePoint(...codePoints);
-  };
 
   return (
     <div
@@ -240,32 +223,47 @@ export function WorldMap({ siteId, userId }: WorldMapProps) {
             transform: "translateY(-100%)",
           }}
         >
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <span className="text-2xl">
-                {getFlagEmoji(tooltipData.countryCode)}
-              </span>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CircleFlag
+                className="size-4"
+                countryCode={tooltipData.countryCode.toLowerCase()}
+              />
               {tooltipData.country}
             </CardTitle>
+            <CardDescription>
+              Analytics data for {tooltipData.country}
+            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="font-medium">Total Visits:</span>
-              <Badge variant="secondary">{tooltipData.totalVisits}</Badge>
+          <CardContent className="space-y-2">
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Total pageviews</span>
+                <Badge variant="secondary">{tooltipData.totalVisits}</Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">
+                  Total unique visitors
+                </span>
+                <Badge variant="secondary">{tooltipData.uniqueVisits}</Badge>
+              </div>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Mobile:</span>
-              <span className="text-sm">{tooltipData.mobileVisits}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Desktop:</span>
-              <span className="text-sm">{tooltipData.desktopVisits}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">
-                Unique Visitors:
-              </span>
-              <span className="text-sm">{tooltipData.uniqueVisits}</span>
+            <Separator />
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center justify-between">
+                <span className="inline-flex gap-2 items-center text-sm text-muted-foreground">
+                  <Smartphone className="size-4" />
+                  Mobile
+                </span>
+                <Badge variant="secondary">{tooltipData.mobileVisits}</Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="inline-flex gap-2 items-center text-sm text-muted-foreground">
+                  <Monitor className="size-4" />
+                  Desktop
+                </span>
+                <Badge variant="secondary">{tooltipData.desktopVisits}</Badge>
+              </div>
             </div>
           </CardContent>
         </Card>
