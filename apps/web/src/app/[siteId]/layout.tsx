@@ -16,10 +16,10 @@ async function getLayoutDataAndRender({
   session,
 }: {
   children: React.ReactNode;
-  params: { siteId: string };
+  params: Promise<{ siteId: string }>;
   session: NextAuthUser & { id: string }; // Assuming session.user.id is always present after check
 }) {
-  const { siteId } = params;
+  const { siteId } = await params;
   const userId = session.id; // Use session.id directly as passed
 
   const userSites: Site[] = await prisma.site.findMany({
@@ -78,7 +78,7 @@ export default async function SiteSpecificLayout({
   params,
 }: {
   children: React.ReactNode;
-  params: { siteId: string };
+  params: Promise<{ siteId: string }>;
 }) {
   // const { siteId } = params; // This line was reported as the error source. Deferring destructuring.
 

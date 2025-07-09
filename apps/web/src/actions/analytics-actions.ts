@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/db";
 import { unstable_cache as cache } from "next/cache";
 import { z } from "zod";
+import { findCountryCoordinates } from "@/lib/maps/country-coordinates";
 
 const getTopCountriesSchema = z.object({
   siteId: z.string(),
@@ -269,4 +270,189 @@ export async function getVisitsByCountry(
       tags: [`${siteId}-analytics`],
     }
   )();
+}
+
+const getCountryVisitStatsSchema = z.object({
+  siteId: z.string(),
+  userId: z.string(),
+});
+
+export async function getCountryVisitStats(
+  params: z.infer<typeof getCountryVisitStatsSchema>
+) {
+  const validation = getCountryVisitStatsSchema.safeParse(params);
+
+  if (!validation.success) {
+    throw new Error(validation.error.message);
+  }
+
+  const { siteId, userId } = validation.data;
+
+  return await cache(
+    async () => {
+      const site = await prisma.site.findFirst({
+        where: {
+          id: siteId,
+          userId: userId,
+        },
+      });
+
+      if (!site) {
+        throw new Error("Site not found or access denied");
+      }
+
+      // Get all countries with visits, grouped by country
+      const countriesWithVisits = await prisma.pageViewEvent.groupBy({
+        by: ["country", "countryCode"],
+        where: {
+          siteId,
+          country: { not: null },
+          countryCode: { not: null },
+        },
+        _count: {
+          country: true,
+        },
+      });
+
+      // Get detailed stats for each country
+      const countriesWithStats = await Promise.all(
+        countriesWithVisits.map(async (country) => {
+          const countryCode = country.countryCode!;
+          const coordinates = findCountryCoordinates(countryCode);
+
+          // Debug logging to see what country codes we're getting
+          if (!coordinates) {
+            console.log(
+              `No coordinates found for country code: ${countryCode}, country: ${country.country}`
+            );
+          }
+
+          // Get mobile vs desktop breakdown
+          const mobileVisits = await prisma.pageViewEvent.count({
+            where: {
+              siteId,
+              country: country.country,
+              mobile: true,
+            },
+          });
+
+          const desktopVisits = await prisma.pageViewEvent.count({
+            where: {
+              siteId,
+              country: country.country,
+              mobile: false,
+            },
+          });
+
+          // Get unique visits by IP
+          const uniqueVisits = await prisma.pageViewEvent.groupBy({
+            by: ["ip"],
+            where: {
+              siteId,
+              country: country.country,
+              ip: { not: null },
+            },
+            _count: {
+              ip: true,
+            },
+          });
+
+          return {
+            country: country.country!,
+            countryCode,
+            totalVisits: country._count.country,
+            mobileVisits,
+            desktopVisits,
+            uniqueVisits: uniqueVisits.length,
+            coordinates: coordinates
+              ? ([coordinates.longitude, coordinates.latitude] as [
+                  number,
+                  number
+                ])
+              : null,
+          };
+        })
+      );
+
+      // Debug: Log all countries and their coordinate status
+      console.log(
+        "Countries with visits:",
+        countriesWithStats.map((c) => ({
+          country: c.country,
+          countryCode: c.countryCode,
+          hasCoordinates: c.coordinates !== null,
+          totalVisits: c.totalVisits,
+        }))
+      );
+
+      // Temporarily return all countries to debug (including those without coordinates)
+      const result = countriesWithStats.sort(
+        (a, b) => b.totalVisits - a.totalVisits
+      );
+
+      console.log(
+        "Final result:",
+        result.map((c) => ({
+          country: c.country,
+          countryCode: c.countryCode,
+          hasCoordinates: c.coordinates !== null,
+          totalVisits: c.totalVisits,
+        }))
+      );
+
+      return result;
+    },
+    [`${siteId}-country-visit-stats`],
+    {
+      revalidate: 300, // 5 minutes
+      tags: [`${siteId}-analytics`],
+    }
+  )();
+}
+
+export async function debugCountryCodes(
+  params: z.infer<typeof getCountryVisitStatsSchema>
+) {
+  const validation = getCountryVisitStatsSchema.safeParse(params);
+
+  if (!validation.success) {
+    throw new Error(validation.error.message);
+  }
+
+  const { siteId, userId } = validation.data;
+
+  const site = await prisma.site.findFirst({
+    where: {
+      id: siteId,
+      userId: userId,
+    },
+  });
+
+  if (!site) {
+    throw new Error("Site not found or access denied");
+  }
+
+  // Get all unique country codes from the database
+  const uniqueCountryCodes = await prisma.pageViewEvent.groupBy({
+    by: ["country", "countryCode"],
+    where: {
+      siteId,
+      country: { not: null },
+      countryCode: { not: null },
+    },
+    _count: {
+      countryCode: true,
+    },
+  });
+
+  console.log(
+    "Unique country codes in database:",
+    uniqueCountryCodes.map((c) => ({
+      country: c.country,
+      countryCode: c.countryCode,
+      count: c._count.countryCode,
+    }))
+  );
+
+  return uniqueCountryCodes;
 }

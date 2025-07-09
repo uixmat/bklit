@@ -17,8 +17,9 @@ import { WorldMapCard } from "@/components/analytics-cards/world-map-card";
 export default async function AnalyticsPage({
   params,
 }: {
-  params: { siteId: string };
+  params: Promise<{ siteId: string }>;
 }) {
+  const { siteId } = await params;
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user) {
@@ -36,16 +37,13 @@ export default async function AnalyticsPage({
       md:grid-cols-2 lg:grid-cols-3"
       >
         <Suspense fallback={<TotalViewsCardSkeleton />}>
-          <TotalViewsCard siteId={params.siteId} userId={session.user.id} />
+          <TotalViewsCard siteId={siteId} userId={session.user.id} />
         </Suspense>
         <Suspense fallback={<TopCountriesCardSkeleton />}>
-          <TopCountriesCard siteId={params.siteId} userId={session.user.id} />
+          <TopCountriesCard siteId={siteId} userId={session.user.id} />
         </Suspense>
         <Suspense fallback={<RecentPageViewsCardSkeleton />}>
-          <RecentPageViewsCard
-            siteId={params.siteId}
-            userId={session.user.id}
-          />
+          <RecentPageViewsCard siteId={siteId} userId={session.user.id} />
         </Suspense>
       </div>
       <div className="grid gap-4 mt-4">

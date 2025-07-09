@@ -20,15 +20,14 @@ export default async function BillingPage({
   params,
   searchParams,
 }: {
-  params: { siteId: string };
+  params: Promise<{ siteId: string }>;
   searchParams?: { [key: string]: string | string[] | undefined };
 }) {
+  const { siteId } = await params;
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user?.id) {
-    redirect(
-      `/login?callbackUrl=${encodeURIComponent(`/${params.siteId}/billing`)}`
-    );
+    redirect(`/login?callbackUrl=${encodeURIComponent(`/${siteId}/billing`)}`);
   }
 
   const userPlan = await getUserPlan(session.user.id);

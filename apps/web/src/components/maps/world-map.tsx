@@ -4,19 +4,19 @@ import { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import * as topojson from "topojson-client";
 
-import { getVisitsByCountry } from "@/actions/analytics-actions";
+import { getCountryVisitStats } from "@/actions/analytics-actions";
 
-interface CityData {
-  name: string;
-  visits: number;
-}
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 interface CountryVisitData {
   country: string;
   countryCode: string;
   totalVisits: number;
+  mobileVisits: number;
+  desktopVisits: number;
+  uniqueVisits: number;
   coordinates: [number, number] | null;
-  cities: CityData[];
 }
 
 interface WorldMapProps {
@@ -26,15 +26,16 @@ interface WorldMapProps {
 
 export function WorldMap({ siteId, userId }: WorldMapProps) {
   const svgRef = useRef<SVGSVGElement>(null);
-  const tooltipRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [visitData, setVisitData] = useState<CountryVisitData[]>([]);
+  const [tooltipData, setTooltipData] = useState<CountryVisitData | null>(null);
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const data = await getVisitsByCountry({ siteId, userId });
+        const data = await getCountryVisitStats({ siteId, userId });
         setVisitData(data);
       } catch (error) {
         console.error("Error loading visit data:", error);
@@ -60,8 +61,8 @@ export function WorldMap({ siteId, userId }: WorldMapProps) {
     // Set up projection
     const projection = d3
       .geoNaturalEarth1()
-      .scale(150)
-      .translate([width / 2, height / 2]);
+      .scale(350)
+      .translate([width / 2, height / 1.1]);
 
     const path = d3.geoPath().projection(projection);
 
@@ -70,12 +71,22 @@ export function WorldMap({ siteId, userId }: WorldMapProps) {
       .zoom<SVGSVGElement, unknown>()
       .scaleExtent([0.5, 8])
       .on("zoom", (event) => {
-        g.attr("transform", event.transform);
+        const { transform } = event;
+        g.attr("transform", transform);
+
+        // Scale markers with zoom
+        g.selectAll(".marker")
+          .attr("r", (d) => {
+            const data = d as CountryVisitData;
+            return (Math.sqrt(data.totalVisits / 10) + 3) / transform.k;
+          })
+          .attr("stroke-width", 2 / transform.k);
       });
 
     svg.call(zoom);
 
     // Load and render world map
+    // @ts-expect-error - D3.js world atlas types are complex
     d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
       .then((world: any) => {
         if (!world) return;
@@ -83,8 +94,9 @@ export function WorldMap({ siteId, userId }: WorldMapProps) {
         const countries = topojson.feature(world, world.objects.countries);
 
         // Draw countries
+        // @ts-expect-error - D3.js feature collection types are complex
         g.selectAll(".country")
-          .data(countries.features)
+          .data((countries as any).features)
           .enter()
           .append("path")
           .attr("class", "country")
@@ -132,96 +144,38 @@ export function WorldMap({ siteId, userId }: WorldMapProps) {
               .attr("r", Math.sqrt(d.totalVisits / 10) + 6)
               .attr("opacity", 1);
 
-            // Calculate tooltip position relative to container
-            const containerRect = containerRef.current?.getBoundingClientRect();
-            if (!containerRect) return;
+            // Dim all countries except the one this marker belongs to
+            g.selectAll(".country")
+              .transition()
+              .duration(200)
+              .attr("opacity", (countryFeature) => {
+                // Check if this country matches the marker's country
+                const feature = countryFeature as d3.GeoPermissibleObjects & {
+                  properties?: {
+                    ISO_A2?: string;
+                    ADM0_A3?: string;
+                  };
+                };
+                const countryIso =
+                  feature.properties?.ISO_A2 || feature.properties?.ADM0_A3;
+                return countryIso === d.countryCode ? 1 : 0.3; // Keep target country at full opacity, dim others
+              })
+              .attr("fill", "#e5e7eb"); // Keep all countries at their original color
 
-            const tooltip = d3.select(tooltipRef.current);
-            const tooltipNode = tooltipRef.current;
-            if (!tooltipNode) return;
+            // Show tooltip
+            const svgRect = svgRef.current!.getBoundingClientRect();
+            const relativeX = event.clientX - svgRect.left;
+            const relativeY = event.clientY - svgRect.top;
 
-            // Get mouse position relative to container
-            const mouseX = event.clientX - containerRect.left;
-            const mouseY = event.clientY - containerRect.top;
-
-            // Calculate tooltip position
-            const tooltipWidth = 250; // Approximate tooltip width
-            const padding = 10;
-
-            let left = mouseX + padding;
-            let top = mouseY - padding;
-
-            // Adjust if tooltip would go outside container bounds
-            if (left + tooltipWidth > containerRect.width) {
-              left = mouseX - tooltipWidth - padding;
-            }
-            if (top < 0) {
-              top = mouseY + padding;
-            }
-
-            // Create tooltip content with flag and city data
-            const citiesList = d.cities
-              .slice(0, 5) // Show top 5 cities
-              .map(
-                (city) =>
-                  `<div class="flex justify-between"><span>${city.name}</span><span class="font-medium">${city.visits}</span></div>`
-              )
-              .join("");
-
-            tooltip
-              .style("opacity", 1)
-              .html(
-                `
-              <div class="flex items-center gap-2 mb-3">
-                <div class="w-6 h-6 rounded-full overflow-hidden">
-                  <img src="https://flagcdn.com/w40/${d.countryCode.toLowerCase()}.png" 
-                       alt="${d.country}" 
-                       class="w-full h-full object-cover" />
-                </div>
-                <div class="font-semibold text-lg">${d.country}</div>
-              </div>
-              <div class="mb-2">
-                <span class="font-medium">Total Visits:</span> ${d.totalVisits.toLocaleString()}
-              </div>
-              <div class="space-y-1 text-sm">
-                <div class="font-medium mb-1">Top Cities:</div>
-                ${citiesList}
-                ${
-                  d.cities.length > 5
-                    ? `<div class="text-xs text-gray-500 mt-1">+${
-                        d.cities.length - 5
-                      } more cities</div>`
-                    : ""
-                }
-              </div>
-            `
-              )
-              .style("left", `${left}px`)
-              .style("top", `${top}px`);
+            setTooltipData(d);
+            setTooltipPosition({ x: relativeX, y: relativeY });
           })
           .on("mousemove", (event) => {
-            const containerRect = containerRef.current?.getBoundingClientRect();
-            if (!containerRect) return;
+            const svgRect = svgRef.current!.getBoundingClientRect();
+            const relativeX = event.clientX - svgRect.left;
+            const relativeY = event.clientY - svgRect.top;
 
-            const mouseX = event.clientX - containerRect.left;
-            const mouseY = event.clientY - containerRect.top;
-
-            const tooltipWidth = 250;
-            const padding = 10;
-
-            let left = mouseX + padding;
-            let top = mouseY - padding;
-
-            if (left + tooltipWidth > containerRect.width) {
-              left = mouseX - tooltipWidth - padding;
-            }
-            if (top < 0) {
-              top = mouseY + padding;
-            }
-
-            d3.select(tooltipRef.current)
-              .style("left", `${left}px`)
-              .style("top", `${top}px`);
+            setTooltipPosition({ x: relativeX, y: relativeY });
           })
           .on("mouseout", function (event, d) {
             // Reset marker
@@ -231,8 +185,15 @@ export function WorldMap({ siteId, userId }: WorldMapProps) {
               .attr("r", Math.sqrt(d.totalVisits / 10) + 3)
               .attr("opacity", 0.8);
 
+            // Restore all countries to normal opacity and color
+            g.selectAll(".country")
+              .transition()
+              .duration(200)
+              .attr("opacity", 1)
+              .attr("fill", "#e5e7eb");
+
             // Hide tooltip
-            d3.select(tooltipRef.current).style("opacity", 0);
+            setTooltipData(null);
           });
 
         setIsLoading(false);
@@ -242,6 +203,14 @@ export function WorldMap({ siteId, userId }: WorldMapProps) {
         setIsLoading(false);
       });
   }, [visitData]);
+
+  const getFlagEmoji = (countryCode: string) => {
+    const codePoints = countryCode
+      .toUpperCase()
+      .split("")
+      .map((char) => 127397 + char.charCodeAt(0));
+    return String.fromCodePoint(...codePoints);
+  };
 
   return (
     <div
@@ -262,11 +231,45 @@ export function WorldMap({ siteId, userId }: WorldMapProps) {
         className="cursor-grab active:cursor-grabbing"
       />
 
-      <div
-        ref={tooltipRef}
-        className="absolute pointer-events-none bg-white border border-gray-200 rounded-lg shadow-lg p-3 text-sm opacity-0 transition-opacity duration-200 z-30 max-w-xs"
-        style={{ opacity: 0 }}
-      />
+      {tooltipData && (
+        <Card
+          className="absolute pointer-events-none z-30 bg-card/85 backdrop-blur-sm w-80"
+          style={{
+            left: tooltipPosition.x + 10,
+            top: tooltipPosition.y - 10,
+            transform: "translateY(-100%)",
+          }}
+        >
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <span className="text-2xl">
+                {getFlagEmoji(tooltipData.countryCode)}
+              </span>
+              {tooltipData.country}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="font-medium">Total Visits:</span>
+              <Badge variant="secondary">{tooltipData.totalVisits}</Badge>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Mobile:</span>
+              <span className="text-sm">{tooltipData.mobileVisits}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Desktop:</span>
+              <span className="text-sm">{tooltipData.desktopVisits}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">
+                Unique Visitors:
+              </span>
+              <span className="text-sm">{tooltipData.uniqueVisits}</span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
