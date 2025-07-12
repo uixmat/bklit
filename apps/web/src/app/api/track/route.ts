@@ -73,71 +73,130 @@ export async function POST(request: NextRequest) {
     await redis.rpush(redisKey, JSON.stringify(eventData)); // Store the whole payload with location
     console.log(`Data pushed to Redis list: ${redisKey}`);
 
-    // Handle session tracking if sessionId is provided
+    // Handle session tracking and page view creation in a transaction
     if (payload.sessionId) {
       try {
-        console.log("🔄 API: Updating session...", {
-          sessionId: payload.sessionId,
-          siteId: payload.siteId,
-          url: payload.url,
-        });
+        console.log(
+          "🔄 API: Updating session and saving page view in transaction...",
+          {
+            sessionId: payload.sessionId,
+            siteId: payload.siteId,
+            url: payload.url,
+          }
+        );
 
-        await createOrUpdateSession({
-          sessionId: payload.sessionId,
-          siteId: payload.siteId,
-          url: payload.url,
-          userAgent: payload.userAgent,
-          country: locationData?.country,
-          city: locationData?.city,
+        if (!payload.sessionId) {
+          throw new Error("sessionId is required for this operation");
+        }
+        const sessionId = payload.sessionId;
+
+        await prisma.$transaction(async (tx) => {
+          // Upsert session using the transaction client
+          const session = await createOrUpdateSession(
+            {
+              sessionId: sessionId,
+              siteId: payload.siteId,
+              url: payload.url,
+              userAgent: payload.userAgent,
+              country: locationData?.country,
+              city: locationData?.city,
+            },
+            tx
+          );
+
+          console.log("🔗 API: Session upserted successfully", {
+            sessionId: session.sessionId,
+            sessionDbId: session.id,
+            siteId: session.siteId,
+          });
+
+          // Create page view event using the session's primary key (id)
+          await tx.pageViewEvent.create({
+            data: {
+              url: payload.url,
+              timestamp: new Date(payload.timestamp),
+              siteId: payload.siteId,
+              userAgent: payload.userAgent,
+              // Location data
+              ip: locationData?.ip,
+              country: locationData?.country,
+              countryCode: locationData?.countryCode,
+              region: locationData?.region,
+              regionName: locationData?.regionName,
+              city: locationData?.city,
+              zip: locationData?.zip,
+              lat: locationData?.lat,
+              lon: locationData?.lon,
+              timezone: locationData?.timezone,
+              isp: locationData?.isp,
+              mobile: locationData?.mobile,
+              // Link to session using the primary key (id), not the sessionId
+              sessionId: session.id,
+            },
+          });
+
+          console.log("📄 API: Page view event created successfully", {
+            url: payload.url,
+            sessionDbId: session.id,
+          });
         });
-        console.log("✅ API: Session updated successfully", {
-          sessionId: payload.sessionId,
-          siteId: payload.siteId,
-        });
+        console.log(
+          "✅ API: Session updated and page view saved successfully",
+          {
+            sessionId: payload.sessionId,
+            siteId: payload.siteId,
+          }
+        );
       } catch (sessionError) {
-        console.error("❌ API: Error updating session:", sessionError);
+        console.error(
+          "❌ API: Error updating session or saving page view:",
+          sessionError
+        );
         // Continue execution - session tracking failed but page view tracking should still work
       }
-    }
-
-    // Save page view to database for historical persistence
-    try {
-      console.log("💾 API: Saving page view to database...", {
-        url: payload.url,
-        siteId: payload.siteId,
-        sessionId: payload.sessionId,
-      });
-
-      await prisma.pageViewEvent.create({
-        data: {
+    } else {
+      // Save page view to database for historical persistence (no session)
+      try {
+        console.log("💾 API: Saving page view to database (no session)...", {
           url: payload.url,
-          timestamp: new Date(payload.timestamp),
           siteId: payload.siteId,
-          userAgent: payload.userAgent,
-          // Location data
-          ip: locationData?.ip,
-          country: locationData?.country,
-          countryCode: locationData?.countryCode,
-          region: locationData?.region,
-          regionName: locationData?.regionName,
-          city: locationData?.city,
-          zip: locationData?.zip,
-          lat: locationData?.lat,
-          lon: locationData?.lon,
-          timezone: locationData?.timezone,
-          isp: locationData?.isp,
-          mobile: locationData?.mobile,
-          // Link to session if available
-          sessionId: payload.sessionId || null,
-        },
-      });
-      console.log("✅ API: Page view saved to database successfully", {
-        siteId: payload.siteId,
-        sessionId: payload.sessionId,
-      });
-    } catch (dbError) {
-      console.error("❌ API: Error saving page view to database:", dbError);
-      // Continue execution - Redis storage succeeded, so real-time features still work
+        });
+        await prisma.pageViewEvent.create({
+          data: {
+            url: payload.url,
+            timestamp: new Date(payload.timestamp),
+            siteId: payload.siteId,
+            userAgent: payload.userAgent,
+            // Location data
+            ip: locationData?.ip,
+            country: locationData?.country,
+            countryCode: locationData?.countryCode,
+            region: locationData?.region,
+            regionName: locationData?.regionName,
+            city: locationData?.city,
+            zip: locationData?.zip,
+            lat: locationData?.lat,
+            lon: locationData?.lon,
+            timezone: locationData?.timezone,
+            isp: locationData?.isp,
+            mobile: locationData?.mobile,
+            // No session link
+            sessionId: null,
+          },
+        });
+        console.log(
+          "✅ API: Page view saved to database successfully (no session)",
+          {
+            siteId: payload.siteId,
+          }
+        );
+      } catch (dbError) {
+        console.error(
+          "❌ API: Error saving page view to database (no session):",
+          dbError
+        );
+        // Continue execution - Redis storage succeeded, so real-time features still work
+      }
     }
 
     // Emit event via Socket.IO

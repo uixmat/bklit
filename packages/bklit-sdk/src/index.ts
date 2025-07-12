@@ -9,6 +9,9 @@ interface BklitOptions {
 const DEFAULT_API_HOST = "http://localhost:3000/api/track"; // Replace with your actual production URL
 let bklitSocket: Socket | null = null; // Keep track of the socket instance
 let currentSessionId: string | null = null; // Keep track of current session
+let lastTrackedUrl: string | null = null; // Track last URL to prevent duplicates
+let lastTrackedTime: number = 0; // Track last tracking time
+const TRACKING_DEBOUNCE_MS = 1000; // Debounce tracking by 1 second
 
 export function initBklit(options: BklitOptions): void {
   if (typeof window === "undefined") {
@@ -36,6 +39,9 @@ export function initBklit(options: BklitOptions): void {
   // Generate or get existing session ID
   if (!currentSessionId) {
     currentSessionId = generateSessionId();
+    // Reset tracking state for new session
+    lastTrackedUrl = null;
+    lastTrackedTime = 0;
     console.log("🆔 Bklit SDK: New session created", {
       sessionId: currentSessionId,
     });
@@ -46,9 +52,25 @@ export function initBklit(options: BklitOptions): void {
   }
 
   async function trackPageView() {
+    const currentUrl = window.location.href;
+    const now = Date.now();
+
+    // Check if we should skip this tracking request
+    if (
+      lastTrackedUrl === currentUrl &&
+      now - lastTrackedTime < TRACKING_DEBOUNCE_MS
+    ) {
+      console.log("⏭️ Bklit SDK: Skipping duplicate page view tracking", {
+        url: currentUrl,
+        timeSinceLastTrack: now - lastTrackedTime,
+        debounceMs: TRACKING_DEBOUNCE_MS,
+      });
+      return;
+    }
+
     try {
       const data = {
-        url: window.location.href,
+        url: currentUrl,
         timestamp: new Date().toISOString(),
         siteId: siteId,
         userAgent: navigator.userAgent,
@@ -72,6 +94,10 @@ export function initBklit(options: BklitOptions): void {
       });
 
       if (response.ok) {
+        // Update tracking state only on success
+        lastTrackedUrl = currentUrl;
+        lastTrackedTime = now;
+
         console.log("✅ Bklit SDK: Page view tracked successfully!", {
           url: data.url,
           sessionId: data.sessionId,
@@ -170,7 +196,7 @@ export function initBklit(options: BklitOptions): void {
           siteId: siteId,
         });
 
-        const endSessionUrl = apiHost.replace("/track", "/session-end");
+        const endSessionUrl = apiHost + "/session-end";
         const response = await fetch(endSessionUrl, {
           method: "POST",
           headers: {

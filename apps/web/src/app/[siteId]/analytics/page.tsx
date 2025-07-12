@@ -16,6 +16,7 @@ import { MobileDesktopCard } from "@/components/analytics-cards/mobile-desktop-c
 import { BrowserStatsCard } from "@/components/analytics-cards/browser-stats-card";
 import { BounceRateCard } from "@/components/analytics-cards/bounce-rate-card";
 import { SessionAnalyticsCard } from "@/components/analytics-cards/session-analytics-card";
+import SessionsList from "./sessions-list";
 
 export default async function AnalyticsPage({
   params,
@@ -60,6 +61,12 @@ export default async function AnalyticsPage({
       </div>
       <div className="grid gap-4">
         <SessionAnalyticsCard siteId={siteId} userId={session.user.id} />
+      </div>
+      <div className="mt-8">
+        <h2 className="text-lg font-semibold mb-2">
+          Recent Sessions & Page Flow
+        </h2>
+        <SessionsList siteId={siteId} limit={5} />
       </div>
     </>
   );

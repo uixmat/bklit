@@ -385,15 +385,15 @@ export async function getCountryVisitStats(
       );
 
       // Debug: Log all countries and their coordinate status
-      console.log(
-        "Countries with visits:",
-        countriesWithStats.map((c) => ({
-          country: c.country,
-          countryCode: c.countryCode,
-          hasCoordinates: c.coordinates !== null,
-          totalVisits: c.totalVisits,
-        }))
-      );
+      // console.log(
+      //   "Countries with visits:",
+      //   countriesWithStats.map((c) => ({
+      //     country: c.country,
+      //     countryCode: c.countryCode,
+      //     hasCoordinates: c.coordinates !== null,
+      //     totalVisits: c.totalVisits,
+      //   }))
+      // );
 
       // Temporarily return all countries to debug (including those without coordinates)
       const result = countriesWithStats.sort(

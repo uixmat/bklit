@@ -28,6 +28,9 @@ var import_socket = require("socket.io-client");
 var DEFAULT_API_HOST = "http://localhost:3000/api/track";
 var bklitSocket = null;
 var currentSessionId = null;
+var lastTrackedUrl = null;
+var lastTrackedTime = 0;
+var TRACKING_DEBOUNCE_MS = 1e3;
 function initBklit(options) {
   if (typeof window === "undefined") {
     return;
@@ -46,6 +49,8 @@ function initBklit(options) {
   window.bklitApiHost = apiHost;
   if (!currentSessionId) {
     currentSessionId = generateSessionId();
+    lastTrackedUrl = null;
+    lastTrackedTime = 0;
     console.log("\u{1F194} Bklit SDK: New session created", {
       sessionId: currentSessionId
     });
@@ -55,9 +60,19 @@ function initBklit(options) {
     });
   }
   async function trackPageView2() {
+    const currentUrl2 = window.location.href;
+    const now = Date.now();
+    if (lastTrackedUrl === currentUrl2 && now - lastTrackedTime < TRACKING_DEBOUNCE_MS) {
+      console.log("\u23ED\uFE0F Bklit SDK: Skipping duplicate page view tracking", {
+        url: currentUrl2,
+        timeSinceLastTrack: now - lastTrackedTime,
+        debounceMs: TRACKING_DEBOUNCE_MS
+      });
+      return;
+    }
     try {
       const data = {
-        url: window.location.href,
+        url: currentUrl2,
         timestamp: (/* @__PURE__ */ new Date()).toISOString(),
         siteId,
         userAgent: navigator.userAgent,
@@ -78,6 +93,8 @@ function initBklit(options) {
         keepalive: true
       });
       if (response.ok) {
+        lastTrackedUrl = currentUrl2;
+        lastTrackedTime = now;
         console.log("\u2705 Bklit SDK: Page view tracked successfully!", {
           url: data.url,
           sessionId: data.sessionId,
@@ -157,7 +174,7 @@ function initBklit(options) {
           sessionId: currentSessionId,
           siteId
         });
-        const endSessionUrl = apiHost.replace("/track", "/session-end");
+        const endSessionUrl = apiHost + "/session-end";
         const response = await fetch(endSessionUrl, {
           method: "POST",
           headers: {

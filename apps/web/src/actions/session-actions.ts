@@ -21,30 +21,42 @@ function generateVisitorId(userAgent: string): string {
   return Math.abs(hash).toString(36);
 }
 
-// Create or update a session
-export async function createOrUpdateSession(data: SessionData) {
+// Create or update a session (accepts a Prisma client for transaction support)
+export async function createOrUpdateSession(
+  data: SessionData,
+  prismaClient: typeof prisma = prisma
+) {
   const { sessionId, siteId, url, userAgent, country, city } = data;
 
   try {
+    // Debug: which client is being used
+    console.log(
+      "[createOrUpdateSession] Using client:",
+      prismaClient === prisma ? "global prisma" : "transaction client"
+    );
+
     // Check if session exists
-    const existingSession = await prisma.trackedSession.findUnique({
+    const existingSession = await prismaClient.trackedSession.findUnique({
       where: { sessionId },
     });
 
     if (existingSession) {
       // Update existing session
-      return await prisma.trackedSession.update({
+      return await prismaClient.trackedSession.update({
         where: { sessionId },
         data: {
           exitPage: url,
         },
       });
     } else {
-      // Create new session
+      // Upsert session (create if not exists, update if exists)
       const visitorId = userAgent ? generateVisitorId(userAgent) : null;
-
-      return await prisma.trackedSession.create({
-        data: {
+      return await prismaClient.trackedSession.upsert({
+        where: { sessionId },
+        update: {
+          exitPage: url,
+        },
+        create: {
           sessionId,
           siteId,
           entryPage: url,
