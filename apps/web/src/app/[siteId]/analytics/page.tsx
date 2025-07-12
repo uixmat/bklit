@@ -59,15 +59,15 @@ export default async function AnalyticsPage({
           <WorldMapCard />
         </Suspense>
       </div>
-      <div className="grid gap-4">
+      <div className="grid gap-4 md:grid-cols-2">
         <SessionAnalyticsCard siteId={siteId} userId={session.user.id} />
       </div>
-      <div className="mt-8">
+      {/* <div className="mt-8">
         <h2 className="text-lg font-semibold mb-2">
           Recent Sessions & Page Flow
         </h2>
         <SessionsList siteId={siteId} limit={5} />
-      </div>
+      </div> */}
     </>
   );
 }
