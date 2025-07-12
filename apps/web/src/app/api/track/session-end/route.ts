@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { endSession } from "@/actions/session-actions";
 
-interface SessionEndPayload {
-  sessionId: string;
-  siteId: string;
-}
-
 // Helper function to create a response with CORS headers
 function createCorsResponse(
   body: Record<string, unknown> | { message: string; error?: string },
@@ -25,40 +20,27 @@ export async function OPTIONS() {
 
 export async function POST(request: NextRequest) {
   try {
-    const payload: SessionEndPayload = await request.json();
-    console.log("🔄 API: Session end request received", {
-      sessionId: payload.sessionId,
-      siteId: payload.siteId,
-    });
+    const { sessionId } = await request.json();
 
-    if (!payload.sessionId || !payload.siteId) {
-      return createCorsResponse(
-        { message: "sessionId and siteId are required" },
-        400
-      );
-    }
+    // Use the shared endSession logic
+    const updatedSession = await endSession(sessionId);
 
-    // End the session
-    console.log("🔄 API: Ending session...", {
-      sessionId: payload.sessionId,
-      siteId: payload.siteId,
-    });
-
-    await endSession(payload.sessionId);
-    console.log("✅ API: Session ended successfully", {
-      sessionId: payload.sessionId,
-      siteId: payload.siteId,
-    });
-
-    return createCorsResponse({ message: "Session ended successfully" }, 200);
+    return createCorsResponse(
+      {
+        message: "Session ended",
+        endedAt: updatedSession.endedAt,
+        duration: updatedSession.duration,
+        didBounce: updatedSession.didBounce,
+      },
+      200
+    );
   } catch (error) {
     console.error("Error ending session:", error);
-    let errorMessage = "Error ending session";
-    if (error instanceof Error) {
-      errorMessage = error.message;
-    }
     return createCorsResponse(
-      { message: "Error ending session", error: errorMessage },
+      {
+        message: "Error ending session",
+        error: error instanceof Error ? error.message : String(error),
+      },
       500
     );
   }
