@@ -9,6 +9,8 @@ import {
   ChartLegendContent,
 } from "@/components/ui/chart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useQuery } from "@tanstack/react-query";
+import { useProject } from "@/contexts/project-context";
 
 const chartConfig = {
   bounced: {
@@ -21,21 +23,25 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-interface BounceRateData {
-  totalSessions: number;
-  bouncedSessions: number;
-  bounceRate: number;
+function useBounceRate(siteId: string | undefined, days = 30) {
+  return useQuery({
+    queryKey: ["bounce-rate", siteId],
+    queryFn: async () => {
+      if (!siteId) return null;
+      const res = await fetch(
+        `/api/session-analytics?siteId=${siteId}&days=${days}`
+      );
+      if (!res.ok) throw new Error("Failed to fetch bounce rate");
+      return res.json();
+    },
+    enabled: !!siteId,
+  });
 }
 
-interface BounceRateCardProps {
-  data: BounceRateData | null;
-  isLoading?: boolean;
-}
+export function BounceRateCard() {
+  const { currentSiteId } = useProject();
+  const { data, isLoading } = useBounceRate(currentSiteId || undefined);
 
-export function BounceRateCard({
-  data,
-  isLoading = false,
-}: BounceRateCardProps) {
   if (isLoading || !data) {
     return (
       <Card>

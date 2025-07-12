@@ -1,36 +1,93 @@
 (function () {
+  const INACTIVITY_TIMEOUT_MS = 3 * 60 * 1000; // 3 minutes
+  let inactivityTimer = null;
+  let sessionEnded = false;
+
+  // Utility: Get or generate a sessionId
+  function getSessionId() {
+    let sessionId = localStorage.getItem("bklit_session_id");
+    if (!sessionId) {
+      sessionId = Math.random().toString(36).slice(2) + Date.now();
+      localStorage.setItem("bklit_session_id", sessionId);
+    }
+    return sessionId;
+  }
+
+  // End session API call
+  async function endSession() {
+    if (sessionEnded) return;
+    sessionEnded = true;
+    const sessionId = getSessionId();
+    try {
+      await fetch("http://localhost:3000/api/track/session-end", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId }),
+        keepalive: true, // for beforeunload
+      });
+      // Optionally clear sessionId if you want new session next visit
+      // localStorage.removeItem('bklit_session_id');
+    } catch {
+      // Silent fail
+    }
+  }
+
+  // Reset inactivity timer
+  function resetInactivityTimer() {
+    if (sessionEnded) return;
+    if (inactivityTimer) clearTimeout(inactivityTimer);
+    inactivityTimer = setTimeout(endSession, INACTIVITY_TIMEOUT_MS);
+  }
+
+  // Track page view (existing logic)
   async function trackPageView() {
     try {
       const data = {
         url: window.location.href,
         timestamp: new Date().toISOString(),
         siteId: "YOUR_SITE_ID_HERE",
-        // We'll need a way to identify the site later, e.g., a siteId configured by the user
-        // siteId: 'YOUR_CONFIGURABLE_SITE_ID'
+        sessionId: getSessionId(),
       };
-
-      // Replace with your actual deployed URL
-      const response = await fetch("http://localhost:3000/api/track", {
-        // Or your production URL
+      await fetch("http://localhost:3000/api/track", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-
-      if (!response.ok) {
-        console.error("Failed to track page view:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error tracking page view:", error);
+    } catch {
+      // Silent fail
     }
   }
+  window.trackPageView = trackPageView;
 
-  // Track initial page view
+  // --- SPA Navigation Tracking ---
+  // Helper to wrap history methods
+  function wrapHistoryMethod(type) {
+    const orig = history[type];
+    return function () {
+      const rv = orig.apply(this, arguments);
+      window.dispatchEvent(new Event(type));
+      return rv;
+    };
+  }
+  history.pushState = wrapHistoryMethod("pushState");
+  history.replaceState = wrapHistoryMethod("replaceState");
+
+  // Listen for all navigation events
+  window.addEventListener("popstate", trackPageView);
+  window.addEventListener("pushState", trackPageView);
+  window.addEventListener("replaceState", trackPageView);
+
+  // User activity events
+  ["mousemove", "keydown", "scroll", "touchstart", "visibilitychange"].forEach(
+    (event) => {
+      window.addEventListener(event, resetInactivityTimer, { passive: true });
+    }
+  );
+
+  // End session on tab close
+  window.addEventListener("beforeunload", endSession);
+
+  // Start tracking
   trackPageView();
-
-  // Potentially track history changes for SPAs later
-  // window.addEventListener('popstate', trackPageView);
-  // Or override pushState/replaceState
+  resetInactivityTimer();
 })();

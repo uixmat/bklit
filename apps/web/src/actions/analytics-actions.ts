@@ -680,3 +680,87 @@ export async function getBrowserStats(
     }
   )();
 }
+
+const getSessionAnalyticsSchema = z.object({
+  siteId: z.string(),
+  userId: z.string(),
+  days: z.number().default(30),
+});
+
+export async function getSessionAnalytics(
+  params: z.input<typeof getSessionAnalyticsSchema>
+) {
+  const validation = getSessionAnalyticsSchema.safeParse(params);
+
+  if (!validation.success) {
+    throw new Error(validation.error.message);
+  }
+
+  const { siteId, userId, days } = validation.data;
+
+  return await cache(
+    async () => {
+      const site = await prisma.site.findFirst({
+        where: {
+          id: siteId,
+          userId: userId,
+        },
+      });
+
+      if (!site) {
+        throw new Error("Site not found or access denied");
+      }
+
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - days);
+
+      const sessions = await prisma.trackedSession.findMany({
+        where: {
+          siteId,
+          startedAt: {
+            gte: startDate,
+          },
+        },
+        include: {
+          pageViewEvents: {
+            orderBy: { timestamp: "asc" },
+          },
+        },
+        orderBy: {
+          startedAt: "desc",
+        },
+      });
+
+      const totalSessions = sessions.length;
+      const bouncedSessions = sessions.filter((s) => s.didBounce).length;
+      const bounceRate =
+        totalSessions > 0 ? (bouncedSessions / totalSessions) * 100 : 0;
+
+      const avgSessionDuration =
+        sessions.length > 0
+          ? sessions.reduce((sum, s) => sum + (s.duration || 0), 0) /
+            sessions.length
+          : 0;
+
+      const avgPageViews =
+        sessions.length > 0
+          ? sessions.reduce((sum, s) => sum + s.pageViewEvents.length, 0) /
+            sessions.length
+          : 0;
+
+      return {
+        totalSessions,
+        bouncedSessions,
+        bounceRate: Math.round(bounceRate * 100) / 100,
+        avgSessionDuration: Math.round(avgSessionDuration),
+        avgPageViews: Math.round(avgPageViews * 100) / 100,
+        recentSessions: sessions.slice(0, 5), // Return last 5 sessions for display
+      };
+    },
+    [`${siteId}-session-analytics`],
+    {
+      revalidate: 300, // 5 minutes
+      tags: [`${siteId}-analytics`],
+    }
+  )();
+}

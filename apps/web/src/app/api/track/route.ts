@@ -35,7 +35,12 @@ export async function OPTIONS() {
 export async function POST(request: NextRequest) {
   try {
     const payload: TrackingPayload = await request.json();
-    console.log("Tracking data received:", payload);
+    console.log("📊 API: Page view tracking request received", {
+      url: payload.url,
+      siteId: payload.siteId,
+      sessionId: payload.sessionId,
+      timestamp: payload.timestamp,
+    });
 
     if (!payload.siteId) {
       return createCorsResponse({ message: "siteId is required" }, 400);
@@ -71,32 +76,44 @@ export async function POST(request: NextRequest) {
     // Handle session tracking if sessionId is provided
     if (payload.sessionId) {
       try {
+        console.log("🔄 API: Updating session...", {
+          sessionId: payload.sessionId,
+          siteId: payload.siteId,
+          url: payload.url,
+        });
+
         await createOrUpdateSession({
           sessionId: payload.sessionId,
           siteId: payload.siteId,
           url: payload.url,
-          timestamp: payload.timestamp,
-          userAgent: payload.userAgent || "",
-          referrer: payload.referrer,
-          ip: locationData?.ip,
+          userAgent: payload.userAgent,
+          country: locationData?.country,
+          city: locationData?.city,
         });
-        console.log(
-          `Session updated for site: ${payload.siteId}, session: ${payload.sessionId}`
-        );
+        console.log("✅ API: Session updated successfully", {
+          sessionId: payload.sessionId,
+          siteId: payload.siteId,
+        });
       } catch (sessionError) {
-        console.error("Error updating session:", sessionError);
+        console.error("❌ API: Error updating session:", sessionError);
         // Continue execution - session tracking failed but page view tracking should still work
       }
     }
 
     // Save page view to database for historical persistence
     try {
+      console.log("💾 API: Saving page view to database...", {
+        url: payload.url,
+        siteId: payload.siteId,
+        sessionId: payload.sessionId,
+      });
+
       await prisma.pageViewEvent.create({
         data: {
           url: payload.url,
           timestamp: new Date(payload.timestamp),
           siteId: payload.siteId,
-          userAgent: payload.userAgent, // Store user agent
+          userAgent: payload.userAgent,
           // Location data
           ip: locationData?.ip,
           country: locationData?.country,
@@ -114,9 +131,12 @@ export async function POST(request: NextRequest) {
           sessionId: payload.sessionId || null,
         },
       });
-      console.log(`Page view saved to database for site: ${payload.siteId}`);
+      console.log("✅ API: Page view saved to database successfully", {
+        siteId: payload.siteId,
+        sessionId: payload.sessionId,
+      });
     } catch (dbError) {
-      console.error("Error saving page view to database:", dbError);
+      console.error("❌ API: Error saving page view to database:", dbError);
       // Continue execution - Redis storage succeeded, so real-time features still work
     }
 
@@ -137,6 +157,11 @@ export async function POST(request: NextRequest) {
     } else {
       console.warn("Socket.IO server instance not found. Cannot emit event.");
     }
+
+    console.log("✅ API: Page view tracking completed successfully", {
+      siteId: payload.siteId,
+      sessionId: payload.sessionId,
+    });
 
     return createCorsResponse({ message: "Data received and stored" }, 200);
   } catch (error) {

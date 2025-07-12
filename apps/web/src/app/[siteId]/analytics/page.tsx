@@ -51,7 +51,7 @@ export default async function AnalyticsPage({
           <MobileDesktopCard />
         </Suspense>
         <BrowserStatsCard />
-        <BounceRateCard data={null} isLoading={true} />
+        <BounceRateCard />
       </div>
       <div className="grid gap-4">
         <Suspense fallback={<WorldMapCardSkeleton />}>
@@ -59,7 +59,7 @@ export default async function AnalyticsPage({
         </Suspense>
       </div>
       <div className="grid gap-4">
-        <SessionAnalyticsCard />
+        <SessionAnalyticsCard siteId={siteId} userId={session.user.id} />
       </div>
     </>
   );

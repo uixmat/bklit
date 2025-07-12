@@ -1,7 +1,8 @@
 {
   "name": "bklit",
   "version": "0.1.0",
-  "private": true,
+  "description": "A lightweight analytics SDK for tracking page views, sessions, and user behavior",
+  "private": false,
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -20,5 +21,22 @@
     "typescript": "^5.4.5"
   },
   "peerDependencies": {},
-  "license": "MIT"
+  "license": "MIT",
+  "keywords": [
+    "analytics",
+    "tracking",
+    "sdk",
+    "page-views",
+    "sessions",
+    "user-behavior"
+  ],
+  "author": "Bklit Analytics",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/bklit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/bklit/issues"
+  },
+  "homepage": "https://github.com/your-username/bklit#readme"
 }

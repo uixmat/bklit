@@ -19,13 +19,30 @@ export function initBklit(options: BklitOptions): void {
   const { siteId, apiHost = DEFAULT_API_HOST } = options;
 
   if (!siteId) {
-    console.error("Bklit SDK: siteId is required for initialization.");
+    console.error("❌ Bklit SDK: siteId is required for initialization.");
     return;
   }
+
+  console.log("🎯 Bklit SDK: Initializing with configuration", {
+    siteId,
+    apiHost,
+    userAgent: navigator.userAgent.substring(0, 50) + "...",
+  });
+
+  // Store configuration globally for manual tracking
+  window.bklitSiteId = siteId;
+  window.bklitApiHost = apiHost;
 
   // Generate or get existing session ID
   if (!currentSessionId) {
     currentSessionId = generateSessionId();
+    console.log("🆔 Bklit SDK: New session created", {
+      sessionId: currentSessionId,
+    });
+  } else {
+    console.log("🔄 Bklit SDK: Using existing session", {
+      sessionId: currentSessionId,
+    });
   }
 
   async function trackPageView() {
@@ -34,10 +51,16 @@ export function initBklit(options: BklitOptions): void {
         url: window.location.href,
         timestamp: new Date().toISOString(),
         siteId: siteId,
-        userAgent: navigator.userAgent, // Add user agent
+        userAgent: navigator.userAgent,
         sessionId: currentSessionId,
         referrer: document.referrer || undefined,
       };
+
+      console.log("🚀 Bklit SDK: Tracking page view...", {
+        url: data.url,
+        sessionId: data.sessionId,
+        siteId: data.siteId,
+      });
 
       const response = await fetch(apiHost, {
         method: "POST",
@@ -45,23 +68,30 @@ export function initBklit(options: BklitOptions): void {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
-        keepalive: true, // Good for sending data before page unloads
+        keepalive: true,
       });
 
-      if (!response.ok) {
+      if (response.ok) {
+        console.log("✅ Bklit SDK: Page view tracked successfully!", {
+          url: data.url,
+          sessionId: data.sessionId,
+          status: response.status,
+        });
+      } else {
         console.error(
-          `Bklit SDK: Failed to track page view for site ${siteId}. Status: ${response.statusText}`
+          `❌ Bklit SDK: Failed to track page view for site ${siteId}. Status: ${response.statusText}`
         );
       }
     } catch (error) {
       console.error(
-        `Bklit SDK: Error tracking page view for site ${siteId}:`,
+        `❌ Bklit SDK: Error tracking page view for site ${siteId}:`,
         error
       );
     }
   }
 
   // Track initial page view
+  console.log("🎯 Bklit SDK: Initializing page view tracking...");
   trackPageView();
 
   // --- New Socket.IO Live Presence ---
@@ -131,7 +161,45 @@ export function initBklit(options: BklitOptions): void {
   }
 
   // Cleanup on page unload
-  const handlePageUnload = () => {
+  const handlePageUnload = async () => {
+    // End the session when user leaves
+    if (currentSessionId) {
+      try {
+        console.log("🔄 Bklit SDK: Ending session on page unload...", {
+          sessionId: currentSessionId,
+          siteId: siteId,
+        });
+
+        const endSessionUrl = apiHost.replace("/track", "/session-end");
+        const response = await fetch(endSessionUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            sessionId: currentSessionId,
+            siteId: siteId,
+          }),
+          keepalive: true, // Important for sending data before page unloads
+        });
+
+        if (response.ok) {
+          console.log("✅ Bklit SDK: Session ended successfully!", {
+            sessionId: currentSessionId,
+            status: response.status,
+          });
+        } else {
+          console.error("❌ Bklit SDK: Failed to end session", {
+            sessionId: currentSessionId,
+            status: response.status,
+            statusText: response.statusText,
+          });
+        }
+      } catch (error) {
+        console.error("❌ Bklit SDK: Error ending session:", error);
+      }
+    }
+
     if (bklitSocket && bklitSocket.connected) {
       bklitSocket.emit("leave_site_room", siteId); // Important for accurate live count
       bklitSocket.disconnect();
@@ -143,11 +211,40 @@ export function initBklit(options: BklitOptions): void {
   window.removeEventListener("beforeunload", handlePageUnload); // Remove first to avoid duplicates
   window.addEventListener("beforeunload", handlePageUnload);
 
-  // TODO: Add SPA navigation tracking (popstate, pushState override)
-  // For SPAs, when route changes, you might want to:
-  // 1. Call trackPageView() again for the new URL.
-  // 2. If siteId context changes (multi-tenant SPA), emit leave_site_room for oldId, then join_site_room for newId.
-  // For now, the socket connection persists for the initial siteId.
+  // SPA navigation tracking
+  let currentUrl = window.location.href;
+
+  const handleRouteChange = () => {
+    const newUrl = window.location.href;
+    if (newUrl !== currentUrl) {
+      console.log("🔄 Bklit SDK: Route change detected", {
+        from: currentUrl,
+        to: newUrl,
+        sessionId: currentSessionId,
+      });
+      currentUrl = newUrl;
+      trackPageView(); // Track the new page view
+    }
+  };
+
+  // Listen for popstate (browser back/forward)
+  window.addEventListener("popstate", handleRouteChange);
+
+  // Override pushState and replaceState for SPA navigation
+  const originalPushState = history.pushState;
+  const originalReplaceState = history.replaceState;
+
+  history.pushState = function (...args) {
+    originalPushState.apply(history, args);
+    setTimeout(handleRouteChange, 0);
+  };
+
+  history.replaceState = function (...args) {
+    originalReplaceState.apply(history, args);
+    setTimeout(handleRouteChange, 0);
+  };
+
+  console.log("🎯 Bklit SDK: SPA navigation tracking enabled");
 }
 
 // Helper function to generate a unique session ID
@@ -158,5 +255,76 @@ function generateSessionId(): string {
   return `${timestamp}-${random}`;
 }
 
-// Optional: For users who might prefer a default export or a different pattern.
-// export default { init: initBklit };
+// Global function for manual page view tracking
+export function trackPageView() {
+  if (typeof window === "undefined") {
+    console.warn(
+      "❌ Bklit SDK: trackPageView can only be called in browser environment"
+    );
+    return;
+  }
+
+  if (!currentSessionId) {
+    console.warn("❌ Bklit SDK: No active session. Call initBklit() first.");
+    return;
+  }
+
+  console.log("🎯 Bklit SDK: Manual page view tracking triggered");
+
+  // Call the internal trackPageView function
+  // We need to recreate it here since it's scoped inside initBklit
+  const data = {
+    url: window.location.href,
+    timestamp: new Date().toISOString(),
+    siteId: window.bklitSiteId || "unknown",
+    userAgent: navigator.userAgent,
+    sessionId: currentSessionId,
+    referrer: document.referrer || undefined,
+  };
+
+  console.log("🚀 Bklit SDK: Manual page view tracking...", {
+    url: data.url,
+    sessionId: data.sessionId,
+    siteId: data.siteId,
+  });
+
+  const apiHost = window.bklitApiHost || DEFAULT_API_HOST;
+
+  fetch(apiHost, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+    keepalive: true,
+  })
+    .then((response) => {
+      if (response.ok) {
+        console.log("✅ Bklit SDK: Manual page view tracked successfully!", {
+          url: data.url,
+          sessionId: data.sessionId,
+          status: response.status,
+        });
+      } else {
+        console.error("❌ Bklit SDK: Failed to track manual page view", {
+          status: response.status,
+          statusText: response.statusText,
+        });
+      }
+    })
+    .catch((error) => {
+      console.error("❌ Bklit SDK: Error tracking manual page view:", error);
+    });
+}
+
+// Store configuration globally for manual tracking
+declare global {
+  interface Window {
+    trackPageView?: () => void;
+    bklitSiteId?: string;
+    bklitApiHost?: string;
+  }
+}
+
+// Make trackPageView available globally
+window.trackPageView = trackPageView;
