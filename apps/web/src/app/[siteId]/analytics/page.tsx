@@ -16,7 +16,7 @@ import { MobileDesktopCard } from "@/components/analytics-cards/mobile-desktop-c
 import { BrowserStatsCard } from "@/components/analytics-cards/browser-stats-card";
 import { BounceRateCard } from "@/components/analytics-cards/bounce-rate-card";
 import { SessionAnalyticsCard } from "@/components/analytics-cards/session-analytics-card";
-import SessionsList from "./sessions-list";
+// import SessionsList from "./sessions-list";
 
 export default async function AnalyticsPage({
   params,

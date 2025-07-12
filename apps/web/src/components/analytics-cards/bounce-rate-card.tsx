@@ -8,7 +8,13 @@ import {
   ChartLegend,
   ChartLegendContent,
 } from "@/components/ui/chart";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardDescription,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { useProject } from "@/contexts/project-context";
 
@@ -45,8 +51,9 @@ export function BounceRateCard() {
   if (isLoading || !data) {
     return (
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Bounce Rate</CardTitle>
+        <CardHeader>
+          <CardTitle>Bounce Rate</CardTitle>
+          <CardDescription>Sessions that bounced</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="h-[200px] flex items-center justify-center">
@@ -66,14 +73,13 @@ export function BounceRateCard() {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">Bounce Rate</CardTitle>
+      <CardHeader>
+        <CardTitle>{data.bounceRate}% Bounce Rate</CardTitle>
+        <CardDescription>
+          {data.bouncedSessions} of {data.totalSessions} sessions
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{data.bounceRate}%</div>
-        <p className="text-xs text-muted-foreground">
-          {data.bouncedSessions} of {data.totalSessions} sessions
-        </p>
         <div className="mt-4 h-[200px]">
           <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
             <PieChart accessibilityLayer data={chartData}>

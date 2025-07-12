@@ -11,7 +11,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useProject } from "@/contexts/project-context";
-import { getAnalyticsStats } from "@/actions/analytics-actions";
+import {
+  getAnalyticsStats,
+  getSessionAnalytics,
+} from "@/actions/analytics-actions";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface AnalyticsStats {
@@ -21,9 +24,17 @@ interface AnalyticsStats {
   uniqueVisits: number;
 }
 
+interface SessionAnalytics {
+  totalSessions: number;
+  bounceRate: number;
+}
+
 export function ViewsCard({ userId }: { userId: string }) {
   const { currentSiteId } = useProject();
   const [stats, setStats] = useState<AnalyticsStats | null>(null);
+  const [sessionStats, setSessionStats] = useState<SessionAnalytics | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [liveUsers, setLiveUsers] = useState(0);
   const socketRef = useRef<Socket | null>(null);
@@ -39,8 +50,15 @@ export function ViewsCard({ userId }: { userId: string }) {
     const fetchStats = async () => {
       try {
         setLoading(true);
-        const data = await getAnalyticsStats({ siteId: currentSiteId, userId });
+        const [data, sessionData] = await Promise.all([
+          getAnalyticsStats({ siteId: currentSiteId, userId }),
+          getSessionAnalytics({ siteId: currentSiteId, userId }),
+        ]);
         setStats(data);
+        setSessionStats({
+          totalSessions: sessionData.totalSessions,
+          bounceRate: sessionData.bounceRate,
+        });
       } catch (error) {
         console.error("Failed to fetch analytics stats:", error);
       } finally {
@@ -88,7 +106,7 @@ export function ViewsCard({ userId }: { userId: string }) {
     };
   }, [currentSiteId]);
 
-  if (loading || !stats) {
+  if (loading || !stats || !sessionStats) {
     return <ViewsCardSkeleton />;
   }
 
@@ -109,16 +127,32 @@ export function ViewsCard({ userId }: { userId: string }) {
             </div>
             <div>
               <div className="text-2xl font-bold">
+                {sessionStats.totalSessions.toLocaleString()}
+              </div>
+              <div className="text-sm text-muted-foreground">
+                Total Sessions
+              </div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold">
+                {sessionStats.bounceRate}%
+              </div>
+              <div className="text-sm text-muted-foreground">Bounce Rate</div>
+            </div>
+          </div>
+          <div className="flex justify-between items-center pt-2 border-t">
+            <div>
+              <div className="text-2xl font-bold">
                 {stats.uniqueVisits.toLocaleString()}
               </div>
               <div className="text-sm text-muted-foreground">
                 Unique Visitors
               </div>
             </div>
-          </div>
-          <div className="pt-2 border-t">
-            <div className="text-2xl font-bold">{liveUsers}</div>
-            <div className="text-sm text-muted-foreground">Live Users</div>
+            <div>
+              <div className="text-2xl font-bold">{liveUsers}</div>
+              <div className="text-sm text-muted-foreground">Live Users</div>
+            </div>
           </div>
         </div>
       </CardContent>
@@ -144,9 +178,20 @@ export function ViewsCardSkeleton() {
               <Skeleton className="h-8 w-20 rounded" />
               <Skeleton className="h-4 w-20 mt-1 rounded" />
             </div>
+            <div>
+              <Skeleton className="h-8 w-20 rounded" />
+              <Skeleton className="h-4 w-20 mt-1 rounded" />
+            </div>
           </div>
-          <div className="pt-2 border-t">
-            <Skeleton className="h-4 w-24 rounded" />
+          <div className="flex justify-between items-center pt-2 border-t">
+            <div>
+              <Skeleton className="h-8 w-20 rounded" />
+              <Skeleton className="h-4 w-20 mt-1 rounded" />
+            </div>
+            <div>
+              <Skeleton className="h-8 w-20 rounded" />
+              <Skeleton className="h-4 w-20 mt-1 rounded" />
+            </div>
           </div>
         </div>
       </CardContent>

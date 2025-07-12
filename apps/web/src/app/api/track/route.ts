@@ -110,6 +110,26 @@ export async function POST(request: NextRequest) {
             siteId: session.siteId,
           });
 
+          // DEDUPLICATION: Check for recent identical page view event
+          const recentPageView = await tx.pageViewEvent.findFirst({
+            where: {
+              sessionId: session.id,
+              url: payload.url,
+              timestamp: {
+                gte: new Date(Date.now() - 2000), // 2 seconds window
+              },
+            },
+            orderBy: { timestamp: "desc" },
+          });
+
+          if (recentPageView) {
+            console.log("⏭️ Duplicate page view detected, skipping insert:", {
+              sessionId: session.id,
+              url: payload.url,
+            });
+            return;
+          }
+
           // Create page view event using the session's primary key (id)
           await tx.pageViewEvent.create({
             data: {
