@@ -87,6 +87,9 @@ export function initBklit(options: BklitOptions): void {
     bklitSocket = io(socketURL, {
       path: "/api/socketio", // Standard path for our Socket.IO server
       addTrailingSlash: false,
+      transports: ["polling", "websocket"], // Try polling first for ngrok compatibility
+      timeout: 30000, // Increase timeout for ngrok connections
+      forceNew: true, // Force new connection to avoid issues
       // autoConnect: false, // We will connect manually if needed
     });
 
@@ -105,6 +108,8 @@ export function initBklit(options: BklitOptions): void {
 
     bklitSocket.on("connect_error", (error: Error) => {
       console.error("Bklit SDK: Socket connection error:", error);
+      console.log("Bklit SDK: Attempting to connect to:", socketURL);
+      console.log("Bklit SDK: This might be expected when using ngrok tunnels");
     });
   }
 

@@ -23,7 +23,13 @@ export const initSocket = (httpServer: HttpServer): SocketIOServer => {
     const io = new SocketIOServer(httpServer, {
       path: "/api/socketio", // Client will connect to this path
       addTrailingSlash: false,
-      cors: { origin: "*" }, // Configure CORS appropriately
+      cors: {
+        origin: "*",
+        methods: ["GET", "POST"],
+        credentials: true,
+      },
+      transports: ["websocket", "polling"], // Allow both WebSocket and polling
+      allowEIO3: true, // Allow Engine.IO v3 clients
     });
 
     io.on("connection", (socket: Socket) => {

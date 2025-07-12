@@ -89,7 +89,13 @@ function initBklit(options) {
     bklitSocket = (0, import_socket.io)(socketURL, {
       path: "/api/socketio",
       // Standard path for our Socket.IO server
-      addTrailingSlash: false
+      addTrailingSlash: false,
+      transports: ["polling", "websocket"],
+      // Try polling first for ngrok compatibility
+      timeout: 3e4,
+      // Increase timeout for ngrok connections
+      forceNew: true
+      // Force new connection to avoid issues
       // autoConnect: false, // We will connect manually if needed
     });
     bklitSocket.on("connect", () => {
@@ -104,6 +110,8 @@ function initBklit(options) {
     });
     bklitSocket.on("connect_error", (error) => {
       console.error("Bklit SDK: Socket connection error:", error);
+      console.log("Bklit SDK: Attempting to connect to:", socketURL);
+      console.log("Bklit SDK: This might be expected when using ngrok tunnels");
     });
   }
   const handlePageUnload = () => {
