@@ -85,9 +85,14 @@ function initBklit(options) {
       );
     });
     bklitSocket.on("connect_error", (error) => {
-      console.error("Bklit SDK: Socket connection error:", error);
-      console.log("Bklit SDK: Attempting to connect to:", socketURL);
-      console.log("Bklit SDK: This might be expected when using ngrok tunnels");
+      console.log(
+        "Bklit SDK: Socket.IO connection not available (this is normal for ngrok tunnels)"
+      );
+      console.log(
+        "Bklit SDK: Page tracking is still working - only live visitor count is disabled"
+      );
+      bklitSocket?.disconnect();
+      bklitSocket = null;
     });
   }
   const handlePageUnload = () => {

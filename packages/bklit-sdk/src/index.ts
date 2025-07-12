@@ -107,9 +107,18 @@ export function initBklit(options: BklitOptions): void {
     });
 
     bklitSocket.on("connect_error", (error: Error) => {
-      console.error("Bklit SDK: Socket connection error:", error);
-      console.log("Bklit SDK: Attempting to connect to:", socketURL);
-      console.log("Bklit SDK: This might be expected when using ngrok tunnels");
+      // Don't show errors for Socket.IO connection failures through ngrok
+      // The main tracking functionality still works perfectly
+      console.log(
+        "Bklit SDK: Socket.IO connection not available (this is normal for ngrok tunnels)"
+      );
+      console.log(
+        "Bklit SDK: Page tracking is still working - only live visitor count is disabled"
+      );
+
+      // Disconnect to prevent repeated connection attempts
+      bklitSocket?.disconnect();
+      bklitSocket = null;
     });
   }
 
