@@ -3,12 +3,15 @@ import redis from "@/lib/redis"; // Corrected path assuming redis.ts is in apps/
 import { getIoServer } from "@/lib/socketio-server"; // Import getIoServer
 import { prisma } from "@/lib/db"; // Import Prisma client
 import { getLocationFromIP, extractClientIP } from "@/lib/ip-geolocation";
+import { createOrUpdateSession } from "@/actions/session-actions";
 
 interface TrackingPayload {
   url: string;
   timestamp: string;
   siteId: string; // Added siteId
   userAgent?: string; // Add user agent to payload
+  sessionId?: string; // Session identifier
+  referrer?: string; // Where they came from
   // other potential fields
 }
 
@@ -65,6 +68,27 @@ export async function POST(request: NextRequest) {
     await redis.rpush(redisKey, JSON.stringify(eventData)); // Store the whole payload with location
     console.log(`Data pushed to Redis list: ${redisKey}`);
 
+    // Handle session tracking if sessionId is provided
+    if (payload.sessionId) {
+      try {
+        await createOrUpdateSession({
+          sessionId: payload.sessionId,
+          siteId: payload.siteId,
+          url: payload.url,
+          timestamp: payload.timestamp,
+          userAgent: payload.userAgent || "",
+          referrer: payload.referrer,
+          ip: locationData?.ip,
+        });
+        console.log(
+          `Session updated for site: ${payload.siteId}, session: ${payload.sessionId}`
+        );
+      } catch (sessionError) {
+        console.error("Error updating session:", sessionError);
+        // Continue execution - session tracking failed but page view tracking should still work
+      }
+    }
+
     // Save page view to database for historical persistence
     try {
       await prisma.pageViewEvent.create({
@@ -86,6 +110,8 @@ export async function POST(request: NextRequest) {
           timezone: locationData?.timezone,
           isp: locationData?.isp,
           mobile: locationData?.mobile,
+          // Link to session if available
+          sessionId: payload.sessionId || null,
         },
       });
       console.log(`Page view saved to database for site: ${payload.siteId}`);

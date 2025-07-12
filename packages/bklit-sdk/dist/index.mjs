@@ -2,6 +2,7 @@
 import { io } from "socket.io-client";
 var DEFAULT_API_HOST = "http://localhost:3000/api/track";
 var bklitSocket = null;
+var currentSessionId = null;
 function initBklit(options) {
   if (typeof window === "undefined") {
     return;
@@ -11,14 +12,19 @@ function initBklit(options) {
     console.error("Bklit SDK: siteId is required for initialization.");
     return;
   }
+  if (!currentSessionId) {
+    currentSessionId = generateSessionId();
+  }
   async function trackPageView() {
     try {
       const data = {
         url: window.location.href,
         timestamp: (/* @__PURE__ */ new Date()).toISOString(),
         siteId,
-        userAgent: navigator.userAgent
+        userAgent: navigator.userAgent,
         // Add user agent
+        sessionId: currentSessionId,
+        referrer: document.referrer || void 0
       };
       const response = await fetch(apiHost, {
         method: "POST",
@@ -105,6 +111,11 @@ function initBklit(options) {
   };
   window.removeEventListener("beforeunload", handlePageUnload);
   window.addEventListener("beforeunload", handlePageUnload);
+}
+function generateSessionId() {
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).substring(2, 15);
+  return `${timestamp}-${random}`;
 }
 export {
   initBklit

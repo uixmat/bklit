@@ -14,6 +14,8 @@ import {
 import { WorldMapCard } from "@/components/analytics-cards/world-map-card";
 import { MobileDesktopCard } from "@/components/analytics-cards/mobile-desktop-card";
 import { BrowserStatsCard } from "@/components/analytics-cards/browser-stats-card";
+import { BounceRateCard } from "@/components/analytics-cards/bounce-rate-card";
+import { SessionAnalyticsCard } from "@/components/analytics-cards/session-analytics-card";
 
 export default async function AnalyticsPage({
   params,
@@ -49,11 +51,15 @@ export default async function AnalyticsPage({
           <MobileDesktopCard />
         </Suspense>
         <BrowserStatsCard />
+        <BounceRateCard data={null} isLoading={true} />
       </div>
       <div className="grid gap-4">
         <Suspense fallback={<WorldMapCardSkeleton />}>
           <WorldMapCard />
         </Suspense>
+      </div>
+      <div className="grid gap-4">
+        <SessionAnalyticsCard />
       </div>
     </>
   );

@@ -8,6 +8,7 @@ interface BklitOptions {
 
 const DEFAULT_API_HOST = "http://localhost:3000/api/track"; // Replace with your actual production URL
 let bklitSocket: Socket | null = null; // Keep track of the socket instance
+let currentSessionId: string | null = null; // Keep track of current session
 
 export function initBklit(options: BklitOptions): void {
   if (typeof window === "undefined") {
@@ -22,6 +23,11 @@ export function initBklit(options: BklitOptions): void {
     return;
   }
 
+  // Generate or get existing session ID
+  if (!currentSessionId) {
+    currentSessionId = generateSessionId();
+  }
+
   async function trackPageView() {
     try {
       const data = {
@@ -29,6 +35,8 @@ export function initBklit(options: BklitOptions): void {
         timestamp: new Date().toISOString(),
         siteId: siteId,
         userAgent: navigator.userAgent, // Add user agent
+        sessionId: currentSessionId,
+        referrer: document.referrer || undefined,
       };
 
       const response = await fetch(apiHost, {
@@ -140,6 +148,14 @@ export function initBklit(options: BklitOptions): void {
   // 1. Call trackPageView() again for the new URL.
   // 2. If siteId context changes (multi-tenant SPA), emit leave_site_room for oldId, then join_site_room for newId.
   // For now, the socket connection persists for the initial siteId.
+}
+
+// Helper function to generate a unique session ID
+function generateSessionId(): string {
+  // Generate a unique session ID based on timestamp and random number
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).substring(2, 15);
+  return `${timestamp}-${random}`;
 }
 
 // Optional: For users who might prefer a default export or a different pattern.

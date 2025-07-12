@@ -79,6 +79,7 @@ model Site {
   pageViewEvents  PageViewEvent[]
   eventDefinitions EventDefinition[]
   trackedEvents    TrackedEvent[] // All tracked custom events for this site
+  trackedSessions  TrackedSession[] // All tracked sessions for this site
 
   @@index([userId])
 }
@@ -109,10 +110,15 @@ model PageViewEvent {
   siteId String
   site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
 
+  // Session tracking
+  sessionId String?
+  session   TrackedSession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+
   @@index([siteId, timestamp])
   @@index([createdAt])
   @@index([country])
   @@index([city])
+  @@index([sessionId])
 }
 
 model EventDefinition {
@@ -147,4 +153,68 @@ model TrackedEvent {
   @@index([eventDefinitionId])
   @@index([siteId, timestamp])
   @@index([siteId, createdAt])
+}
+
+model TrackedSession {
+  id        String   @id @default(cuid())
+  sessionId String   // Unique session identifier
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Session metadata
+  entryPage     String   // First page visited in session
+  entryTime     DateTime // When session started
+  exitPage      String?  // Last page visited (null if session is ongoing)
+  exitTime      DateTime? // When session ended (null if ongoing)
+  duration      Int?     // Session duration in seconds (null if ongoing)
+  
+  // Navigation data
+  pageViews     Int      @default(1) // Total page views in session
+  uniquePages   Int      @default(1) // Number of unique pages visited
+  
+  // Bounce tracking
+  didBounce     Boolean  @default(false) // True if session duration < 7.5 seconds
+  bounceTime    Int?     // Time in seconds when bounce occurred (null if no bounce)
+  
+  // Visitor tracking
+  isReturning   Boolean  @default(false) // True if this is a returning visitor
+  visitorId     String?  // Anonymous visitor identifier for tracking returning users
+  
+  // UTM tracking
+  utmSource     String?
+  utmMedium     String?
+  utmCampaign   String?
+  utmTerm       String?
+  utmContent    String?
+  
+  // Referrer data
+  referrer      String?  // Where they came from
+  referrerDomain String? // Just the domain of the referrer
+  
+  // Device/browser data (denormalized for easier querying)
+  userAgent     String?  @db.Text
+  isMobile      Boolean?
+  browser       String?
+  os            String?
+  
+  // Location data (denormalized from first page view)
+  country       String?
+  countryCode   String?
+  region        String?
+  city          String?
+  
+  siteId String
+  site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  // Related page views
+  pageViewEvents PageViewEvent[]
+
+  @@unique([sessionId])
+  @@index([siteId, entryTime])
+  @@index([siteId, createdAt])
+  @@index([siteId, didBounce])
+  @@index([siteId, isReturning])
+  @@index([visitorId])
+  @@index([entryTime])
+  @@index([didBounce])
 }
