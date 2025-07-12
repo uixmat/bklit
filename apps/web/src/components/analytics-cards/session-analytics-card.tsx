@@ -1,70 +1,61 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getSessionAnalytics } from "@/actions/analytics-actions";
+import { getRecentSessions } from "@/actions/session-actions";
 import { Suspense } from "react";
 import { SessionAnalyticsSkeleton } from "./skeletons";
+import { formatDistanceToNow } from "date-fns";
 
 interface SessionAnalyticsCardProps {
   siteId: string;
-  userId: string;
-  days?: number;
 }
 
-async function SessionAnalyticsContent({
-  siteId,
-  userId,
-  days = 30,
-}: SessionAnalyticsCardProps) {
-  const analytics = await getSessionAnalytics({ siteId, userId, days });
+function formatDuration(seconds: number | null): string {
+  if (!seconds) return "0s";
+
+  if (seconds < 60) {
+    return `${seconds}s`;
+  }
+
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+
+  if (remainingSeconds === 0) {
+    return `${minutes}m`;
+  }
+
+  return `${minutes}m ${remainingSeconds}s`;
+}
+
+async function SessionAnalyticsContent({ siteId }: SessionAnalyticsCardProps) {
+  const sessions = await getRecentSessions(siteId, 5);
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Sessions</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{analytics.totalSessions}</div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Bounce Rate</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{analytics.bounceRate}%</div>
-          <p className="text-xs text-muted-foreground">
-            {analytics.bouncedSessions} of {analytics.totalSessions} sessions
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">
-            Avg Session Duration
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">
-            {analytics.avgSessionDuration > 60
-              ? `${Math.floor(analytics.avgSessionDuration / 60)}m ${
-                  analytics.avgSessionDuration % 60
-                }s`
-              : `${analytics.avgSessionDuration}s`}
+    <div className="space-y-3">
+      {sessions.length === 0 ? (
+        <p className="text-sm text-muted-foreground text-center py-4">
+          No sessions found
+        </p>
+      ) : (
+        sessions.map((session) => (
+          <div
+            key={session.id}
+            className="flex items-center justify-between p-3 rounded-lg border bg-card"
+          >
+            <div className="flex-1">
+              <div className="text-sm font-medium">
+                {formatDistanceToNow(new Date(session.startedAt), {
+                  addSuffix: true,
+                })}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {session.pageViewEvents.length} pages
+              </div>
+            </div>
+            <div className="text-sm font-medium">
+              {formatDuration(session.duration)}
+            </div>
           </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Avg Page Views</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{analytics.avgPageViews}</div>
-          <p className="text-xs text-muted-foreground">per session</p>
-        </CardContent>
-      </Card>
+        ))
+      )}
     </div>
   );
 }
@@ -73,7 +64,7 @@ export function SessionAnalyticsCard(props: SessionAnalyticsCardProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Session Analytics</CardTitle>
+        <CardTitle>Recent Sessions</CardTitle>
       </CardHeader>
       <CardContent>
         <Suspense fallback={<SessionAnalyticsSkeleton />}>
