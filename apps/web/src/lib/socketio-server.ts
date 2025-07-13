@@ -9,9 +9,8 @@ declare global {
   var io: SocketIOServer | undefined;
 }
 
-// Store active users per site
-// In a real-world scenario, you might use Redis or another store for this if scaling across multiple server instances
-const siteViewers = new Map<string, Set<string>>(); // Map<siteId, Set<socketId>>
+// Live users tracking is now handled by database session tracking
+// Socket.IO is used for real-time notifications (new page views, etc.)
 
 // This function needs to be called ONCE with the main http.Server instance when your server starts.
 // For example, in a custom server.js file.
@@ -43,36 +42,17 @@ export const initSocket = (httpServer: HttpServer): SocketIOServer => {
           return;
         }
         socket.join(siteId);
-        if (!siteViewers.has(siteId)) {
-          siteViewers.set(siteId, new Set());
-        }
-        const room = siteViewers.get(siteId);
-        room?.add(socket.id);
         console.log(`Socket ${socket.id} joined room: ${siteId}`);
-        // Use global.io here as 'io' from closure might not be the global one if re-init is attempted
-        global.io?.to(siteId).emit("update_live_users", room?.size || 0);
       });
 
       socket.on("leave_site_room", (siteId: string) => {
         if (!siteId) return;
         socket.leave(siteId);
-        const room = siteViewers.get(siteId);
-        room?.delete(socket.id);
         console.log(`Socket ${socket.id} left room: ${siteId}`);
-        global.io?.to(siteId).emit("update_live_users", room?.size || 0);
       });
 
       socket.on("disconnect", () => {
         console.log(`Socket disconnected: ${socket.id}`);
-        siteViewers.forEach((sockets, siteId) => {
-          if (sockets.has(socket.id)) {
-            sockets.delete(socket.id);
-            global.io?.to(siteId).emit("update_live_users", sockets.size);
-            console.log(
-              `Socket ${socket.id} removed from site ${siteId} on disconnect`
-            );
-          }
-        });
       });
     });
 

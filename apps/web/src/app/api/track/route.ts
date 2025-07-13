@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import redis from "@/lib/redis"; // Corrected path assuming redis.ts is in apps/web/src/lib
 import { getIoServer } from "@/lib/socketio-server"; // Import getIoServer
 import { prisma } from "@/lib/db"; // Import Prisma client
 import { getLocationFromIP, extractClientIP } from "@/lib/ip-geolocation";
@@ -64,14 +63,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Store data in Redis for real-time features
-    const redisKey = `events:${payload.siteId}`;
-    const eventData = {
-      ...payload,
-      location: locationData,
-    };
-    await redis.rpush(redisKey, JSON.stringify(eventData)); // Store the whole payload with location
-    console.log(`Data pushed to Redis list: ${redisKey}`);
+    // Note: Redis storage removed - all data is now stored in PostgreSQL
+    // Real-time features are handled via Socket.IO and session tracking
 
     // Handle session tracking and page view creation in a transaction
     if (payload.sessionId) {
@@ -215,21 +208,18 @@ export async function POST(request: NextRequest) {
           "❌ API: Error saving page view to database (no session):",
           dbError
         );
-        // Continue execution - Redis storage succeeded, so real-time features still work
+        // Continue execution - session tracking failed but page view tracking should still work
       }
     }
 
-    // Emit event via Socket.IO
+    // Emit real-time notification via Socket.IO
     const io = getIoServer();
     if (io) {
-      // We don't have the live user count here directly from siteViewers map without more complex state sharing.
-      // For now, let's just signal that a new event happened for that siteId.
-      // The client can then re-fetch or the server could push the new total if it calculated it.
-      // However, our socketio-server already updates live_users on join/leave.
-      // Let's emit a generic event, or perhaps we can make track endpoint also update the count.
-      // For simplicity, let's assume the existing join/leave in socketio-server is the primary source for live_users count.
-      // This emission can be for other real-time updates like "new_page_view".
-      io.to(payload.siteId).emit("new_page_view", payload); // Emit the new page view data
+      io.to(payload.siteId).emit("new_page_view", {
+        url: payload.url,
+        timestamp: payload.timestamp,
+        siteId: payload.siteId,
+      });
       console.log(
         `Socket event 'new_page_view' emitted to room: ${payload.siteId}`
       );
@@ -245,7 +235,7 @@ export async function POST(request: NextRequest) {
     return createCorsResponse({ message: "Data received and stored" }, 200);
   } catch (error) {
     console.error("Error processing tracking data:", error);
-    // Check if the error is from Redis or JSON parsing etc.
+    // Check if the error is from JSON parsing etc.
     let errorMessage = "Error processing request";
     if (error instanceof Error) {
       errorMessage = error.message;

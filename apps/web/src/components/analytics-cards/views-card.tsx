@@ -14,6 +14,7 @@ import { useProject } from "@/contexts/project-context";
 import {
   getAnalyticsStats,
   getSessionAnalytics,
+  getLiveUsers,
 } from "@/actions/analytics-actions";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -50,15 +51,17 @@ export function ViewsCard({ userId }: { userId: string }) {
     const fetchStats = async () => {
       try {
         setLoading(true);
-        const [data, sessionData] = await Promise.all([
+        const [data, sessionData, liveUsersData] = await Promise.all([
           getAnalyticsStats({ siteId: currentSiteId, userId }),
           getSessionAnalytics({ siteId: currentSiteId, userId }),
+          getLiveUsers({ siteId: currentSiteId, userId }),
         ]);
         setStats(data);
         setSessionStats({
           totalSessions: sessionData.totalSessions,
           bounceRate: sessionData.bounceRate,
         });
+        setLiveUsers(liveUsersData);
       } catch (error) {
         console.error("Failed to fetch analytics stats:", error);
       } finally {
@@ -67,6 +70,13 @@ export function ViewsCard({ userId }: { userId: string }) {
     };
 
     fetchStats();
+
+    // Set up periodic refresh for live users count (every 30 seconds)
+    const interval = setInterval(() => {
+      getLiveUsers({ siteId: currentSiteId, userId }).then(setLiveUsers);
+    }, 30000);
+
+    return () => clearInterval(interval);
   }, [currentSiteId, userId]);
 
   useEffect(() => {
@@ -82,13 +92,12 @@ export function ViewsCard({ userId }: { userId: string }) {
       socket.emit("join_site_room", currentSiteId);
     });
 
-    socket.on("update_live_users", (count: number) => {
-      const newDisplayCount = Math.max(0, count - 1);
-      setLiveUsers(newDisplayCount);
+    socket.on("new_page_view", () => {
+      // Show notification when new page view is tracked
+      toast.info("A new page view was tracked!");
 
-      if (newDisplayCount > previousLiveUsersRef.current) {
-        toast.info("A new user is viewing the site!");
-      }
+      // Optionally refresh live users count
+      getLiveUsers({ siteId: currentSiteId, userId }).then(setLiveUsers);
     });
 
     socket.on("disconnect", () => {});

@@ -179,3 +179,33 @@ export async function getRecentSessions(siteId: string, limit: number = 10) {
     throw error;
   }
 }
+
+// Clean up stale sessions (sessions older than 30 minutes that haven't ended)
+export async function cleanupStaleSessions() {
+  try {
+    const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+
+    const result = await prisma.trackedSession.updateMany({
+      where: {
+        endedAt: null, // Sessions that haven't ended
+        startedAt: {
+          lt: thirtyMinutesAgo, // Started more than 30 minutes ago
+        },
+      },
+      data: {
+        endedAt: new Date(),
+        duration: 1800, // 30 minutes in seconds
+        didBounce: false,
+      },
+    });
+
+    if (result.count > 0) {
+      console.log(`Cleaned up ${result.count} stale sessions`);
+    }
+
+    return result.count;
+  } catch (error) {
+    console.error("Error cleaning up stale sessions:", error);
+    return 0;
+  }
+}

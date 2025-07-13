@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { unstable_cache as cache } from "next/cache";
 import { z } from "zod";
 import { findCountryCoordinates } from "@/lib/maps/country-coordinates";
+import { cleanupStaleSessions } from "@/actions/session-actions";
 
 const getTopCountriesSchema = z.object({
   siteId: z.string(),
@@ -760,6 +761,60 @@ export async function getSessionAnalytics(
     [`${siteId}-session-analytics`],
     {
       revalidate: 300, // 5 minutes
+      tags: [`${siteId}-analytics`],
+    }
+  )();
+}
+
+const getLiveUsersSchema = z.object({
+  siteId: z.string(),
+  userId: z.string(),
+});
+
+export async function getLiveUsers(params: z.infer<typeof getLiveUsersSchema>) {
+  const validation = getLiveUsersSchema.safeParse(params);
+
+  if (!validation.success) {
+    throw new Error(validation.error.message);
+  }
+
+  const { siteId, userId } = validation.data;
+
+  return await cache(
+    async () => {
+      const site = await prisma.site.findFirst({
+        where: {
+          id: siteId,
+          userId: userId,
+        },
+      });
+
+      if (!site) {
+        throw new Error("Site not found or access denied");
+      }
+
+      // Clean up stale sessions first
+      await cleanupStaleSessions();
+
+      // Count active sessions (sessions that haven't ended)
+      // Exclude sessions older than 30 minutes to avoid counting stale sessions
+      const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+
+      const liveUsers = await prisma.trackedSession.count({
+        where: {
+          siteId,
+          endedAt: null, // Active sessions only
+          startedAt: {
+            gte: thirtyMinutesAgo, // Only count sessions started in last 30 minutes
+          },
+        },
+      });
+
+      return liveUsers;
+    },
+    [`${siteId}-live-users`],
+    {
+      revalidate: 30, // 30 seconds - more frequent updates for live data
       tags: [`${siteId}-analytics`],
     }
   )();
