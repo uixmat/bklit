@@ -209,3 +209,32 @@ export async function cleanupStaleSessions() {
     return 0;
   }
 }
+
+// Get a single session by ID with all related data
+export async function getSessionById(sessionId: string) {
+  try {
+    const session = await prisma.trackedSession.findUnique({
+      where: { id: sessionId },
+      include: {
+        pageViewEvents: {
+          orderBy: { timestamp: "asc" },
+        },
+        site: {
+          select: {
+            name: true,
+            domain: true,
+          },
+        },
+      },
+    });
+
+    if (!session) {
+      throw new Error("Session not found");
+    }
+
+    return session;
+  } catch (error) {
+    console.error("Error getting session by ID:", error);
+    throw error;
+  }
+}

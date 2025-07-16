@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "install": "pnpm install",
     "dev:web": "dotenv -e ./apps/web/.env tsx server.ts",
     "dev:playground": "VITE_NGROK_URL=$(cat .ngrok-url) pnpm --filter playground dev",
     "build:web": "pnpm --filter tracker build",

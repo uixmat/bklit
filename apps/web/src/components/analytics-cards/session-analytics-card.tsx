@@ -3,6 +3,8 @@ import { getRecentSessions } from "@/actions/session-actions";
 import { Suspense } from "react";
 import { SessionAnalyticsSkeleton } from "./skeletons";
 import { formatDistanceToNow } from "date-fns";
+import Link from "next/link";
+import { ExternalLink } from "lucide-react";
 
 interface SessionAnalyticsCardProps {
   siteId: string;
@@ -36,24 +38,30 @@ async function SessionAnalyticsContent({ siteId }: SessionAnalyticsCardProps) {
         </p>
       ) : (
         sessions.map((session) => (
-          <div
+          <Link
             key={session.id}
-            className="flex items-center justify-between p-3 rounded-lg border bg-card"
+            href={`/${siteId}/analytics/session/${session.id}`}
+            className="block"
           >
-            <div className="flex-1">
-              <div className="text-sm font-medium">
-                {formatDistanceToNow(new Date(session.startedAt), {
-                  addSuffix: true,
-                })}
+            <div className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors group">
+              <div className="flex-1">
+                <div className="text-sm font-medium">
+                  {formatDistanceToNow(new Date(session.startedAt), {
+                    addSuffix: true,
+                  })}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {session.pageViewEvents.length} pages
+                </div>
               </div>
-              <div className="text-xs text-muted-foreground">
-                {session.pageViewEvents.length} pages
+              <div className="flex items-center space-x-2">
+                <div className="text-sm font-medium">
+                  {formatDuration(session.duration)}
+                </div>
+                <ExternalLink className="h-3 w-3 text-muted-foreground group-hover:text-foreground transition-colors" />
               </div>
             </div>
-            <div className="text-sm font-medium">
-              {formatDuration(session.duration)}
-            </div>
-          </div>
+          </Link>
         ))
       )}
     </div>
@@ -63,8 +71,14 @@ async function SessionAnalyticsContent({ siteId }: SessionAnalyticsCardProps) {
 export function SessionAnalyticsCard(props: SessionAnalyticsCardProps) {
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle>Recent Sessions</CardTitle>
+        <Link
+          href={`/${props.siteId}/analytics/sessions`}
+          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          View All
+        </Link>
       </CardHeader>
       <CardContent>
         <Suspense fallback={<SessionAnalyticsSkeleton />}>

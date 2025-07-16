@@ -102,10 +102,6 @@ export function ViewsCard({ userId }: { userId: string }) {
 
     socket.on("disconnect", () => {});
 
-    socket.on("connect_error", (error) => {
-      console.error("Socket connection error:", error);
-    });
-
     return () => {
       if (socket) {
         socket.emit("leave_site_room", currentSiteId);
@@ -113,7 +109,7 @@ export function ViewsCard({ userId }: { userId: string }) {
         socketRef.current = null;
       }
     };
-  }, [currentSiteId]);
+  }, [currentSiteId, userId]);
 
   if (loading || !stats || !sessionStats) {
     return <ViewsCardSkeleton />;
