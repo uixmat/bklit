@@ -1,12 +1,12 @@
 import { Users } from "lucide-react";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { BillingSuccessDialog } from "@/components/dialogs/billing-success-dialog";
 import { PageHeader } from "@/components/page-header";
 import { ProductCard } from "@/components/polar/product-card";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { getPublishedPolarProducts } from "@/lib/polar";
 

@@ -3,11 +3,11 @@ import { GeistSans as geistSansFont } from "geist/font/sans";
 import type { Metadata } from "next";
 import "./globals.css";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { QueryClientProvider } from "@/components/providers/query-provider";
 import AuthProvider from "@/components/providers/session-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { authOptions } from "@/lib/auth";
 
 const geistSans = geistSansFont;
 const geistMono = geistMonoFont;

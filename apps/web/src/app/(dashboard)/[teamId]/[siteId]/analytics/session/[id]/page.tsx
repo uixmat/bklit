@@ -4,10 +4,10 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getServerSession } from "next-auth/next";
 import { getSessionById } from "@/actions/session-actions";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { UserSession } from "@/components/reactflow/user-session";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { authOptions } from "@/lib/auth";
 
 interface SessionPageProps {
   params: Promise<{ teamId: string; siteId: string; id: string }>;

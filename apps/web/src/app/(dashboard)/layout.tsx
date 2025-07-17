@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { SiteHeader } from "@/components/site-header";
 import { ProjectProvider } from "@/contexts/project-context";
 import { TeamsProvider } from "@/contexts/teams-provider";
+import { authOptions } from "@/lib/auth";
 
 export default async function DashboardLayout({
   children,

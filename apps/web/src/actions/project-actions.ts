@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 // import { z } from 'zod'; // Unused, schema is imported directly
 import { prisma } from "@/lib/db";
 import { getPlanDetails, PlanType } from "@/lib/plans"; // Import plan helpers

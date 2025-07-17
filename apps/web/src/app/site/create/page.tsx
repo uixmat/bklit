@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import AddProjectForm from "@/components/forms/add-project-form";
 import { PageHeader } from "@/components/page-header";
 import {
@@ -10,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { authOptions } from "@/lib/auth";
 
 export default async function CreateSitePage() {
   const session = await getServerSession(authOptions);

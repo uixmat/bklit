@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth/next";
 import { Suspense } from "react";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { BounceRateCard } from "@/components/analytics-cards/bounce-rate-card";
 import { BrowserStatsCard } from "@/components/analytics-cards/browser-stats-card";
 import { MobileDesktopCard } from "@/components/analytics-cards/mobile-desktop-card";
@@ -16,6 +15,7 @@ import {
 import { TopCountriesCard } from "@/components/analytics-cards/top-countries-card";
 import { ViewsCard } from "@/components/analytics-cards/views-card";
 import { WorldMapCard } from "@/components/analytics-cards/world-map-card";
+import { authOptions } from "@/lib/auth";
 
 export default async function AnalyticsPage({
   params,
