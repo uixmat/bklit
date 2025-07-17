@@ -193,10 +193,6 @@ export async function cleanupStaleSessions() {
       },
     });
 
-    if (result.count > 0) {
-      console.log(`Cleaned up ${result.count} stale sessions`);
-    }
-
     return result.count;
   } catch (error) {
     console.error("Error cleaning up stale sessions:", error);

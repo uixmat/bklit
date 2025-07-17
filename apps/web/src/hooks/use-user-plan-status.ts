@@ -19,13 +19,6 @@ export function useUserPlanStatus(): UserPlanStatus {
   const { data: session, status: sessionStatus } = useSession();
   const userId = session?.user?.id;
 
-  console.log(
-    "[useUserPlanStatus] Hook called. Session status:",
-    sessionStatus,
-    "User ID:",
-    userId,
-  );
-
   let calculatedIsLoadingPlanDetails = false;
   if (sessionStatus === "loading") {
     if (!session) {
@@ -54,15 +47,6 @@ export function useUserPlanStatus(): UserPlanStatus {
     refetchOnMount: "always",
   });
 
-  console.log(
-    "[useUserPlanStatus] Project count query: data:",
-    projectCountData,
-    "isLoading:",
-    isLoadingProjectCount,
-    "error:",
-    projectCountError,
-  );
-
   const currentPlanId = (session?.user?.plan as PlanType) || PlanType.FREE;
   const currentPlanDetails = getPlanDetails(currentPlanId);
 
@@ -76,19 +60,6 @@ export function useUserPlanStatus(): UserPlanStatus {
     isLoadingProjectCount && projectCountData === undefined;
   const combinedIsLoading =
     initialSessionTrulyLoading || projectCountIsInitiallyLoading;
-
-  console.log(
-    "[useUserPlanStatus] Returning: projectCount:",
-    finalProjectCount,
-    "hasReachedLimit:",
-    hasReachedLimit,
-    "isLoading (combined):",
-    combinedIsLoading,
-    "isLoadingPlanDetails:",
-    calculatedIsLoadingPlanDetails,
-    "planId:",
-    currentPlanId,
-  );
 
   return {
     planId: currentPlanId,

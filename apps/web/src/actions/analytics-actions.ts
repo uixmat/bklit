@@ -371,10 +371,10 @@ export async function getCountryVisitStats(
           return {
             country: country.country || "",
             countryCode,
-            totalVisits: country._count.country,
-            mobileVisits,
-            desktopVisits,
-            uniqueVisits: uniqueVisits.length,
+            totalVisits: Number(country._count.country) || 0,
+            mobileVisits: Number(mobileVisits) || 0,
+            desktopVisits: Number(desktopVisits) || 0,
+            uniqueVisits: Number(uniqueVisits.length) || 0,
             coordinates: coordinates
               ? ([coordinates.longitude, coordinates.latitude] as [
                   number,

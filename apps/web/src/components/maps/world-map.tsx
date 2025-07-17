@@ -85,7 +85,8 @@ export function WorldMap({ siteId, userId }: WorldMapProps) {
         g.selectAll(".marker")
           .attr("r", (d) => {
             const data = d as CountryVisitData;
-            return (Math.sqrt(data.totalVisits / 10) + 3) / transform.k;
+            const totalVisits = Number(data.totalVisits) || 0;
+            return (Math.sqrt(totalVisits / 10) + 3) / transform.k;
           })
           .attr("stroke-width", 2 / transform.k);
       });
@@ -124,9 +125,19 @@ export function WorldMap({ siteId, userId }: WorldMapProps) {
           });
 
         // Add circle markers for countries with visits
+        const validData = visitData.filter((d) => {
+          const hasCoordinates = d.coordinates !== null;
+          const hasValidVisits =
+            typeof d.totalVisits === "number" && !isNaN(d.totalVisits);
+          if (!hasCoordinates || !hasValidVisits) {
+            console.warn("Invalid data for marker:", d);
+          }
+          return hasCoordinates && hasValidVisits;
+        });
+
         const markers = g
           .selectAll(".marker")
-          .data(visitData.filter((d) => d.coordinates !== null))
+          .data(validData)
           .enter()
           .append("circle")
           .attr("class", "marker")
@@ -144,16 +155,20 @@ export function WorldMap({ siteId, userId }: WorldMapProps) {
           .transition()
           .duration(1000)
           .delay((_d, i) => i * 100)
-          .attr("r", (d) => Math.sqrt(d.totalVisits / 10) + 6);
+          .attr("r", (d) => {
+            const totalVisits = Number(d.totalVisits) || 0;
+            return Math.sqrt(totalVisits / 10) + 6;
+          });
 
         // Add tooltip interactions
         markers
           .on("mouseover", function (event, d) {
             // Highlight marker
+            const totalVisits = Number(d.totalVisits) || 0;
             d3.select(this)
               .transition()
               .duration(200)
-              .attr("r", Math.sqrt(d.totalVisits / 10) + 8)
+              .attr("r", Math.sqrt(totalVisits / 10) + 8)
               .attr("opacity", 1);
 
             // Show tooltip
@@ -173,10 +188,11 @@ export function WorldMap({ siteId, userId }: WorldMapProps) {
           })
           .on("mouseout", function (d) {
             // Reset marker
+            const totalVisits = Number(d.totalVisits) || 0;
             d3.select(this)
               .transition()
               .duration(200)
-              .attr("r", Math.sqrt(d.totalVisits / 10) + 6);
+              .attr("r", Math.sqrt(totalVisits / 10) + 6);
 
             // Restore all countries to normal opacity and color
             g.selectAll(".country")
