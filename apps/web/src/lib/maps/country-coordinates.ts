@@ -45,7 +45,7 @@ export function getCountryCoordinates(): CountryCoordinate[] {
 }
 
 export function findCountryCoordinates(
-  countryCode: string
+  countryCode: string,
 ): CountryCoordinate | null {
   const coordinates = getCountryCoordinates();
 
@@ -77,13 +77,13 @@ export function findCountryCoordinates(
     found = coordinates.find(
       (coord) =>
         coord.alpha2Code.includes(normalizedCode) ||
-        coord.alpha3Code.includes(normalizedCode)
+        coord.alpha3Code.includes(normalizedCode),
     );
   }
 
   if (!found) {
     console.log(
-      `No coordinates found for country code: ${countryCode} (normalized: ${normalizedCode}, mapped: ${mappedCode})`
+      `No coordinates found for country code: ${countryCode} (normalized: ${normalizedCode}, mapped: ${mappedCode})`,
     );
   }
 

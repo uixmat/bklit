@@ -1,10 +1,11 @@
-import { createServer, IncomingMessage, ServerResponse } from "http";
-import { parse } from "url";
+import {
+  createServer,
+  type IncomingMessage,
+  type ServerResponse,
+} from "node:http";
+import path from "node:path";
+import { fileURLToPath, parse } from "node:url";
 import next from "next";
-import path from "path";
-import { fileURLToPath } from "url";
-
-// const { initSocket } = require("./apps/web/src/lib/socketio-server.ts"); // Old require
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -26,7 +27,7 @@ app
         const httpServer = createServer(
           async (req: IncomingMessage, res: ServerResponse) => {
             try {
-              const parsedUrl = parse(req.url!, true);
+              const parsedUrl = parse(req.url || "", true);
               // Let Next.js handle all requests
               await handle(req, res, parsedUrl);
             } catch (err) {
@@ -34,7 +35,7 @@ app
               res.statusCode = 500;
               res.end("internal server error");
             }
-          }
+          },
         );
 
         // Initialize Socket.IO with the httpServer instance
@@ -45,7 +46,7 @@ app
           console.log(`> Ready on http://localhost:${port}`);
           console.log(`> Next.js app from ${appDir} is being served.`);
           console.log(
-            `> Socket.IO initialized and listening on path /api/socketio`
+            `> Socket.IO initialized and listening on path /api/socketio`,
           );
         });
 
