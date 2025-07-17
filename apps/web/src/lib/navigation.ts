@@ -51,10 +51,6 @@ export const navigationConfig: NavigationConfig = {
       title: "Profile",
       href: "/user/[userId]",
     },
-    {
-      title: "Settings",
-      href: "/user/[userId]/settings",
-    },
   ],
 };
 

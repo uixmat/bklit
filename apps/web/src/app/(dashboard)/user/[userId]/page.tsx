@@ -13,7 +13,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Users, Globe, Plus } from "lucide-react";
+import { Users, Plus } from "lucide-react";
 
 async function getUserTeams(userId: string) {
   return await prisma.teamMember.findMany({
@@ -60,7 +60,7 @@ export default async function UserPage({
     redirect("/");
   }
 
-  const [teamMemberships, directSites] = await Promise.all([
+  const [teamMemberships] = await Promise.all([
     getUserTeams(userId),
     getUserDirectSites(userId),
   ]);
@@ -169,47 +169,6 @@ export default async function UserPage({
           </div>
         )}
       </div>
-
-      {/* Direct Sites Section (for backward compatibility) */}
-      {directSites.length > 0 && (
-        <div className="space-y-4 pt-8 border-t">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold flex items-center gap-2">
-              <Globe className="size-6" />
-              Personal Projects
-            </h2>
-            <Button asChild>
-              <Link href="/projects/create">
-                <Plus className="mr-2 size-4" />
-                Create Project
-              </Link>
-            </Button>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {directSites.map((site) => (
-              <Card key={site.id} className="hover:shadow-md transition-shadow">
-                <CardHeader>
-                  <CardTitle className="text-lg">{site.name}</CardTitle>
-                  <CardDescription>
-                    {site.domain || "No domain configured"}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex gap-2">
-                    <Button asChild size="sm" variant="outline">
-                      <Link href={`/site/${site.id}`}>View Project</Link>
-                    </Button>
-                    <Button asChild size="sm">
-                      <Link href={`/site/${site.id}/setup`}>Setup</Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
