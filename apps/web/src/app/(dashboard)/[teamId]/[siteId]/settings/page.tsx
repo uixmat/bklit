@@ -7,34 +7,10 @@ import {
 } from "@/components/ui/card";
 import { PageHeader } from "@/components/page-header";
 import { DeleteProjectForm } from "@/components/forms/delete-project-form";
-import { prisma } from "@/lib/db";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
-
-async function getSiteData(siteId: string, teamId: string, userId: string) {
-  const site = await prisma.site.findFirst({
-    where: {
-      id: siteId,
-      teamId: teamId,
-    },
-    include: {
-      team: {
-        include: {
-          members: {
-            where: { userId },
-          },
-        },
-      },
-    },
-  });
-
-  if (!site || !site.team || site.team.members.length === 0) {
-    return null;
-  }
-
-  return { site, userMembership: site.team.members[0] };
-}
+import { getSiteDataForSettings } from "@/actions/project-actions";
 
 export default async function ProjectDashboardPage({
   params,
@@ -48,7 +24,11 @@ export default async function ProjectDashboardPage({
     redirect("/signin");
   }
 
-  const siteData = await getSiteData(siteId, teamId, session.user.id);
+  const siteData = await getSiteDataForSettings(
+    siteId,
+    teamId,
+    session.user.id
+  );
 
   if (!siteData) {
     redirect("/");

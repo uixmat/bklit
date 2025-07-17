@@ -1,7 +1,6 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/db";
 import { PageHeader } from "@/components/page-header";
 import {
   Card,
@@ -14,34 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Users, Plus } from "lucide-react";
-
-async function getUserTeams(userId: string) {
-  return await prisma.teamMember.findMany({
-    where: { userId },
-    include: {
-      team: {
-        include: {
-          sites: true,
-          members: {
-            include: {
-              user: {
-                select: { name: true, email: true, image: true },
-              },
-            },
-          },
-        },
-      },
-    },
-    orderBy: { joinedAt: "desc" },
-  });
-}
-
-async function getUserDirectSites(userId: string) {
-  return await prisma.site.findMany({
-    where: { userId },
-    orderBy: { createdAt: "desc" },
-  });
-}
+import { getUserTeams, getUserDirectSites } from "@/actions/user-actions";
 
 export default async function UserPage({
   params,
@@ -87,7 +59,7 @@ export default async function UserPage({
           </Button>
         </div>
 
-        {teamMemberships.length === 0 ? (
+        {!teamMemberships || teamMemberships.length === 0 ? (
           <Card>
             <CardContent className="pt-6">
               <p className="text-muted-foreground text-center py-8">

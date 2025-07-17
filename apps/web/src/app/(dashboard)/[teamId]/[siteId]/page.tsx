@@ -1,7 +1,6 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/db";
 import {
   Card,
   CardContent,
@@ -12,30 +11,7 @@ import {
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-
-async function getSiteData(siteId: string, teamId: string, userId: string) {
-  const site = await prisma.site.findFirst({
-    where: {
-      id: siteId,
-      teamId: teamId,
-    },
-    include: {
-      team: {
-        include: {
-          members: {
-            where: { userId },
-          },
-        },
-      },
-    },
-  });
-
-  if (!site || !site.team || site.team.members.length === 0) {
-    return null;
-  }
-
-  return { site, userMembership: site.team.members[0] };
-}
+import { getSiteData } from "@/actions/project-actions";
 
 export default async function ProjectDashboardPage({
   params,

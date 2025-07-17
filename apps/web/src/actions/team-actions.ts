@@ -176,3 +176,139 @@ export async function deleteTeamAction(
     };
   }
 }
+
+export async function getTeamData(teamId: string, userId: string) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user?.id) {
+    return null;
+  }
+
+  try {
+    const team = await prisma.team.findUnique({
+      where: { id: teamId },
+      include: {
+        sites: true,
+        members: {
+          include: {
+            user: {
+              select: { name: true, email: true, image: true },
+            },
+          },
+        },
+      },
+    });
+
+    if (!team) {
+      return null;
+    }
+
+    // Check if user is a member of this team
+    const userMembership = team.members.find(
+      (member) => member.userId === userId
+    );
+    if (!userMembership) {
+      return null;
+    }
+
+    return { team, userMembership };
+  } catch (error) {
+    console.error("Error fetching team data:", error);
+    return null;
+  }
+}
+
+export async function getTeamDataForSettings(teamId: string, userId: string) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user?.id) {
+    return null;
+  }
+
+  try {
+    const team = await prisma.team.findUnique({
+      where: { id: teamId },
+      include: {
+        members: {
+          where: { userId },
+        },
+      },
+    });
+
+    if (!team || team.members.length === 0) {
+      return null;
+    }
+
+    return { team, userMembership: team.members[0] };
+  } catch (error) {
+    console.error("Error fetching team data for settings:", error);
+    return null;
+  }
+}
+
+export async function getTeamPlan(teamId: string) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user?.id) {
+    return null;
+  }
+
+  try {
+    const team = await prisma.team.findUnique({
+      where: { id: teamId },
+      select: { plan: true, name: true },
+    });
+    return team || { plan: "free", name: "Unknown Team" };
+  } catch (error) {
+    console.error("Error fetching team plan:", error);
+    return null;
+  }
+}
+
+export async function getTeamPlanStatus(teamId: string) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user?.id) {
+    return null;
+  }
+
+  try {
+    // Check if user is a member of this team
+    const teamMembership = await prisma.teamMember.findFirst({
+      where: {
+        teamId,
+        userId: session.user.id,
+      },
+    });
+
+    if (!teamMembership) {
+      return null;
+    }
+
+    // Get team with counts
+    const team = await prisma.team.findUnique({
+      where: { id: teamId },
+      include: {
+        _count: {
+          select: {
+            sites: true,
+            members: true,
+          },
+        },
+      },
+    });
+
+    if (!team) {
+      return null;
+    }
+
+    return {
+      plan: team.plan,
+      projectCount: team._count.sites,
+      memberCount: team._count.members,
+    };
+  } catch (error) {
+    console.error("Error fetching team plan status:", error);
+    return null;
+  }
+}

@@ -164,3 +164,81 @@ export async function deleteProjectAction(
     };
   }
 }
+
+export async function getSiteData(
+  siteId: string,
+  teamId: string,
+  userId: string
+) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user?.id) {
+    return null;
+  }
+
+  try {
+    const site = await prisma.site.findFirst({
+      where: {
+        id: siteId,
+        teamId: teamId,
+      },
+      include: {
+        team: {
+          include: {
+            members: {
+              where: { userId },
+            },
+          },
+        },
+      },
+    });
+
+    if (!site || !site.team || site.team.members.length === 0) {
+      return null;
+    }
+
+    return { site, userMembership: site.team.members[0] };
+  } catch (error) {
+    console.error("Error fetching site data:", error);
+    return null;
+  }
+}
+
+export async function getSiteDataForSettings(
+  siteId: string,
+  teamId: string,
+  userId: string
+) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user?.id) {
+    return null;
+  }
+
+  try {
+    const site = await prisma.site.findFirst({
+      where: {
+        id: siteId,
+        teamId: teamId,
+      },
+      include: {
+        team: {
+          include: {
+            members: {
+              where: { userId },
+            },
+          },
+        },
+      },
+    });
+
+    if (!site || !site.team || site.team.members.length === 0) {
+      return null;
+    }
+
+    return { site, userMembership: site.team.members[0] };
+  } catch (error) {
+    console.error("Error fetching site data for settings:", error);
+    return null;
+  }
+}

@@ -1,7 +1,6 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/db";
 import { PageHeader } from "@/components/page-header";
 import {
   Card,
@@ -14,36 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Users, Globe, Plus, Settings } from "lucide-react";
-
-async function getTeamData(teamId: string, userId: string) {
-  const team = await prisma.team.findUnique({
-    where: { id: teamId },
-    include: {
-      sites: true,
-      members: {
-        include: {
-          user: {
-            select: { name: true, email: true, image: true },
-          },
-        },
-      },
-    },
-  });
-
-  if (!team) {
-    return null;
-  }
-
-  // Check if user is a member of this team
-  const userMembership = team.members.find(
-    (member) => member.userId === userId
-  );
-  if (!userMembership) {
-    return null;
-  }
-
-  return { team, userMembership };
-}
+import { getTeamData } from "@/actions/team-actions";
 
 export default async function TeamDashboardPage({
   params,

@@ -76,42 +76,52 @@ export async function getUserFirstTeam() {
   }
 }
 
-export async function getUserTeams() {
+export async function getUserTeams(userId: string) {
   const session = await getServerSession(authOptions);
 
-  if (!session || !session.user || !session.user.id) {
+  if (!session || !session.user?.id) {
     return null;
   }
 
   try {
-    // Get user's team memberships with team data
-    const teamMemberships = await prisma.teamMember.findMany({
-      where: { userId: session.user.id },
+    return await prisma.teamMember.findMany({
+      where: { userId },
       include: {
         team: {
           include: {
             sites: true,
+            members: {
+              include: {
+                user: {
+                  select: { name: true, email: true, image: true },
+                },
+              },
+            },
           },
         },
       },
       orderBy: { joinedAt: "desc" },
     });
-
-    // Transform to return teams with site counts
-    const teams = teamMemberships.map((membership) => ({
-      id: membership.team.id,
-      name: membership.team.name,
-      slug: membership.team.slug,
-      description: membership.team.description,
-      plan: membership.team.plan,
-      role: membership.role,
-      siteCount: membership.team.sites.length,
-      sites: membership.team.sites,
-    }));
-
-    return teams;
   } catch (error) {
     console.error("Error fetching user teams:", error);
+    return null;
+  }
+}
+
+export async function getUserDirectSites(userId: string) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user?.id) {
+    return null;
+  }
+
+  try {
+    return await prisma.site.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+    });
+  } catch (error) {
+    console.error("Error fetching user direct sites:", error);
     return null;
   }
 }

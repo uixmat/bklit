@@ -1,6 +1,5 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getPublishedPolarProducts } from "@/lib/polar";
@@ -9,14 +8,7 @@ import { ProductCard } from "@/components/polar/product-card";
 import { BillingSuccessDialog } from "@/components/dialogs/billing-success-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Users } from "lucide-react";
-
-async function getTeamPlan(teamId: string) {
-  const team = await prisma.team.findUnique({
-    where: { id: teamId },
-    select: { plan: true, name: true },
-  });
-  return team || { plan: "free", name: "Unknown Team" };
-}
+import { getTeamBillingData } from "@/actions/billing-actions";
 
 export default async function BillingPage({
   params,
@@ -33,19 +25,11 @@ export default async function BillingPage({
     redirect(`/login?callbackUrl=${encodeURIComponent(`/${teamId}/billing`)}`);
   }
 
-  // Check if user is a member of this team
-  const teamMembership = await prisma.teamMember.findFirst({
-    where: {
-      teamId,
-      userId: session.user.id,
-    },
-  });
+  const team = await getTeamBillingData(teamId);
 
-  if (!teamMembership) {
+  if (!team) {
     redirect("/");
   }
-
-  const team = await getTeamPlan(teamId);
   const products = await getPublishedPolarProducts();
   const showSuccessMessage = resolvedSearchParams?.purchase === "success";
 

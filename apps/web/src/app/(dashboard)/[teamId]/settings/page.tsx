@@ -7,27 +7,10 @@ import {
 } from "@/components/ui/card";
 import { PageHeader } from "@/components/page-header";
 import { DeleteTeamForm } from "@/components/forms/delete-team-form";
-import { prisma } from "@/lib/db";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
-
-async function getTeamData(teamId: string, userId: string) {
-  const team = await prisma.team.findUnique({
-    where: { id: teamId },
-    include: {
-      members: {
-        where: { userId },
-      },
-    },
-  });
-
-  if (!team || team.members.length === 0) {
-    return null;
-  }
-
-  return { team, userMembership: team.members[0] };
-}
+import { getTeamDataForSettings } from "@/actions/team-actions";
 
 export default async function TeamSettingsPage({
   params,
@@ -41,7 +24,7 @@ export default async function TeamSettingsPage({
     redirect("/signin");
   }
 
-  const teamData = await getTeamData(teamId, session.user.id);
+  const teamData = await getTeamDataForSettings(teamId, session.user.id);
 
   if (!teamData) {
     redirect("/");
