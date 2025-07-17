@@ -1,4 +1,4 @@
-(function () {
+(() => {
   const INACTIVITY_TIMEOUT_MS = 3 * 60 * 1000; // 3 minutes
   let inactivityTimer = null;
   let sessionEnded = false;
@@ -64,7 +64,7 @@
   function wrapHistoryMethod(type) {
     const orig = history[type];
     return function () {
-      const rv = orig.apply(this, arguments);
+      const rv = orig.apply(this, args);
       window.dispatchEvent(new Event(type));
       return rv;
     };
@@ -81,7 +81,7 @@
   ["mousemove", "keydown", "scroll", "touchstart", "visibilitychange"].forEach(
     (event) => {
       window.addEventListener(event, resetInactivityTimer, { passive: true });
-    }
+    },
   );
 
   // End session on tab close

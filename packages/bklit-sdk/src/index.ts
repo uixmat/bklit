@@ -1,5 +1,5 @@
 // packages/bklit-sdk/src/index.ts
-import { io, Socket } from "socket.io-client";
+import { io, type Socket } from "socket.io-client";
 
 interface BklitOptions {
   siteId: string;
@@ -260,12 +260,12 @@ export function initBklit(options: BklitOptions): void {
   const originalPushState = history.pushState;
   const originalReplaceState = history.replaceState;
 
-  history.pushState = function (...args) {
+  history.pushState = (...args) => {
     originalPushState.apply(history, args);
     setTimeout(handleRouteChange, 0);
   };
 
-  history.replaceState = function (...args) {
+  history.replaceState = (...args) => {
     originalReplaceState.apply(history, args);
     setTimeout(handleRouteChange, 0);
   };

@@ -1,10 +1,10 @@
 "use server";
 
-import { prisma } from "@/lib/db";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { getServerSession } from "next-auth/next";
 import { revalidatePath } from "next/cache";
+import { getServerSession } from "next-auth/next";
 import { z } from "zod";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { prisma } from "@/lib/db";
 
 const createTeamSchema = z.object({
   name: z
@@ -25,8 +25,8 @@ export type TeamFormState = {
 };
 
 export async function createTeamAction(
-  prevState: TeamFormState,
-  formData: FormData
+  _prevState: TeamFormState,
+  formData: FormData,
 ): Promise<TeamFormState> {
   const session = await getServerSession(authOptions);
 
@@ -106,8 +106,8 @@ export async function createTeamAction(
 
 // Action to delete a team
 export async function deleteTeamAction(
-  prevState: TeamFormState,
-  formData: FormData
+  _prevState: TeamFormState,
+  formData: FormData,
 ): Promise<TeamFormState> {
   const session = await getServerSession(authOptions);
 

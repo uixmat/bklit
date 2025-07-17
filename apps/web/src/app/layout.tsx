@@ -13,36 +13,36 @@ const geistSans = geistSansFont;
 const geistMono = geistMonoFont;
 
 export const metadata: Metadata = {
-	title: "Bklit Analytics",
-	description: "Track your website analytics",
+  title: "Bklit Analytics",
+  description: "Track your website analytics",
 };
 
 export default async function RootLayout({
-	children,
+  children,
 }: Readonly<{
-	children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-	const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions);
 
-	return (
-		<html lang="en" suppressHydrationWarning>
-			<body
-				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-			>
-				<ThemeProvider
-					attribute="class"
-					defaultTheme="system"
-					enableSystem
-					disableTransitionOnChange
-				>
-					<QueryClientProvider>
-						<AuthProvider session={session}>
-							{children}
-							<Toaster />
-						</AuthProvider>
-					</QueryClientProvider>
-				</ThemeProvider>
-			</body>
-		</html>
-	);
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <QueryClientProvider>
+            <AuthProvider session={session}>
+              {children}
+              <Toaster />
+            </AuthProvider>
+          </QueryClientProvider>
+        </ThemeProvider>
+      </body>
+    </html>
+  );
 }
