@@ -1,48 +1,48 @@
-import type { Metadata } from "next";
-import { GeistSans as geistSansFont } from "geist/font/sans";
 import { GeistMono as geistMonoFont } from "geist/font/mono";
+import { GeistSans as geistSansFont } from "geist/font/sans";
+import type { Metadata } from "next";
 import "./globals.css";
-import AuthProvider from "@/components/providers/session-provider";
-import { Toaster } from "@/components/ui/sonner";
-import { ThemeProvider } from "@/components/theme-provider";
-import { QueryClientProvider } from "@/components/providers/query-provider";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { QueryClientProvider } from "@/components/providers/query-provider";
+import AuthProvider from "@/components/providers/session-provider";
+import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = geistSansFont;
 const geistMono = geistMonoFont;
 
 export const metadata: Metadata = {
-  title: "Bklit Analytics",
-  description: "Track your website analytics",
+	title: "Bklit Analytics",
+	description: "Track your website analytics",
 };
 
 export default async function RootLayout({
-  children,
+	children,
 }: Readonly<{
-  children: React.ReactNode;
+	children: React.ReactNode;
 }>) {
-  const session = await getServerSession(authOptions);
+	const session = await getServerSession(authOptions);
 
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <QueryClientProvider>
-            <AuthProvider session={session}>
-              {children}
-              <Toaster />
-            </AuthProvider>
-          </QueryClientProvider>
-        </ThemeProvider>
-      </body>
-    </html>
-  );
+	return (
+		<html lang="en" suppressHydrationWarning>
+			<body
+				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+			>
+				<ThemeProvider
+					attribute="class"
+					defaultTheme="system"
+					enableSystem
+					disableTransitionOnChange
+				>
+					<QueryClientProvider>
+						<AuthProvider session={session}>
+							{children}
+							<Toaster />
+						</AuthProvider>
+					</QueryClientProvider>
+				</ThemeProvider>
+			</body>
+		</html>
+	);
 }
