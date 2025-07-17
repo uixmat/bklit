@@ -129,8 +129,7 @@ export async function deleteProjectAction(
     if (!project) {
       return {
         success: false,
-        message:
-          "Project not found or you do not have permission to delete it.",
+        message: "Project not found or you do not have permission to delete it.",
       };
     }
 
@@ -165,11 +164,7 @@ export async function deleteProjectAction(
   }
 }
 
-export async function getSiteData(
-  siteId: string,
-  teamId: string,
-  userId: string
-) {
+export async function getSiteData(siteId: string, teamId: string, userId: string) {
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user?.id) {
@@ -204,11 +199,7 @@ export async function getSiteData(
   }
 }
 
-export async function getSiteDataForSettings(
-  siteId: string,
-  teamId: string,
-  userId: string
-) {
+export async function getSiteDataForSettings(siteId: string, teamId: string, userId: string) {
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user?.id) {

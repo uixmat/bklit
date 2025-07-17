@@ -11,9 +11,7 @@ const getTopCountriesSchema = z.object({
   userId: z.string(),
 });
 
-export async function getTopCountries(
-  params: z.infer<typeof getTopCountriesSchema>
-) {
+export async function getTopCountries(params: z.infer<typeof getTopCountriesSchema>) {
   const validation = getTopCountriesSchema.safeParse(params);
 
   if (!validation.success) {
@@ -73,9 +71,7 @@ const getAnalyticsStatsSchema = z.object({
   days: z.number().default(7),
 });
 
-export async function getAnalyticsStats(
-  params: z.input<typeof getAnalyticsStatsSchema>
-) {
+export async function getAnalyticsStats(params: z.input<typeof getAnalyticsStatsSchema>) {
   const validation = getAnalyticsStatsSchema.safeParse(params);
 
   if (!validation.success) {
@@ -100,33 +96,32 @@ export async function getAnalyticsStats(
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - days);
 
-      const [totalViews, recentViews, uniquePages, uniqueVisits] =
-        await Promise.all([
-          prisma.pageViewEvent.count({
-            where: { siteId },
-          }),
-          prisma.pageViewEvent.count({
-            where: {
-              siteId,
-              timestamp: {
-                gte: startDate,
-              },
+      const [totalViews, recentViews, uniquePages, uniqueVisits] = await Promise.all([
+        prisma.pageViewEvent.count({
+          where: { siteId },
+        }),
+        prisma.pageViewEvent.count({
+          where: {
+            siteId,
+            timestamp: {
+              gte: startDate,
             },
-          }),
-          prisma.pageViewEvent.findMany({
-            where: { siteId },
-            distinct: ["url"],
-            select: { url: true },
-          }),
-          prisma.pageViewEvent.findMany({
-            where: {
-              siteId,
-              ip: { not: null },
-            },
-            distinct: ["ip"],
-            select: { ip: true },
-          }),
-        ]);
+          },
+        }),
+        prisma.pageViewEvent.findMany({
+          where: { siteId },
+          distinct: ["url"],
+          select: { url: true },
+        }),
+        prisma.pageViewEvent.findMany({
+          where: {
+            siteId,
+            ip: { not: null },
+          },
+          distinct: ["ip"],
+          select: { ip: true },
+        }),
+      ]);
 
       return {
         totalViews,
@@ -149,9 +144,7 @@ const getRecentPageViewsSchema = z.object({
   limit: z.number().default(5),
 });
 
-export async function getRecentPageViews(
-  params: z.input<typeof getRecentPageViewsSchema>
-) {
+export async function getRecentPageViews(params: z.input<typeof getRecentPageViewsSchema>) {
   const validation = getRecentPageViewsSchema.safeParse(params);
 
   if (!validation.success) {
@@ -198,9 +191,7 @@ const getVisitsByCountrySchema = z.object({
   userId: z.string(),
 });
 
-export async function getVisitsByCountry(
-  params: z.infer<typeof getVisitsByCountrySchema>
-) {
+export async function getVisitsByCountry(params: z.infer<typeof getVisitsByCountrySchema>) {
   const validation = getVisitsByCountrySchema.safeParse(params);
 
   if (!validation.success) {
@@ -260,9 +251,7 @@ export async function getVisitsByCountry(
             countryCode: country.countryCode ?? "",
             totalVisits: country._count.country,
             coordinates:
-              country.lat && country.lon
-                ? ([country.lon, country.lat] as [number, number])
-                : null,
+              country.lat && country.lon ? ([country.lon, country.lat] as [number, number]) : null,
             cities: cities.map((city) => ({
               name: city.city ?? "",
               visits: city._count.city,
@@ -271,9 +260,7 @@ export async function getVisitsByCountry(
         })
       );
 
-      return countriesWithCities.filter(
-        (country) => country.coordinates !== null
-      );
+      return countriesWithCities.filter((country) => country.coordinates !== null);
     },
     [`${siteId}-visits-by-country`],
     {
@@ -288,9 +275,7 @@ const getCountryVisitStatsSchema = z.object({
   userId: z.string(),
 });
 
-export async function getCountryVisitStats(
-  params: z.infer<typeof getCountryVisitStatsSchema>
-) {
+export async function getCountryVisitStats(params: z.infer<typeof getCountryVisitStatsSchema>) {
   const validation = getCountryVisitStatsSchema.safeParse(params);
 
   if (!validation.success) {
@@ -376,10 +361,7 @@ export async function getCountryVisitStats(
             desktopVisits,
             uniqueVisits: uniqueVisits.length,
             coordinates: coordinates
-              ? ([coordinates.longitude, coordinates.latitude] as [
-                  number,
-                  number
-                ])
+              ? ([coordinates.longitude, coordinates.latitude] as [number, number])
               : null,
           };
         })
@@ -397,9 +379,7 @@ export async function getCountryVisitStats(
       // );
 
       // Temporarily return all countries to debug (including those without coordinates)
-      const result = countriesWithStats.sort(
-        (a, b) => b.totalVisits - a.totalVisits
-      );
+      const result = countriesWithStats.sort((a, b) => b.totalVisits - a.totalVisits);
 
       console.log(
         "Final result:",
@@ -421,9 +401,7 @@ export async function getCountryVisitStats(
   )();
 }
 
-export async function debugCountryCodes(
-  params: z.infer<typeof getCountryVisitStatsSchema>
-) {
+export async function debugCountryCodes(params: z.infer<typeof getCountryVisitStatsSchema>) {
   const validation = getCountryVisitStatsSchema.safeParse(params);
 
   if (!validation.success) {
@@ -473,9 +451,7 @@ const getMobileDesktopStatsSchema = z.object({
   userId: z.string(),
 });
 
-export async function getMobileDesktopStats(
-  params: z.infer<typeof getMobileDesktopStatsSchema>
-) {
+export async function getMobileDesktopStats(params: z.infer<typeof getMobileDesktopStatsSchema>) {
   const validation = getMobileDesktopStatsSchema.safeParse(params);
 
   if (!validation.success) {
@@ -601,9 +577,7 @@ const getBrowserStatsSchema = z.object({
   userId: z.string(),
 });
 
-export async function getBrowserStats(
-  params: z.infer<typeof getBrowserStatsSchema>
-) {
+export async function getBrowserStats(params: z.infer<typeof getBrowserStatsSchema>) {
   const validation = getBrowserStatsSchema.safeParse(params);
 
   if (!validation.success) {
@@ -648,19 +622,13 @@ export async function getBrowserStats(
           browser = "Chrome";
         } else if (userAgent.includes("Firefox")) {
           browser = "Firefox";
-        } else if (
-          userAgent.includes("Safari") &&
-          !userAgent.includes("Chrome")
-        ) {
+        } else if (userAgent.includes("Safari") && !userAgent.includes("Chrome")) {
           browser = "Safari";
         } else if (userAgent.includes("Edge")) {
           browser = "Edge";
         } else if (userAgent.includes("Opera")) {
           browser = "Opera";
-        } else if (
-          userAgent.includes("MSIE") ||
-          userAgent.includes("Trident")
-        ) {
+        } else if (userAgent.includes("MSIE") || userAgent.includes("Trident")) {
           browser = "Internet Explorer";
         }
 
@@ -688,9 +656,7 @@ const getSessionAnalyticsSchema = z.object({
   days: z.number().default(30),
 });
 
-export async function getSessionAnalytics(
-  params: z.input<typeof getSessionAnalyticsSchema>
-) {
+export async function getSessionAnalytics(params: z.input<typeof getSessionAnalyticsSchema>) {
   const validation = getSessionAnalyticsSchema.safeParse(params);
 
   if (!validation.success) {
@@ -734,19 +700,16 @@ export async function getSessionAnalytics(
 
       const totalSessions = sessions.length;
       const bouncedSessions = sessions.filter((s) => s.didBounce).length;
-      const bounceRate =
-        totalSessions > 0 ? (bouncedSessions / totalSessions) * 100 : 0;
+      const bounceRate = totalSessions > 0 ? (bouncedSessions / totalSessions) * 100 : 0;
 
       const avgSessionDuration =
         sessions.length > 0
-          ? sessions.reduce((sum, s) => sum + (s.duration || 0), 0) /
-            sessions.length
+          ? sessions.reduce((sum, s) => sum + (s.duration || 0), 0) / sessions.length
           : 0;
 
       const avgPageViews =
         sessions.length > 0
-          ? sessions.reduce((sum, s) => sum + s.pageViewEvents.length, 0) /
-            sessions.length
+          ? sessions.reduce((sum, s) => sum + s.pageViewEvents.length, 0) / sessions.length
           : 0;
 
       return {
