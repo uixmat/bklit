@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { useUserPlanStatus } from "@/hooks/use-user-plan-status";
 import { useProject } from "@/contexts/project-context";
+import { useTeams } from "@/contexts/teams-provider";
 import { PlanType } from "@/lib/plans";
 
 export function ProjectLimitBanner() {
@@ -13,6 +14,7 @@ export function ProjectLimitBanner() {
     isLoading: isLoadingPlanStatus,
   } = useUserPlanStatus();
   const { currentSiteId, isLoadingSites } = useProject();
+  const { currentTeamId } = useTeams();
 
   if (isLoadingPlanStatus || isLoadingSites || !hasReachedLimit) {
     return null;
@@ -27,7 +29,7 @@ export function ProjectLimitBanner() {
       {planId.toLowerCase() === PlanType.FREE.toLowerCase() &&
         currentSiteId && (
           <Link
-            href={`/${currentSiteId}/billing`}
+            href={`/${currentTeamId || ""}/${currentSiteId}/billing`}
             className="font-semibold underline hover:text-yellow-600 dark:hover:text-yellow-200"
           >
             Upgrade

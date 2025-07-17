@@ -9,6 +9,7 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
+import { useTeams } from "./teams-provider";
 
 interface ProjectContextType {
   currentSiteId: string | null;
@@ -22,37 +23,58 @@ const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
 export const ProjectProvider: React.FC<{
   children: ReactNode;
-  sites: Site[];
-  initialSiteIdFromUrl?: string | null;
-}> = ({ children, sites, initialSiteIdFromUrl = null }) => {
-  const [currentSiteId, setCurrentSiteIdState] = useState<string | null>(
-    initialSiteIdFromUrl
-  );
-  const [availableSites, setAvailableSites] = useState<Site[]>(sites || []);
-  const [isLoadingSites, setIsLoadingSites] = useState(!sites);
+}> = ({ children }) => {
+  const [currentSiteId, setCurrentSiteIdState] = useState<string | null>(null);
+  const [availableSites, setAvailableSites] = useState<Site[]>([]);
+  const [isLoadingSites, setIsLoadingSites] = useState(true);
 
   const params = useParams();
+  const { currentTeamId } = useTeams();
+  const teamId = currentTeamId || (params?.teamId as string | undefined);
 
+  // Fetch sites for the current team
   useEffect(() => {
-    if (sites) {
-      setAvailableSites(sites);
-      setIsLoadingSites(false);
-    } else {
+    if (!teamId) {
       setAvailableSites([]);
-      setIsLoadingSites(true);
+      setIsLoadingSites(false);
+      return;
     }
-  }, [sites]);
 
+    const fetchSites = async () => {
+      try {
+        setIsLoadingSites(true);
+        const response = await fetch(`/api/teams/${teamId}/sites`);
+        if (response.ok) {
+          const sites = await response.json();
+          setAvailableSites(sites);
+
+          // Set the first site as current if no site is selected
+          if (sites.length > 0 && !currentSiteId) {
+            setCurrentSiteIdState(sites[0].id);
+          }
+        } else {
+          setAvailableSites([]);
+        }
+      } catch (error) {
+        console.error("Error fetching sites:", error);
+        setAvailableSites([]);
+      } finally {
+        setIsLoadingSites(false);
+      }
+    };
+
+    fetchSites();
+  }, [teamId, currentSiteId]);
+
+  // Handle site selection from URL params
   useEffect(() => {
     const siteIdFromParams = params?.siteId as string | undefined;
     if (siteIdFromParams) {
       setCurrentSiteIdState(siteIdFromParams);
-    } else if (initialSiteIdFromUrl) {
-      setCurrentSiteIdState(initialSiteIdFromUrl);
-    } else if (availableSites && availableSites.length > 0 && !currentSiteId) {
+    } else if (availableSites.length > 0 && !currentSiteId) {
       setCurrentSiteIdState(availableSites[0].id);
     }
-  }, [params, availableSites, initialSiteIdFromUrl, currentSiteId]);
+  }, [params, availableSites, currentSiteId]);
 
   const activeProject =
     availableSites.find((site) => site.id === currentSiteId) || null;

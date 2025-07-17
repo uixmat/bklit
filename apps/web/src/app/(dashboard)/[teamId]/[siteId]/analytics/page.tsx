@@ -21,9 +21,9 @@ import { SessionAnalyticsCard } from "@/components/analytics-cards/session-analy
 export default async function AnalyticsPage({
   params,
 }: {
-  params: Promise<{ siteId: string }>;
+  params: Promise<{ teamId: string; siteId: string }>;
 }) {
-  const { siteId } = await params;
+  const { teamId, siteId } = await params;
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user) {
@@ -31,7 +31,7 @@ export default async function AnalyticsPage({
   }
 
   return (
-    <>
+    <div className="flex flex-col gap-4">
       <div
         className="grid gap-4 
       md:grid-cols-2 lg:grid-cols-3"
@@ -43,11 +43,7 @@ export default async function AnalyticsPage({
         <Suspense fallback={<RecentPageViewsCardSkeleton />}>
           <RecentPageViewsCard siteId={siteId} userId={session.user.id} />
         </Suspense>
-      </div>
-      <div
-        className="grid gap-4 
-      md:grid-cols-2 lg:grid-cols-3"
-      >
+
         <Suspense fallback={<MobileDesktopCardSkeleton />}>
           <MobileDesktopCard />
         </Suspense>
@@ -60,7 +56,7 @@ export default async function AnalyticsPage({
         </Suspense>
       </div>
       <div className="grid gap-4 md:grid-cols-2">
-        <SessionAnalyticsCard siteId={siteId} userId={session.user.id} />
+        <SessionAnalyticsCard siteId={siteId} teamId={teamId} />
       </div>
       {/* <div className="mt-8">
         <h2 className="text-lg font-semibold mb-2">
@@ -68,6 +64,6 @@ export default async function AnalyticsPage({
         </h2>
         <SessionsList siteId={siteId} limit={5} />
       </div> */}
-    </>
+    </div>
   );
 }

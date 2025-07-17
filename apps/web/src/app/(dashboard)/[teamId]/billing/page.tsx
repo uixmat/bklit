@@ -7,38 +7,52 @@ import { getPublishedPolarProducts } from "@/lib/polar";
 import { PageHeader } from "@/components/page-header";
 import { ProductCard } from "@/components/polar/product-card";
 import { BillingSuccessDialog } from "@/components/dialogs/billing-success-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Users } from "lucide-react";
 
-async function getUserPlan(userId: string) {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { plan: true },
+async function getTeamPlan(teamId: string) {
+  const team = await prisma.team.findUnique({
+    where: { id: teamId },
+    select: { plan: true, name: true },
   });
-  return user?.plan || "free"; // Default to free if not found, though should always exist
+  return team || { plan: "free", name: "Unknown Team" };
 }
 
 export default async function BillingPage({
   params,
   searchParams,
 }: {
-  params: Promise<{ siteId: string }>;
+  params: Promise<{ teamId: string }>;
   searchParams?: { [key: string]: string | string[] | undefined };
 }) {
-  const { siteId } = await params;
+  const { teamId } = await params;
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user?.id) {
-    redirect(`/login?callbackUrl=${encodeURIComponent(`/${siteId}/billing`)}`);
+    redirect(`/login?callbackUrl=${encodeURIComponent(`/${teamId}/billing`)}`);
   }
 
-  const userPlan = await getUserPlan(session.user.id);
+  // Check if user is a member of this team
+  const teamMembership = await prisma.teamMember.findFirst({
+    where: {
+      teamId,
+      userId: session.user.id,
+    },
+  });
+
+  if (!teamMembership) {
+    redirect("/");
+  }
+
+  const team = await getTeamPlan(teamId);
   const products = await getPublishedPolarProducts();
   const showSuccessMessage = searchParams?.purchase === "success";
 
   return (
     <div className="space-y-6 prose dark:prose-invert max-w-none">
       <PageHeader
-        title="Billing"
-        description="Manage your subscription and billing information."
+        title={`${team.name} - Billing`}
+        description={`Manage subscription and billing information for ${team.name}.`}
       />
       <BillingSuccessDialog isOpenInitially={showSuccessMessage} />
 
@@ -47,22 +61,43 @@ export default async function BillingPage({
           <CardTitle>Current Plan</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="mb-4">
+            <p className="text-sm text-muted-foreground mb-2">Team</p>
+            <div className="flex items-center gap-2">
+              <Users className="size-4 text-muted-foreground" />
+              <p className="text-lg font-semibold">{team.name}</p>
+              <Badge variant="outline" className="ml-2">
+                {team.plan} Plan
+              </Badge>
+            </div>
+          </div>
           <p className="text-lg">
-            You are currently on the{" "}
-            <span className="font-semibold capitalize">{userPlan}</span> plan.
+            This team is currently on the{" "}
+            <span className="font-semibold capitalize">{team.plan}</span> plan.
           </p>
-          {userPlan === "free" && (
+          {team.plan === "free" && (
             <div>
               <p className="text-muted-foreground mb-3">
                 Upgrade to access more features and support our development.
               </p>
+              <div className="text-sm text-muted-foreground space-y-1">
+                <p>• Limited to 3 projects per team</p>
+                <p>• Basic analytics and insights</p>
+                <p>• Community support</p>
+              </div>
             </div>
           )}
-          {userPlan === "pro" && (
+          {team.plan === "pro" && (
             <div>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground mb-3">
                 Thank you for being a Pro member!
               </p>
+              <div className="text-sm text-muted-foreground space-y-1">
+                <p>• Unlimited projects per team</p>
+                <p>• Advanced analytics and insights</p>
+                <p>• Priority support</p>
+                <p>• Custom domains</p>
+              </div>
               {/* TODO: Add link to Polar customer portal if available/integrated */}
               {/* <Button variant="outline">Manage Subscription</Button> */}
             </div>

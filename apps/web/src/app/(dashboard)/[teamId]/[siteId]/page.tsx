@@ -1,6 +1,7 @@
-"use client";
-
-import { useProject } from "@/contexts/project-context";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { redirect } from "next/navigation";
+import { prisma } from "@/lib/db";
 import {
   Card,
   CardContent,
@@ -8,32 +9,59 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useUserPlanStatus } from "@/hooks/use-user-plan-status";
 import { PageHeader } from "@/components/page-header";
 import { DeleteProjectForm } from "@/components/forms/delete-project-form";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-export default function ProjectDashboardPage() {
-  const { activeProject, isLoadingSites, currentSiteId } = useProject();
-  const { isLoading: isLoadingPlanStatus } = useUserPlanStatus();
+async function getSiteData(siteId: string, teamId: string, userId: string) {
+  const site = await prisma.site.findFirst({
+    where: {
+      id: siteId,
+      teamId: teamId,
+    },
+    include: {
+      team: {
+        include: {
+          members: {
+            where: { userId },
+          },
+        },
+      },
+    },
+  });
 
-  if (isLoadingSites || isLoadingPlanStatus) {
-    return <div>Loading project details...</div>;
+  if (!site || !site.team || site.team.members.length === 0) {
+    return null;
   }
 
-  if (!activeProject) {
-    return (
-      <div>
-        <p>No project selected or found.</p>
-      </div>
-    );
+  return { site, userMembership: site.team.members[0] };
+}
+
+export default async function ProjectDashboardPage({
+  params,
+}: {
+  params: Promise<{ teamId: string; siteId: string }>;
+}) {
+  const { teamId, siteId } = await params;
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user?.id) {
+    redirect("/signin");
   }
+
+  const siteData = await getSiteData(siteId, teamId, session.user.id);
+
+  if (!siteData) {
+    redirect("/");
+  }
+
+  const { site, userMembership } = siteData;
 
   return (
     <div className="space-y-6 prose dark:prose-invert max-w-none">
       <PageHeader
-        title={`${activeProject.name} - Dashboard`}
+        title={`${site.name} - Dashboard`}
         description="Overview of your project and analytics."
       />
 
@@ -44,18 +72,18 @@ export default function ProjectDashboardPage() {
         </CardHeader>
         <CardContent>
           <p className="text-lg">
-            <strong>Project Name:</strong> {activeProject.name}
+            <strong>Project Name:</strong> {site.name}
           </p>
           <p className="text-muted-foreground">
-            <strong>Project ID:</strong> {activeProject.id}
+            <strong>Project ID:</strong> {site.id}
           </p>
-          {activeProject.domain && (
+          {site.domain && (
             <p className="text-muted-foreground">
-              <strong>Domain:</strong> {activeProject.domain}
+              <strong>Domain:</strong> {site.domain}
             </p>
           )}
           <p className="text-sm text-gray-500 mt-2">
-            Created: {new Date(activeProject.createdAt).toLocaleDateString()}
+            Created: {new Date(site.createdAt).toLocaleDateString()}
           </p>
         </CardContent>
       </Card>
@@ -69,7 +97,7 @@ export default function ProjectDashboardPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Link href={`/${currentSiteId}/analytics`}>
+            <Link href={`/${teamId}/${siteId}/analytics`}>
               <Button>Go to Analytics</Button>
             </Link>
           </CardContent>
@@ -83,19 +111,18 @@ export default function ProjectDashboardPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Link href={`/${currentSiteId}/setup`}>
+            <Link href={`/${teamId}/${siteId}/setup`}>
               <Button>Go to Setup</Button>
             </Link>
           </CardContent>
         </Card>
       </div>
 
-      <div className="pt-6 mt-6 border-t">
-        <DeleteProjectForm
-          siteId={activeProject.id}
-          projectName={activeProject.name}
-        />
-      </div>
+      {userMembership.role === "owner" && (
+        <div className="pt-6 mt-6 border-t">
+          <DeleteProjectForm siteId={site.id} projectName={site.name} />
+        </div>
+      )}
     </div>
   );
 }

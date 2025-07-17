@@ -6,6 +6,7 @@ export const enum PlanType {
 export interface PlanDetails {
   name: string;
   projectLimit: number;
+  teamMemberLimit: number;
   // Add other plan-specific features here in the future, e.g.:
   // featureAccess: string[];
   // priceId?: string; // For linking to subscription products
@@ -15,10 +16,12 @@ export const PLAN_DETAILS: Record<PlanType, PlanDetails> = {
   [PlanType.FREE]: {
     name: "Free",
     projectLimit: 1,
+    teamMemberLimit: 1,
   },
   [PlanType.PRO]: {
     name: "Pro",
     projectLimit: 5,
+    teamMemberLimit: 5,
   },
 };
 

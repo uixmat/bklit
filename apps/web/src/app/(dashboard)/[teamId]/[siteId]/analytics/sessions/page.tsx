@@ -9,7 +9,7 @@ import { ArrowLeft, Clock, MapPin, Monitor } from "lucide-react";
 import Link from "next/link";
 
 interface SessionsPageProps {
-  params: Promise<{ siteId: string }>;
+  params: Promise<{ teamId: string; siteId: string }>;
   searchParams: Promise<{ page?: string; limit?: string }>;
 }
 
@@ -54,7 +54,7 @@ export default async function SessionsPage({
   params,
   searchParams,
 }: SessionsPageProps) {
-  const { siteId } = await params;
+  const { teamId, siteId } = await params;
   const { page = "1", limit = "20" } = await searchParams;
   const session = await getServerSession(authOptions);
 
@@ -79,7 +79,7 @@ export default async function SessionsPage({
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Link
-            href={`/${siteId}/analytics`}
+            href={`/${teamId}/${siteId}/analytics`}
             className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -168,7 +168,7 @@ export default async function SessionsPage({
               sessions.map((session) => (
                 <Link
                   key={session.id}
-                  href={`/${siteId}/analytics/session/${session.id}`}
+                  href={`/${teamId}/${siteId}/analytics/session/${session.id}`}
                   className="block"
                 >
                   <div className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors group">
@@ -217,7 +217,7 @@ export default async function SessionsPage({
         <div className="flex items-center justify-center space-x-2">
           {pageNumber > 1 && (
             <Link
-              href={`/${siteId}/analytics/sessions?page=${
+              href={`/${teamId}/${siteId}/analytics/sessions?page=${
                 pageNumber - 1
               }&limit=${limitNumber}`}
               className="px-3 py-2 text-sm border rounded-md hover:bg-accent transition-colors"
@@ -230,7 +230,7 @@ export default async function SessionsPage({
           </span>
           {pageNumber < totalPages && (
             <Link
-              href={`/${siteId}/analytics/sessions?page=${
+              href={`/${teamId}/${siteId}/analytics/sessions?page=${
                 pageNumber + 1
               }&limit=${limitNumber}`}
               className="px-3 py-2 text-sm border rounded-md hover:bg-accent transition-colors"

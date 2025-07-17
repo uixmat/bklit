@@ -10,7 +10,7 @@ import Link from "next/link";
 import { UserSession } from "@/components/reactflow/user-session";
 
 interface SessionPageProps {
-  params: Promise<{ siteId: string; id: string }>;
+  params: Promise<{ teamId: string; siteId: string; id: string }>;
 }
 
 function formatDuration(seconds: number | null): string {
@@ -51,7 +51,7 @@ function getDeviceType(userAgent: string | null): string {
 }
 
 export default async function SessionPage({ params }: SessionPageProps) {
-  const { siteId, id } = await params;
+  const { teamId, siteId, id } = await params;
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user) {
@@ -74,7 +74,7 @@ export default async function SessionPage({ params }: SessionPageProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Link
-            href={`/${siteId}/analytics`}
+            href={`/${teamId}/${siteId}/analytics`}
             className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
