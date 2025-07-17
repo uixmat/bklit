@@ -110,23 +110,15 @@ export default async function SessionPage({ params }: SessionPageProps) {
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Duration</span>
-                <span className="text-sm font-medium">
-                  {formatDuration(sessionData.duration)}
-                </span>
+                <span className="text-sm font-medium">{formatDuration(sessionData.duration)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">
-                  Pages Viewed
-                </span>
-                <span className="text-sm font-medium">
-                  {sessionData.pageViewEvents.length}
-                </span>
+                <span className="text-sm text-muted-foreground">Pages Viewed</span>
+                <span className="text-sm font-medium">{sessionData.pageViewEvents.length}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Status</span>
-                <Badge
-                  variant={sessionData.didBounce ? "destructive" : "default"}
-                >
+                <Badge variant={sessionData.didBounce ? "destructive" : "default"}>
                   {sessionData.didBounce ? "Bounced" : "Engaged"}
                 </Badge>
               </div>
@@ -154,12 +146,8 @@ export default async function SessionPage({ params }: SessionPageProps) {
               </div>
               {sessionData.visitorId && (
                 <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">
-                    Visitor ID
-                  </span>
-                  <span className="text-sm font-mono text-xs">
-                    {sessionData.visitorId}
-                  </span>
+                  <span className="text-sm text-muted-foreground">Visitor ID</span>
+                  <span className="text-sm font-mono text-xs">{sessionData.visitorId}</span>
                 </div>
               )}
             </div>
@@ -179,28 +167,18 @@ export default async function SessionPage({ params }: SessionPageProps) {
               {sessionData.country ? (
                 <>
                   <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">
-                      Country
-                    </span>
-                    <span className="text-sm font-medium">
-                      {sessionData.country}
-                    </span>
+                    <span className="text-sm text-muted-foreground">Country</span>
+                    <span className="text-sm font-medium">{sessionData.country}</span>
                   </div>
                   {sessionData.city && (
                     <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">
-                        City
-                      </span>
-                      <span className="text-sm font-medium">
-                        {sessionData.city}
-                      </span>
+                      <span className="text-sm text-muted-foreground">City</span>
+                      <span className="text-sm font-medium">{sessionData.city}</span>
                     </div>
                   )}
                 </>
               ) : (
-                <div className="text-sm text-muted-foreground">
-                  Location data not available
-                </div>
+                <div className="text-sm text-muted-foreground">Location data not available</div>
               )}
             </div>
           </CardContent>
@@ -228,17 +206,12 @@ export default async function SessionPage({ params }: SessionPageProps) {
                   },
                   index: number
                 ) => (
-                  <div
-                    key={pageView.id}
-                    className="flex items-center space-x-4"
-                  >
+                  <div key={pageView.id} className="flex items-center space-x-4">
                     <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm font-medium">
                       {index + 1}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium truncate">
-                        {pageView.url}
-                      </div>
+                      <div className="text-sm font-medium truncate">{pageView.url}</div>
                       <div className="text-xs text-muted-foreground">
                         {format(new Date(pageView.timestamp), "HH:mm:ss")}
                         {pageView.country && ` • ${pageView.country}`}

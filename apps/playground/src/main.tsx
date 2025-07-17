@@ -10,9 +10,7 @@ const YOUR_SITE_ID = "cmcuk7myh00022k0xgh1kh599";
 
 // Get the ngrok URL from environment variable
 const NGROK_URL = import.meta.env.VITE_NGROK_URL;
-const API_HOST = NGROK_URL
-  ? `${NGROK_URL}/api/track`
-  : "http://localhost:3000/api/track";
+const API_HOST = NGROK_URL ? `${NGROK_URL}/api/track` : "http://localhost:3000/api/track";
 
 // Debug: Check if SDK is imported correctly
 console.log("🔍 Playground: SDK import test", {

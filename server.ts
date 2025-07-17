@@ -1,11 +1,7 @@
-import {
-  createServer,
-  type IncomingMessage,
-  type ServerResponse,
-} from "node:http";
-import next from "next";
+import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import path from "node:path";
 import { fileURLToPath, parse } from "node:url";
+import next from "next";
 
 // const { initSocket } = require("./apps/web/src/lib/socketio-server.ts"); // Old require
 
@@ -26,19 +22,17 @@ app
     // Import after Next.js has prepared, especially if socketio-server might depend on Next.js internals or aliased paths
     import("./apps/web/src/lib/socketio-server")
       .then(({ initSocket }) => {
-        const httpServer = createServer(
-          async (req: IncomingMessage, res: ServerResponse) => {
-            try {
-              const parsedUrl = parse(req.url ?? "", true);
-              // Let Next.js handle all requests
-              await handle(req, res, parsedUrl);
-            } catch (err) {
-              console.error("Error handling request:", err);
-              res.statusCode = 500;
-              res.end("internal server error");
-            }
+        const httpServer = createServer(async (req: IncomingMessage, res: ServerResponse) => {
+          try {
+            const parsedUrl = parse(req.url ?? "", true);
+            // Let Next.js handle all requests
+            await handle(req, res, parsedUrl);
+          } catch (err) {
+            console.error("Error handling request:", err);
+            res.statusCode = 500;
+            res.end("internal server error");
           }
-        );
+        });
 
         // Initialize Socket.IO with the httpServer instance
         initSocket(httpServer);
@@ -47,9 +41,7 @@ app
           // Removed (err) parameter as listen callback in Node for http typically doesn't pass error first for success
           console.log(`> Ready on http://localhost:${port}`);
           console.log(`> Next.js app from ${appDir} is being served.`);
-          console.log(
-            `> Socket.IO initialized and listening on path /api/socketio`
-          );
+          console.log(`> Socket.IO initialized and listening on path /api/socketio`);
         });
 
         httpServer.on("error", (err: Error) => {

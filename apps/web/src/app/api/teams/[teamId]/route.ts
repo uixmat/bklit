@@ -39,9 +39,6 @@ export async function GET(
     return NextResponse.json(team);
   } catch (error) {
     console.error("Error fetching team:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

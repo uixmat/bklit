@@ -17,9 +17,7 @@ export default function Home() {
   return (
     <>
       <h1>Vite + React Playground</h1>
-      <p className="read-the-docs">
-        This site is a testbed for Bklit analytics.
-      </p>
+      <p className="read-the-docs">This site is a testbed for Bklit analytics.</p>
       <nav style={{ marginBottom: 16 }}>
         <Link to="/">Home</Link> | <Link to="/products">Products</Link>
       </nav>
@@ -36,9 +34,7 @@ export default function Home() {
         <p>
           <strong>🔍 Console Logging Enabled</strong>
         </p>
-        <p>
-          Open your browser's developer console to see detailed tracking logs:
-        </p>
+        <p>Open your browser's developer console to see detailed tracking logs:</p>
         <ul style={{ marginLeft: "20px", marginTop: "8px" }}>
           <li>🚀 Page view tracking events</li>
           <li>🆔 Session creation and management</li>
