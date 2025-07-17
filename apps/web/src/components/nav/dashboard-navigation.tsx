@@ -19,7 +19,11 @@ export function DashboardNavigation() {
   const teamId =
     segments[0] !== "user" && segments.length > 0 ? segments[0] : undefined;
   const siteId =
-    segments.length > 1 && segments[1] !== "billing" ? segments[1] : undefined;
+    segments.length > 1 &&
+    segments[1] !== "billing" &&
+    segments[1] !== "settings"
+      ? segments[1]
+      : undefined;
   const userId =
     segments[0] === "user" && segments.length > 1 ? segments[1] : undefined;
 

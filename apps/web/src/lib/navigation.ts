@@ -19,6 +19,10 @@ export const navigationConfig: NavigationConfig = {
       title: "Billing",
       href: "/[teamId]/billing",
     },
+    {
+      title: "Settings",
+      href: "/[teamId]/settings",
+    },
   ],
 
   // Site level navigation (when at /[teamId]/[siteId])
@@ -62,12 +66,16 @@ export function getNavigationItems(pathname: string): NavigationItem[] {
     return navigationConfig.user;
   }
 
-  // Site level: /[teamId]/[siteId]/... (but not billing)
-  if (segments.length >= 2 && segments[1] !== "billing") {
+  // Site level: /[teamId]/[siteId]/... (but not billing, settings)
+  if (
+    segments.length >= 2 &&
+    segments[1] !== "billing" &&
+    segments[1] !== "settings"
+  ) {
     return navigationConfig.site;
   }
 
-  // Team level: /[teamId] or /[teamId]/billing
+  // Team level: /[teamId], /[teamId]/billing, or /[teamId]/settings
   if (segments.length >= 1 && segments[0] !== "user") {
     return navigationConfig.team;
   }

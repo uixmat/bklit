@@ -23,9 +23,10 @@ export default async function BillingPage({
   searchParams,
 }: {
   params: Promise<{ teamId: string }>;
-  searchParams?: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { teamId } = await params;
+  const resolvedSearchParams = await searchParams;
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user?.id) {
@@ -46,7 +47,7 @@ export default async function BillingPage({
 
   const team = await getTeamPlan(teamId);
   const products = await getPublishedPolarProducts();
-  const showSuccessMessage = searchParams?.purchase === "success";
+  const showSuccessMessage = resolvedSearchParams?.purchase === "success";
 
   return (
     <div className="space-y-6 prose dark:prose-invert max-w-none">

@@ -21,7 +21,7 @@ import { useTeamPlanStatus } from "@/hooks/use-team-plan-status";
 import { useUserPlanStatus } from "@/hooks/use-user-plan-status";
 
 import React, { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, usePathname } from "next/navigation";
 import { ModuleWorkspaces } from "./module-workspaces";
 import Link from "next/link";
 import { getUserTeams } from "@/actions/user-actions";
@@ -50,8 +50,16 @@ export function NavWorkspace() {
     useProject();
   const { currentTeam, isLoadingTeam, currentTeamId } = useTeams();
   const params = useParams();
+  const pathname = usePathname();
   const teamId = currentTeamId || (params?.teamId as string | undefined);
-  const siteId = params?.siteId as string | undefined;
+  // Only treat as siteId if it's not a reserved route like billing or settings
+  const segments = pathname.split("/").filter(Boolean);
+  const siteId =
+    segments.length > 1 &&
+    segments[1] !== "billing" &&
+    segments[1] !== "settings"
+      ? segments[1]
+      : undefined;
 
   // Pre-fetch teams data
   const [teams, setTeams] = useState<Team[]>([]);

@@ -1,7 +1,7 @@
 "use client";
 
 import type { Site } from "@prisma/client";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import React, {
   createContext,
   useContext,
@@ -29,6 +29,7 @@ export const ProjectProvider: React.FC<{
   const [isLoadingSites, setIsLoadingSites] = useState(true);
 
   const params = useParams();
+  const pathname = usePathname();
   const { currentTeamId } = useTeams();
   const teamId = currentTeamId || (params?.teamId as string | undefined);
 
@@ -68,13 +69,21 @@ export const ProjectProvider: React.FC<{
 
   // Handle site selection from URL params
   useEffect(() => {
-    const siteIdFromParams = params?.siteId as string | undefined;
+    // Only treat as siteId if it's not a reserved route like billing or settings
+    const segments = pathname.split("/").filter(Boolean);
+    const siteIdFromParams =
+      segments.length > 1 &&
+      segments[1] !== "billing" &&
+      segments[1] !== "settings"
+        ? segments[1]
+        : undefined;
+
     if (siteIdFromParams) {
       setCurrentSiteIdState(siteIdFromParams);
     } else if (availableSites.length > 0 && !currentSiteId) {
       setCurrentSiteIdState(availableSites[0].id);
     }
-  }, [params, availableSites, currentSiteId]);
+  }, [pathname, availableSites, currentSiteId]);
 
   const activeProject =
     availableSites.find((site) => site.id === currentSiteId) || null;

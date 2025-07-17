@@ -10,7 +10,7 @@ import { PageHeader } from "@/components/page-header";
 export default function SettingsPage() {
   return (
     <div className="space-y-6 prose dark:prose-invert max-w-none">
-      <PageHeader title="Site settings" description="Manage your settings." />
+      <PageHeader title="Team settings" description="Manage your settings." />
       <Card className="card">
         <CardHeader>
           <CardTitle>A settings card</CardTitle>
