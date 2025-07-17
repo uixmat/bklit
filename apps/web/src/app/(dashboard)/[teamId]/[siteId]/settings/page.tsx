@@ -15,7 +15,7 @@ import { highlightCode } from "@/lib/shiki-highlighter";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PageHeader } from "@/components/page-header";
 
-export default function ProjectSetupPage() {
+export default function SettingsPage() {
   const { activeProject, isLoadingSites } = useProject();
   const [highlightedInstallCmd, setHighlightedInstallCmd] =
     useState<JSX.Element | null>(null);
