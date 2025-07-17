@@ -94,15 +94,19 @@ export function WorldMap({ siteId, userId }: WorldMapProps) {
 
     // Load and render world map
     d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .then((world: any) => {
+      .then((world) => {
         if (!world) return;
 
-        const countries = topojson.feature(world, world.objects.countries);
+        const countries = topojson.feature(
+          // biome-ignore lint/suspicious/noExplicitAny: D3 and TopoJSON types are complex and external
+          world as any,
+          // biome-ignore lint/suspicious/noExplicitAny: D3 and TopoJSON types are complex and external
+          (world as any).objects.countries,
+        );
 
         // Draw countries
         g.selectAll(".country")
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          // biome-ignore lint/suspicious/noExplicitAny: D3 and TopoJSON types are complex and external
           .data((countries as any).features)
           .enter()
           .append("path")
@@ -126,8 +130,8 @@ export function WorldMap({ siteId, userId }: WorldMapProps) {
           .enter()
           .append("circle")
           .attr("class", "marker")
-          .attr("cx", (d) => projection(d.coordinates!)?.[0] || 0)
-          .attr("cy", (d) => projection(d.coordinates!)?.[1] || 0)
+          .attr("cx", (d) => projection(d.coordinates || [0, 0])?.[0] || 0)
+          .attr("cy", (d) => projection(d.coordinates || [0, 0])?.[1] || 0)
           .attr("r", 0)
           .attr("fill", "var(--card-background)")
           .attr("stroke", "var(--card-foreground)")
@@ -139,7 +143,7 @@ export function WorldMap({ siteId, userId }: WorldMapProps) {
         markers
           .transition()
           .duration(1000)
-          .delay((d, i) => i * 100)
+          .delay((_d, i) => i * 100)
           .attr("r", (d) => Math.sqrt(d.totalVisits / 10) + 6);
 
         // Add tooltip interactions
@@ -153,27 +157,26 @@ export function WorldMap({ siteId, userId }: WorldMapProps) {
               .attr("opacity", 1);
 
             // Show tooltip
-            const svgRect = svgRef.current!.getBoundingClientRect();
-            const relativeX = event.clientX - svgRect.left;
-            const relativeY = event.clientY - svgRect.top;
+            const svgRect = svgRef.current?.getBoundingClientRect();
+            const relativeX = event.clientX - (svgRect?.left || 0);
+            const relativeY = event.clientY - (svgRect?.top || 0);
 
             setTooltipData(d);
             setTooltipPosition({ x: relativeX, y: relativeY });
           })
           .on("mousemove", (event) => {
-            const svgRect = svgRef.current!.getBoundingClientRect();
-            const relativeX = event.clientX - svgRect.left;
-            const relativeY = event.clientY - svgRect.top;
+            const svgRect = svgRef.current?.getBoundingClientRect();
+            const relativeX = event.clientX - (svgRect?.left || 0);
+            const relativeY = event.clientY - (svgRect?.top || 0);
 
             setTooltipPosition({ x: relativeX, y: relativeY });
           })
-          .on("mouseout", function (event, d) {
+          .on("mouseout", function (d) {
             // Reset marker
             d3.select(this)
               .transition()
               .duration(200)
               .attr("r", Math.sqrt(d.totalVisits / 10) + 6);
-            // .attr("fill", "var(--color-region)");
 
             // Restore all countries to normal opacity and color
             g.selectAll(".country")

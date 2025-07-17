@@ -16,7 +16,7 @@ interface WebhookPayload {
 }
 
 export const POST = Webhooks({
-  webhookSecret: process.env.POLAR_WEBHOOK_SECRET!,
+  webhookSecret: process.env.POLAR_WEBHOOK_SECRET || "",
 
   // Assuming payload is the 'data' part of the event, or the event object itself
   async onCheckoutUpdated(payload: WebhookPayload) {
@@ -57,8 +57,7 @@ export const POST = Webhooks({
     }
 
     if (
-      subscription && // This check is now on payload.data
-      subscription.id &&
+      subscription?.id &&
       subscription.customer?.email &&
       subscription.status === "active"
     ) {
@@ -119,13 +118,9 @@ export const POST = Webhooks({
 
     // Debugging the guard clause (now on subscription which is payload.data)
     const subExists = !!subscription;
-    const subIdExists = !!(subscription && subscription.id);
-    const customerExists = !!(subscription && subscription.customer);
-    const customerEmailExists = !!(
-      subscription &&
-      subscription.customer &&
-      subscription.customer.email
-    );
+    const subIdExists = !!subscription?.id;
+    const customerExists = !!subscription?.customer;
+    const customerEmailExists = !!subscription?.customer?.email;
 
     console.log("onSubscriptionUpdated - Guard Debug (on payload.data):", {
       subExists,
@@ -135,10 +130,9 @@ export const POST = Webhooks({
       rawCustomerObject: subscription
         ? subscription.customer
         : "subscription is null",
-      rawCustomerEmail:
-        subscription && subscription.customer
-          ? subscription.customer.email
-          : "customer or subscription is null",
+      rawCustomerEmail: subscription?.customer
+        ? subscription.customer.email
+        : "customer or subscription is null",
     });
 
     if (

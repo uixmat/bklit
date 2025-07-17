@@ -262,11 +262,13 @@ function generateEdgesFromSession(session: SessionData): Edge[] {
     );
 
     if (edgeMap.has(edgeKey)) {
-      const existing = edgeMap.get(edgeKey)!;
-      existing.count++;
-      existing.totalTime += timeDiff;
-      existing.lastTime = timeDiff;
-      existing.bidirectional = true; // If we see the same edge again, it's bidirectional
+      const existing = edgeMap.get(edgeKey);
+      if (existing) {
+        existing.count++;
+        existing.totalTime += timeDiff;
+        existing.lastTime = timeDiff;
+        existing.bidirectional = true;
+      }
     } else {
       edgeMap.set(edgeKey, {
         count: 1,

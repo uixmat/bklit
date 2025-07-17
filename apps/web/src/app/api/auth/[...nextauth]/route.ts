@@ -36,7 +36,7 @@ export const authOptions: AuthOptions = {
       return session;
     },
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    async jwt({ token, user, account, profile, isNewUser }) {
+    async jwt({ token, user }) {
       if (user) {
         // user object is available on sign-in or when JWT is first created
         token.sub = user.id;

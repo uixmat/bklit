@@ -25,7 +25,7 @@ export type TeamFormState = {
 };
 
 export async function createTeamAction(
-  prevState: TeamFormState,
+  _prevState: TeamFormState,
   formData: FormData,
 ): Promise<TeamFormState> {
   const session = await getServerSession(authOptions);
@@ -106,7 +106,7 @@ export async function createTeamAction(
 
 // Action to delete a team
 export async function deleteTeamAction(
-  prevState: TeamFormState,
+  _prevState: TeamFormState,
   formData: FormData,
 ): Promise<TeamFormState> {
   const session = await getServerSession(authOptions);

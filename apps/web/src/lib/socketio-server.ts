@@ -1,4 +1,4 @@
-import type { Server as HttpServer } from "http";
+import type { Server as HttpServer } from "node:http";
 import { type Socket, Server as SocketIOServer } from "socket.io";
 
 // Declare a global variable to hold the Socket.IO server instance.

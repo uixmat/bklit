@@ -40,7 +40,7 @@ export function MobileDesktopCard() {
     queryKey: ["mobile-desktop-stats", currentSiteId],
     queryFn: () =>
       getMobileDesktopStats({
-        siteId: currentSiteId!,
+        siteId: currentSiteId || "",
         userId: session?.user?.id || "",
       }),
     enabled: !!currentSiteId && !!session?.user?.id,

@@ -2,7 +2,6 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
-import React from "react";
 import { getBrowserStats } from "@/actions/analytics-actions";
 import { BrowserIcon } from "@/components/icons/browser";
 import { ChromeIcon } from "@/components/icons/chrome";
@@ -49,7 +48,7 @@ export function BrowserStatsCard() {
     queryKey: ["browser-stats", currentSiteId],
     queryFn: () =>
       getBrowserStats({
-        siteId: currentSiteId!,
+        siteId: currentSiteId || "",
         userId: session?.user?.id || "",
       }),
     enabled: !!currentSiteId && !!session?.user?.id,

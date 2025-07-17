@@ -31,7 +31,7 @@ console.log(
 
 export default polar;
 
-export async function getPublishedPolarProducts(): Promise<any[]> {
+export async function getPublishedPolarProducts(): Promise<unknown[]> {
   if (!SERVER_POLAR_ACCESS_TOKEN) {
     console.error(
       "Polar access token is not configured. Cannot fetch products.",
@@ -45,17 +45,22 @@ export async function getPublishedPolarProducts(): Promise<any[]> {
       // Add limit if you expect many products, e.g., limit: 100
     });
 
-    const products: any[] = [];
+    const products: unknown[] = [];
     for await (const page of productsIterator) {
       // Check if the iterated item has the structure { result: { items: [...] } }
-      if (page && page.result && Array.isArray(page.result.items)) {
+      if (page?.result && Array.isArray(page.result.items)) {
         products.push(...page.result.items);
       } else if (Array.isArray(page)) {
         // Fallback for direct array (less likely now)
         products.push(...page);
-      } else if (page && Array.isArray((page as any).items)) {
+      } else if (
+        page &&
+        typeof page === "object" &&
+        "items" in page &&
+        Array.isArray((page as { items?: unknown[] }).items)
+      ) {
         // Fallback for { items: [...] } (less likely now)
-        products.push(...(page as any).items);
+        products.push(...(page as { items: unknown[] }).items);
       } else {
         console.warn(
           "Unexpected page structure in Polar products iterator (or no items found in page.result.items):",
