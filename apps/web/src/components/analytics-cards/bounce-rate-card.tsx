@@ -1,21 +1,15 @@
 "use client";
-import { PieChart, Pie, Cell } from "recharts";
+import { useQuery } from "@tanstack/react-query";
+import { Cell, Pie, PieChart } from "recharts";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  ChartConfig,
+  type ChartConfig,
   ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
   ChartLegend,
   ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
 } from "@/components/ui/chart";
-import {
-  Card,
-  CardDescription,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { useQuery } from "@tanstack/react-query";
 import { useProject } from "@/contexts/project-context";
 
 const chartConfig = {
@@ -34,9 +28,7 @@ function useBounceRate(siteId: string | undefined, days = 30) {
     queryKey: ["bounce-rate", siteId],
     queryFn: async () => {
       if (!siteId) return null;
-      const res = await fetch(
-        `/api/session-analytics?siteId=${siteId}&days=${days}`
-      );
+      const res = await fetch(`/api/session-analytics?siteId=${siteId}&days=${days}`);
       if (!res.ok) throw new Error("Failed to fetch bounce rate");
       return res.json();
     },
@@ -93,16 +85,11 @@ export function BounceRateCard() {
                 fill="var(--color-bounced)"
               >
                 {chartData.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={`var(--color-${entry.name})`}
-                  />
+                  <Cell key={`cell-${index}`} fill={`var(--color-${entry.name})`} />
                 ))}
               </Pie>
               <ChartTooltip content={<ChartTooltipContent />} />
-              <ChartLegend
-                content={<ChartLegendContent payload="horizontal" />}
-              />
+              <ChartLegend content={<ChartLegendContent payload="horizontal" />} />
             </PieChart>
           </ChartContainer>
         </div>

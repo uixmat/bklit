@@ -44,9 +44,7 @@ export function getCountryCoordinates(): CountryCoordinate[] {
   }
 }
 
-export function findCountryCoordinates(
-  countryCode: string
-): CountryCoordinate | null {
+export function findCountryCoordinates(countryCode: string): CountryCoordinate | null {
   const coordinates = getCountryCoordinates();
 
   // Normalize the country code (uppercase, trim)
@@ -76,8 +74,7 @@ export function findCountryCoordinates(
   if (!found) {
     found = coordinates.find(
       (coord) =>
-        coord.alpha2Code.includes(normalizedCode) ||
-        coord.alpha3Code.includes(normalizedCode)
+        coord.alpha2Code.includes(normalizedCode) || coord.alpha3Code.includes(normalizedCode)
     );
   }
 

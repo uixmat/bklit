@@ -1,8 +1,8 @@
-import NextAuth, { AuthOptions } from "next-auth";
-import GitHubProvider from "next-auth/providers/github";
 import { PrismaAdapter } from "@auth/prisma-adapter";
+import type { PrismaClient } from "@prisma/client";
+import NextAuth, { type AuthOptions } from "next-auth";
+import GitHubProvider from "next-auth/providers/github";
 import { prisma } from "@/lib/db"; // Assuming your Prisma client is exported as prisma from @/lib/db.ts
-import { PrismaClient } from "@prisma/client";
 
 if (!process.env.GITHUB_ID) {
   throw new Error("Missing GITHUB_ID in .env");
@@ -77,14 +77,9 @@ export const authOptions: AuthOptions = {
               // domain can be null/optional by default
             },
           });
-          console.log(
-            `Created default project for new user: ${message.user.id}`
-          );
+          console.log(`Created default project for new user: ${message.user.id}`);
         } catch (error) {
-          console.error(
-            `Failed to create default project for user ${message.user.id}:`,
-            error
-          );
+          console.error(`Failed to create default project for user ${message.user.id}:`, error);
           // Decide on error handling:
           // - Log and continue (user will have no project initially, marketing page logic will apply)
           // - Throw error (might impact user creation flow, depending on NextAuth handling)

@@ -1,25 +1,19 @@
 "use client";
-import { PieChart, Pie, Cell } from "recharts";
+import { useQuery } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
+import { Cell, Pie, PieChart } from "recharts";
+import { getMobileDesktopStats } from "@/actions/analytics-actions";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  ChartConfig,
+  type ChartConfig,
   ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
   ChartLegend,
   ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
 } from "@/components/ui/chart";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
-import { useQuery } from "@tanstack/react-query";
-import { getMobileDesktopStats } from "@/actions/analytics-actions";
-import { useProject } from "@/contexts/project-context";
-import { useSession } from "next-auth/react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useProject } from "@/contexts/project-context";
 
 const chartConfig = {
   desktop: {
@@ -62,8 +56,7 @@ export function MobileDesktopCard() {
       <CardHeader>
         <CardTitle>Mobile/Desktop</CardTitle>
         <CardDescription>
-          Unique page visits by device type ({totalVisits} total unique
-          visitors).
+          Unique page visits by device type ({totalVisits} total unique visitors).
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -79,16 +72,11 @@ export function MobileDesktopCard() {
               fill="var(--color-desktop)"
             >
               {chartData.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={`var(--color-${entry.name})`}
-                />
+                <Cell key={`cell-${index}`} fill={`var(--color-${entry.name})`} />
               ))}
             </Pie>
             <ChartTooltip content={<ChartTooltipContent />} />
-            <ChartLegend
-              content={<ChartLegendContent payload="horizontal" />}
-            />
+            <ChartLegend content={<ChartLegendContent payload="horizontal" />} />
           </PieChart>
         </ChartContainer>
       </CardContent>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { getPlanDetails, PlanDetails, PlanType } from "@/lib/plans";
+import { getPlanDetails, type PlanDetails, PlanType } from "@/lib/plans";
 
 interface TeamPlanStatus {
   planId: PlanType;
@@ -38,10 +38,8 @@ export function useTeamPlanStatus(teamId: string): TeamPlanStatus {
   const projectCount = teamData?.projectCount ?? 0;
   const memberCount = teamData?.memberCount ?? 0;
 
-  const hasReachedProjectLimit =
-    projectCount >= currentPlanDetails.projectLimit;
-  const hasReachedMemberLimit =
-    memberCount >= currentPlanDetails.teamMemberLimit;
+  const hasReachedProjectLimit = projectCount >= currentPlanDetails.projectLimit;
+  const hasReachedMemberLimit = memberCount >= currentPlanDetails.teamMemberLimit;
 
   return {
     planId: currentPlanId,

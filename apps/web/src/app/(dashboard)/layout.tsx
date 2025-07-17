@@ -1,15 +1,11 @@
+import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { redirect } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { ProjectProvider } from "@/contexts/project-context";
 import { TeamsProvider } from "@/contexts/teams-provider";
 
-export default async function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user?.id) {

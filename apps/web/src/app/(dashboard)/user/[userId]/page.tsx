@@ -1,25 +1,15 @@
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { Plus, Users } from "lucide-react";
+import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth/next";
+import { getUserDirectSites, getUserTeams } from "@/actions/user-actions";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { PageHeader } from "@/components/page-header";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { Users, Plus } from "lucide-react";
-import { getUserTeams, getUserDirectSites } from "@/actions/user-actions";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default async function UserPage({
-  params,
-}: {
-  params: Promise<{ userId: string }>;
-}) {
+export default async function UserPage({ params }: { params: Promise<{ userId: string }> }) {
   const { userId } = await params;
   const session = await getServerSession(authOptions);
 
@@ -32,17 +22,11 @@ export default async function UserPage({
     redirect("/");
   }
 
-  const [teamMemberships] = await Promise.all([
-    getUserTeams(userId),
-    getUserDirectSites(userId),
-  ]);
+  const [teamMemberships] = await Promise.all([getUserTeams(userId), getUserDirectSites(userId)]);
 
   return (
     <div className="space-y-6 prose dark:prose-invert max-w-none">
-      <PageHeader
-        title="My Workspaces"
-        description="Manage your teams and projects."
-      />
+      <PageHeader title="My Workspaces" description="Manage your teams and projects." />
 
       {/* Teams Section */}
       <div className="space-y-4">
@@ -70,20 +54,11 @@ export default async function UserPage({
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {teamMemberships.map((membership) => (
-              <Card
-                key={membership.team.id}
-                className="hover:shadow-md transition-shadow"
-              >
+              <Card key={membership.team.id} className="hover:shadow-md transition-shadow">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">
-                      {membership.team.name}
-                    </CardTitle>
-                    <Badge
-                      variant={
-                        membership.role === "owner" ? "default" : "secondary"
-                      }
-                    >
+                    <CardTitle className="text-lg">{membership.team.name}</CardTitle>
+                    <Badge variant={membership.role === "owner" ? "default" : "secondary"}>
                       {membership.role}
                     </Badge>
                   </div>
@@ -129,9 +104,7 @@ export default async function UserPage({
                     </Button>
                     {membership.role === "owner" && (
                       <Button asChild size="sm">
-                        <Link href={`/${membership.team.id}/settings`}>
-                          Settings
-                        </Link>
+                        <Link href={`/${membership.team.id}/settings`}>Settings</Link>
                       </Button>
                     )}
                   </div>

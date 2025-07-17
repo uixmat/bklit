@@ -1,5 +1,5 @@
 // packages/bklit-sdk/src/index.ts
-import { io, Socket } from "socket.io-client";
+import { io, type Socket } from "socket.io-client";
 
 interface BklitOptions {
   siteId: string;
@@ -56,10 +56,7 @@ export function initBklit(options: BklitOptions): void {
     const now = Date.now();
 
     // Check if we should skip this tracking request
-    if (
-      lastTrackedUrl === currentUrl &&
-      now - lastTrackedTime < TRACKING_DEBOUNCE_MS
-    ) {
+    if (lastTrackedUrl === currentUrl && now - lastTrackedTime < TRACKING_DEBOUNCE_MS) {
       console.log("⏭️ Bklit SDK: Skipping duplicate page view tracking", {
         url: currentUrl,
         timeSinceLastTrack: now - lastTrackedTime,
@@ -109,10 +106,7 @@ export function initBklit(options: BklitOptions): void {
         );
       }
     } catch (error) {
-      console.error(
-        `❌ Bklit SDK: Error tracking page view for site ${siteId}:`,
-        error
-      );
+      console.error(`❌ Bklit SDK: Error tracking page view for site ${siteId}:`, error);
     }
   }
 
@@ -129,20 +123,13 @@ export function initBklit(options: BklitOptions): void {
   } else {
     // Determine Socket.IO server URL from apiHost
     // Example: apiHost = http://localhost:3000/api/track -> socketURL = http://localhost:3000
-    let socketURL = DEFAULT_API_HOST.substring(
-      0,
-      DEFAULT_API_HOST.indexOf("/api/track")
-    );
+    let socketURL = DEFAULT_API_HOST.substring(0, DEFAULT_API_HOST.indexOf("/api/track"));
     if (apiHost !== DEFAULT_API_HOST) {
       try {
         const url = new URL(apiHost);
         socketURL = url.origin;
       } catch (e) {
-        console.error(
-          "Bklit SDK: Invalid apiHost for deriving socket URL",
-          apiHost,
-          e
-        );
+        console.error("Bklit SDK: Invalid apiHost for deriving socket URL", apiHost, e);
         // Fallback or do not connect socket if URL is invalid
         return;
       }
@@ -163,10 +150,7 @@ export function initBklit(options: BklitOptions): void {
     });
 
     bklitSocket.on("disconnect", (reason: Socket.DisconnectReason) => {
-      console.log(
-        "Bklit SDK: Socket disconnected from server. Reason:",
-        reason
-      );
+      console.log("Bklit SDK: Socket disconnected from server. Reason:", reason);
       // Server should handle cleanup. Client might attempt reconnection based on reason if desired.
     });
 
@@ -260,12 +244,12 @@ export function initBklit(options: BklitOptions): void {
   const originalPushState = history.pushState;
   const originalReplaceState = history.replaceState;
 
-  history.pushState = function (...args) {
+  history.pushState = (...args) => {
     originalPushState.apply(history, args);
     setTimeout(handleRouteChange, 0);
   };
 
-  history.replaceState = function (...args) {
+  history.replaceState = (...args) => {
     originalReplaceState.apply(history, args);
     setTimeout(handleRouteChange, 0);
   };
@@ -284,9 +268,7 @@ function generateSessionId(): string {
 // Global function for manual page view tracking
 export function trackPageView() {
   if (typeof window === "undefined") {
-    console.warn(
-      "❌ Bklit SDK: trackPageView can only be called in browser environment"
-    );
+    console.warn("❌ Bklit SDK: trackPageView can only be called in browser environment");
     return;
   }
 

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { getSessionAnalytics } from "@/actions/session-actions";
 
 export async function GET(request: NextRequest) {
@@ -12,4 +12,4 @@ export async function GET(request: NextRequest) {
 
   const data = await getSessionAnalytics(siteId, days);
   return NextResponse.json(data);
-} 
+}

@@ -2,13 +2,8 @@
 
 import type { Site } from "@prisma/client";
 import { useParams, usePathname } from "next/navigation";
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from "react";
+import type React from "react";
+import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
 import { useTeams } from "./teams-provider";
 
 interface ProjectContextType {
@@ -72,9 +67,7 @@ export const ProjectProvider: React.FC<{
     // Only treat as siteId if it's not a reserved route like billing or settings
     const segments = pathname.split("/").filter(Boolean);
     const siteIdFromParams =
-      segments.length > 1 &&
-      segments[1] !== "billing" &&
-      segments[1] !== "settings"
+      segments.length > 1 && segments[1] !== "billing" && segments[1] !== "settings"
         ? segments[1]
         : undefined;
 
@@ -85,8 +78,7 @@ export const ProjectProvider: React.FC<{
     }
   }, [pathname, availableSites, currentSiteId]);
 
-  const activeProject =
-    availableSites.find((site) => site.id === currentSiteId) || null;
+  const activeProject = availableSites.find((site) => site.id === currentSiteId) || null;
 
   const setCurrentSiteId = (siteId: string | null) => {
     setCurrentSiteIdState(siteId);

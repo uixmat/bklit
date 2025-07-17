@@ -1,10 +1,10 @@
 "use server";
 
-import { prisma } from "@/lib/db";
 import { unstable_cache as cache } from "next/cache";
 import { z } from "zod";
-import { findCountryCoordinates } from "@/lib/maps/country-coordinates";
 import { cleanupStaleSessions } from "@/actions/session-actions";
+import { prisma } from "@/lib/db";
+import { findCountryCoordinates } from "@/lib/maps/country-coordinates";
 
 const getTopCountriesSchema = z.object({
   siteId: z.string(),
@@ -256,15 +256,15 @@ export async function getVisitsByCountry(
           });
 
           return {
-            country: country.country!,
-            countryCode: country.countryCode!,
+            country: country.country ?? "",
+            countryCode: country.countryCode ?? "",
             totalVisits: country._count.country,
             coordinates:
               country.lat && country.lon
                 ? ([country.lon, country.lat] as [number, number])
                 : null,
             cities: cities.map((city) => ({
-              name: city.city!,
+              name: city.city ?? "",
               visits: city._count.city,
             })),
           };
@@ -328,7 +328,7 @@ export async function getCountryVisitStats(
       // Get detailed stats for each country
       const countriesWithStats = await Promise.all(
         countriesWithVisits.map(async (country) => {
-          const countryCode = country.countryCode!;
+          const countryCode = country.countryCode ?? "";
           const coordinates = findCountryCoordinates(countryCode);
 
           // Debug logging to see what country codes we're getting
@@ -369,7 +369,7 @@ export async function getCountryVisitStats(
           });
 
           return {
-            country: country.country!,
+            country: country.country ?? "",
             countryCode,
             totalVisits: country._count.country,
             mobileVisits,

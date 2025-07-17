@@ -1,21 +1,21 @@
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
-import { ViewsCard } from "@/components/analytics-cards/views-card";
-import { TopCountriesCard } from "@/components/analytics-cards/top-countries-card";
-import { RecentPageViewsCard } from "@/components/analytics-cards/recent-page-views-card";
+import { getServerSession } from "next-auth/next";
 import { Suspense } from "react";
-import {
-  TopCountriesCardSkeleton,
-  RecentPageViewsCardSkeleton,
-  WorldMapCardSkeleton,
-  MobileDesktopCardSkeleton,
-} from "@/components/analytics-cards/skeletons";
-import { WorldMapCard } from "@/components/analytics-cards/world-map-card";
-import { MobileDesktopCard } from "@/components/analytics-cards/mobile-desktop-card";
-import { BrowserStatsCard } from "@/components/analytics-cards/browser-stats-card";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { BounceRateCard } from "@/components/analytics-cards/bounce-rate-card";
+import { BrowserStatsCard } from "@/components/analytics-cards/browser-stats-card";
+import { MobileDesktopCard } from "@/components/analytics-cards/mobile-desktop-card";
+import { RecentPageViewsCard } from "@/components/analytics-cards/recent-page-views-card";
 import { SessionAnalyticsCard } from "@/components/analytics-cards/session-analytics-card";
+import {
+  MobileDesktopCardSkeleton,
+  RecentPageViewsCardSkeleton,
+  TopCountriesCardSkeleton,
+  WorldMapCardSkeleton,
+} from "@/components/analytics-cards/skeletons";
+import { TopCountriesCard } from "@/components/analytics-cards/top-countries-card";
+import { ViewsCard } from "@/components/analytics-cards/views-card";
+import { WorldMapCard } from "@/components/analytics-cards/world-map-card";
 // import SessionsList from "./sessions-list";
 
 export default async function AnalyticsPage({

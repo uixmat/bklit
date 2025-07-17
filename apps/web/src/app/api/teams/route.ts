@@ -1,6 +1,6 @@
+import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 
 export async function GET() {
@@ -59,9 +59,7 @@ export async function GET() {
       slug: team.slug,
       description: team.description,
       plan: team.plan,
-      role:
-        team.members.find((member) => member.userId === session.user.id)
-          ?.role || "member",
+      role: team.members.find((member) => member.userId === session.user.id)?.role || "member",
       siteCount: team._count.sites,
       sites: team.sites,
     }));

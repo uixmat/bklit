@@ -1,20 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
-import * as topojson from "topojson-client";
-
-import { getCountryVisitStats } from "@/actions/analytics-actions";
-import { CircleFlag } from "react-circle-flags";
 import { Monitor, Smartphone } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { useEffect, useRef, useState } from "react";
+import { CircleFlag } from "react-circle-flags";
+import * as topojson from "topojson-client";
+import { getCountryVisitStats } from "@/actions/analytics-actions";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
 interface CountryVisitData {
@@ -177,10 +170,7 @@ export function WorldMap({ siteId, userId }: WorldMapProps) {
             // .attr("fill", "var(--color-region)");
 
             // Restore all countries to normal opacity and color
-            g.selectAll(".country")
-              .transition()
-              .duration(200)
-              .attr("fill", "var(--color-region)");
+            g.selectAll(".country").transition().duration(200).attr("fill", "var(--color-region)");
 
             // Hide tooltip
             setTooltipData(null);
@@ -195,10 +185,7 @@ export function WorldMap({ siteId, userId }: WorldMapProps) {
   }, [visitData]);
 
   return (
-    <div
-      ref={containerRef}
-      className="relative w-full h-full bg-card-background"
-    >
+    <div ref={containerRef} className="relative w-full h-full bg-card-background">
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-card-background z-20">
           <div className="text-lg">Loading world map...</div>
@@ -224,15 +211,10 @@ export function WorldMap({ siteId, userId }: WorldMapProps) {
         >
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <CircleFlag
-                className="size-4"
-                countryCode={tooltipData.countryCode.toLowerCase()}
-              />
+              <CircleFlag className="size-4" countryCode={tooltipData.countryCode.toLowerCase()} />
               {tooltipData.country}
             </CardTitle>
-            <CardDescription>
-              Analytics data for {tooltipData.country}
-            </CardDescription>
+            <CardDescription>Analytics data for {tooltipData.country}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
             <div className="flex flex-col gap-1">
@@ -241,9 +223,7 @@ export function WorldMap({ siteId, userId }: WorldMapProps) {
                 <Badge variant="secondary">{tooltipData.totalVisits}</Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">
-                  Total unique visitors
-                </span>
+                <span className="text-sm text-muted-foreground">Total unique visitors</span>
                 <Badge variant="secondary">{tooltipData.uniqueVisits}</Badge>
               </div>
             </div>

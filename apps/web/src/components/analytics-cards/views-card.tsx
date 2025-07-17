@@ -1,22 +1,12 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
-import { io, Socket } from "socket.io-client";
+import React, { useEffect, useRef, useState } from "react";
+import { io, type Socket } from "socket.io-client";
 import { toast } from "sonner";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { useProject } from "@/contexts/project-context";
-import {
-  getAnalyticsStats,
-  getSessionAnalytics,
-  getLiveUsers,
-} from "@/actions/analytics-actions";
+import { getAnalyticsStats, getLiveUsers, getSessionAnalytics } from "@/actions/analytics-actions";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useProject } from "@/contexts/project-context";
 
 interface AnalyticsStats {
   totalViews: number;
@@ -33,9 +23,7 @@ interface SessionAnalytics {
 export function ViewsCard({ userId }: { userId: string }) {
   const { currentSiteId } = useProject();
   const [stats, setStats] = useState<AnalyticsStats | null>(null);
-  const [sessionStats, setSessionStats] = useState<SessionAnalytics | null>(
-    null
-  );
+  const [sessionStats, setSessionStats] = useState<SessionAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [liveUsers, setLiveUsers] = useState(0);
   const socketRef = useRef<Socket | null>(null);
@@ -125,34 +113,24 @@ export function ViewsCard({ userId }: { userId: string }) {
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <div>
-              <div className="text-2xl font-bold">
-                {stats.totalViews.toLocaleString()}
-              </div>
+              <div className="text-2xl font-bold">{stats.totalViews.toLocaleString()}</div>
               <div className="text-sm text-muted-foreground">Total Views</div>
             </div>
             <div>
               <div className="text-2xl font-bold">
                 {sessionStats.totalSessions.toLocaleString()}
               </div>
-              <div className="text-sm text-muted-foreground">
-                Total Sessions
-              </div>
+              <div className="text-sm text-muted-foreground">Total Sessions</div>
             </div>
             <div>
-              <div className="text-2xl font-bold">
-                {sessionStats.bounceRate}%
-              </div>
+              <div className="text-2xl font-bold">{sessionStats.bounceRate}%</div>
               <div className="text-sm text-muted-foreground">Bounce Rate</div>
             </div>
           </div>
           <div className="flex justify-between items-center pt-2 border-t">
             <div>
-              <div className="text-2xl font-bold">
-                {stats.uniqueVisits.toLocaleString()}
-              </div>
-              <div className="text-sm text-muted-foreground">
-                Unique Visitors
-              </div>
+              <div className="text-2xl font-bold">{stats.uniqueVisits.toLocaleString()}</div>
+              <div className="text-sm text-muted-foreground">Unique Visitors</div>
             </div>
             <div>
               <div className="text-2xl font-bold">{liveUsers}</div>

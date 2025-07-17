@@ -63,11 +63,7 @@ export function getNavigationItems(pathname: string): NavigationItem[] {
   }
 
   // Site level: /[teamId]/[siteId]/... (but not billing, settings)
-  if (
-    segments.length >= 2 &&
-    segments[1] !== "billing" &&
-    segments[1] !== "settings"
-  ) {
+  if (segments.length >= 2 && segments[1] !== "billing" && segments[1] !== "settings") {
     return navigationConfig.site;
   }
 

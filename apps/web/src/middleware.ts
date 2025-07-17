@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 export async function middleware(request: NextRequest) {
@@ -27,10 +27,7 @@ export async function middleware(request: NextRequest) {
     });
 
     // If user is not authenticated and trying to access protected routes
-    if (
-      !token &&
-      (pathname.startsWith("/site") || pathname.startsWith("/teams"))
-    ) {
+    if (!token && (pathname.startsWith("/site") || pathname.startsWith("/teams"))) {
       return NextResponse.redirect(new URL("/home", request.url));
     }
 

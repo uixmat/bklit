@@ -1,12 +1,12 @@
 "use client";
 
-import { Separator } from "@/components/ui/separator";
+import { useSession } from "next-auth/react";
 import { ProjectLimitBanner } from "@/components/banners/project-limit-banner";
 import { BklitLogo } from "@/components/icons/bklit";
+import { DashboardNavigation } from "@/components/nav/dashboard-navigation";
 import { NavUser } from "@/components/nav/nav-user";
 import { NavWorkspace } from "@/components/nav/nav-workspace";
-import { useSession } from "next-auth/react";
-import { DashboardNavigation } from "@/components/nav/dashboard-navigation";
+import { Separator } from "@/components/ui/separator";
 
 export function SiteHeader() {
   const { data: clientSession } = useSession();
@@ -15,10 +15,7 @@ export function SiteHeader() {
       <div className="flex w-full items-center justify-between px-4 lg:px-6 border-b py-4">
         <div className="flex items-center gap-4">
           <BklitLogo size={32} />
-          <Separator
-            orientation="vertical"
-            className="mx-2 data-[orientation=vertical]:h-4"
-          />
+          <Separator orientation="vertical" className="mx-2 data-[orientation=vertical]:h-4" />
           <div className="flex items-center gap-2">
             <NavWorkspace />
           </div>

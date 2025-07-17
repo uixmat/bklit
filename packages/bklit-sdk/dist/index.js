@@ -1,17 +1,18 @@
-"use strict";
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
+  for (var name in all) __defProp(target, name, { get: all[name], enumerable: true });
 };
 var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
+  if ((from && typeof from === "object") || typeof from === "function") {
+    for (const key of __getOwnPropNames(from))
       if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+        __defProp(to, key, {
+          get: () => from[key],
+          enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable,
+        });
   }
   return to;
 };
@@ -21,7 +22,7 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var index_exports = {};
 __export(index_exports, {
   initBklit: () => initBklit,
-  trackPageView: () => trackPageView
+  trackPageView: () => trackPageView,
 });
 module.exports = __toCommonJS(index_exports);
 var import_socket = require("socket.io-client");
@@ -43,7 +44,7 @@ function initBklit(options) {
   console.log("\u{1F3AF} Bklit SDK: Initializing with configuration", {
     siteId,
     apiHost,
-    userAgent: navigator.userAgent.substring(0, 50) + "..."
+    userAgent: navigator.userAgent.substring(0, 50) + "...",
   });
   window.bklitSiteId = siteId;
   window.bklitApiHost = apiHost;
@@ -52,11 +53,11 @@ function initBklit(options) {
     lastTrackedUrl = null;
     lastTrackedTime = 0;
     console.log("\u{1F194} Bklit SDK: New session created", {
-      sessionId: currentSessionId
+      sessionId: currentSessionId,
     });
   } else {
     console.log("\u{1F504} Bklit SDK: Using existing session", {
-      sessionId: currentSessionId
+      sessionId: currentSessionId,
     });
   }
   async function trackPageView2() {
@@ -66,31 +67,31 @@ function initBklit(options) {
       console.log("\u23ED\uFE0F Bklit SDK: Skipping duplicate page view tracking", {
         url: currentUrl2,
         timeSinceLastTrack: now - lastTrackedTime,
-        debounceMs: TRACKING_DEBOUNCE_MS
+        debounceMs: TRACKING_DEBOUNCE_MS,
       });
       return;
     }
     try {
       const data = {
         url: currentUrl2,
-        timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+        timestamp: /* @__PURE__ */ new Date().toISOString(),
         siteId,
         userAgent: navigator.userAgent,
         sessionId: currentSessionId,
-        referrer: document.referrer || void 0
+        referrer: document.referrer || void 0,
       };
       console.log("\u{1F680} Bklit SDK: Tracking page view...", {
         url: data.url,
         sessionId: data.sessionId,
-        siteId: data.siteId
+        siteId: data.siteId,
       });
       const response = await fetch(apiHost, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
-        keepalive: true
+        keepalive: true,
       });
       if (response.ok) {
         lastTrackedUrl = currentUrl2;
@@ -98,7 +99,7 @@ function initBklit(options) {
         console.log("\u2705 Bklit SDK: Page view tracked successfully!", {
           url: data.url,
           sessionId: data.sessionId,
-          status: response.status
+          status: response.status,
         });
       } else {
         console.error(
@@ -106,10 +107,7 @@ function initBklit(options) {
         );
       }
     } catch (error) {
-      console.error(
-        `\u274C Bklit SDK: Error tracking page view for site ${siteId}:`,
-        error
-      );
+      console.error(`\u274C Bklit SDK: Error tracking page view for site ${siteId}:`, error);
     }
   }
   console.log("\u{1F3AF} Bklit SDK: Initializing page view tracking...");
@@ -117,20 +115,13 @@ function initBklit(options) {
   if (bklitSocket && bklitSocket.connected) {
     bklitSocket.emit("join_site_room", siteId);
   } else {
-    let socketURL = DEFAULT_API_HOST.substring(
-      0,
-      DEFAULT_API_HOST.indexOf("/api/track")
-    );
+    let socketURL = DEFAULT_API_HOST.substring(0, DEFAULT_API_HOST.indexOf("/api/track"));
     if (apiHost !== DEFAULT_API_HOST) {
       try {
         const url = new URL(apiHost);
         socketURL = url.origin;
       } catch (e) {
-        console.error(
-          "Bklit SDK: Invalid apiHost for deriving socket URL",
-          apiHost,
-          e
-        );
+        console.error("Bklit SDK: Invalid apiHost for deriving socket URL", apiHost, e);
         return;
       }
     }
@@ -142,7 +133,7 @@ function initBklit(options) {
       // Try polling first for ngrok compatibility
       timeout: 3e4,
       // Increase timeout for ngrok connections
-      forceNew: true
+      forceNew: true,
       // Force new connection to avoid issues
       // autoConnect: false, // We will connect manually if needed
     });
@@ -151,10 +142,7 @@ function initBklit(options) {
       bklitSocket?.emit("join_site_room", siteId);
     });
     bklitSocket.on("disconnect", (reason) => {
-      console.log(
-        "Bklit SDK: Socket disconnected from server. Reason:",
-        reason
-      );
+      console.log("Bklit SDK: Socket disconnected from server. Reason:", reason);
     });
     bklitSocket.on("connect_error", (error) => {
       console.log(
@@ -172,31 +160,31 @@ function initBklit(options) {
       try {
         console.log("\u{1F504} Bklit SDK: Ending session on page unload...", {
           sessionId: currentSessionId,
-          siteId
+          siteId,
         });
         const endSessionUrl = apiHost + "/session-end";
         const response = await fetch(endSessionUrl, {
           method: "POST",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             sessionId: currentSessionId,
-            siteId
+            siteId,
           }),
-          keepalive: true
+          keepalive: true,
           // Important for sending data before page unloads
         });
         if (response.ok) {
           console.log("\u2705 Bklit SDK: Session ended successfully!", {
             sessionId: currentSessionId,
-            status: response.status
+            status: response.status,
           });
         } else {
           console.error("\u274C Bklit SDK: Failed to end session", {
             sessionId: currentSessionId,
             status: response.status,
-            statusText: response.statusText
+            statusText: response.statusText,
           });
         }
       } catch (error) {
@@ -219,7 +207,7 @@ function initBklit(options) {
       console.log("\u{1F504} Bklit SDK: Route change detected", {
         from: currentUrl,
         to: newUrl,
-        sessionId: currentSessionId
+        sessionId: currentSessionId,
       });
       currentUrl = newUrl;
       trackPageView2();
@@ -228,11 +216,11 @@ function initBklit(options) {
   window.addEventListener("popstate", handleRouteChange);
   const originalPushState = history.pushState;
   const originalReplaceState = history.replaceState;
-  history.pushState = function(...args) {
+  history.pushState = (...args) => {
     originalPushState.apply(history, args);
     setTimeout(handleRouteChange, 0);
   };
-  history.replaceState = function(...args) {
+  history.replaceState = (...args) => {
     originalReplaceState.apply(history, args);
     setTimeout(handleRouteChange, 0);
   };
@@ -245,9 +233,7 @@ function generateSessionId() {
 }
 function trackPageView() {
   if (typeof window === "undefined") {
-    console.warn(
-      "\u274C Bklit SDK: trackPageView can only be called in browser environment"
-    );
+    console.warn("\u274C Bklit SDK: trackPageView can only be called in browser environment");
     return;
   }
   if (!currentSessionId) {
@@ -257,45 +243,48 @@ function trackPageView() {
   console.log("\u{1F3AF} Bklit SDK: Manual page view tracking triggered");
   const data = {
     url: window.location.href,
-    timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+    timestamp: /* @__PURE__ */ new Date().toISOString(),
     siteId: window.bklitSiteId || "unknown",
     userAgent: navigator.userAgent,
     sessionId: currentSessionId,
-    referrer: document.referrer || void 0
+    referrer: document.referrer || void 0,
   };
   console.log("\u{1F680} Bklit SDK: Manual page view tracking...", {
     url: data.url,
     sessionId: data.sessionId,
-    siteId: data.siteId
+    siteId: data.siteId,
   });
   const apiHost = window.bklitApiHost || DEFAULT_API_HOST;
   fetch(apiHost, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(data),
-    keepalive: true
-  }).then((response) => {
-    if (response.ok) {
-      console.log("\u2705 Bklit SDK: Manual page view tracked successfully!", {
-        url: data.url,
-        sessionId: data.sessionId,
-        status: response.status
-      });
-    } else {
-      console.error("\u274C Bklit SDK: Failed to track manual page view", {
-        status: response.status,
-        statusText: response.statusText
-      });
-    }
-  }).catch((error) => {
-    console.error("\u274C Bklit SDK: Error tracking manual page view:", error);
-  });
+    keepalive: true,
+  })
+    .then((response) => {
+      if (response.ok) {
+        console.log("\u2705 Bklit SDK: Manual page view tracked successfully!", {
+          url: data.url,
+          sessionId: data.sessionId,
+          status: response.status,
+        });
+      } else {
+        console.error("\u274C Bklit SDK: Failed to track manual page view", {
+          status: response.status,
+          statusText: response.statusText,
+        });
+      }
+    })
+    .catch((error) => {
+      console.error("\u274C Bklit SDK: Error tracking manual page view:", error);
+    });
 }
 window.trackPageView = trackPageView;
 // Annotate the CommonJS export names for ESM import in node:
-0 && (module.exports = {
-  initBklit,
-  trackPageView
-});
+0 &&
+  (module.exports = {
+    initBklit,
+    trackPageView,
+  });

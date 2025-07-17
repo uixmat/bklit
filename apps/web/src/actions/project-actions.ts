@@ -1,12 +1,12 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 // import { z } from 'zod'; // Unused, schema is imported directly
 import { prisma } from "@/lib/db";
-import { addProjectSchema } from "@/lib/schemas/project-schema";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { getServerSession } from "next-auth/next";
-import { revalidatePath } from "next/cache";
 import { getPlanDetails, PlanType } from "@/lib/plans"; // Import plan helpers
+import { addProjectSchema } from "@/lib/schemas/project-schema";
 
 export type FormState = {
   success: boolean;
@@ -16,7 +16,7 @@ export type FormState = {
 };
 
 export async function createProjectAction(
-  prevState: FormState, // Not used initially, but good for progressive enhancement
+  _prevState: FormState, // Not used initially, but good for progressive enhancement
   formData: FormData
 ): Promise<FormState> {
   const session = await getServerSession(authOptions);
@@ -96,7 +96,7 @@ export async function createProjectAction(
 
 // New action to delete a project
 export async function deleteProjectAction(
-  prevState: FormState,
+  _prevState: FormState,
   formData: FormData
 ): Promise<FormState> {
   const session = await getServerSession(authOptions);

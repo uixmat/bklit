@@ -1,3 +1,7 @@
+import { Plus, Users } from "lucide-react";
+import { useParams } from "next/navigation";
+import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
 import {
   Command,
   CommandEmpty,
@@ -6,10 +10,6 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { Plus, Users } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
-import { useParams } from "next/navigation";
 
 interface Team {
   id: string;
@@ -50,9 +50,7 @@ export const ModuleWorkspaces = ({
   const currentTeamId = params?.teamId as string | undefined;
 
   const currentTeam = teams.find((t) => t.id === currentTeamId);
-  const hoveredTeamData = hoveredTeam
-    ? teams.find((t) => t.id === hoveredTeam)
-    : currentTeam;
+  const hoveredTeamData = hoveredTeam ? teams.find((t) => t.id === hoveredTeam) : currentTeam;
 
   return (
     <div className="flex items-start">
@@ -61,9 +59,7 @@ export const ModuleWorkspaces = ({
         <Command>
           <CommandInput placeholder="Find team" />
           <CommandList>
-            <CommandEmpty>
-              {isLoadingTeams ? "Loading teams..." : "No teams found."}
-            </CommandEmpty>
+            <CommandEmpty>{isLoadingTeams ? "Loading teams..." : "No teams found."}</CommandEmpty>
             <CommandGroup heading="Teams">
               {teams.map((team) => (
                 <CommandItem
@@ -119,9 +115,7 @@ export const ModuleWorkspaces = ({
                 ? `No sites found in ${hoveredTeamData.name}`
                 : "Select a team to view sites"}
             </CommandEmpty>
-            <CommandGroup
-              heading={`Sites in ${hoveredTeamData?.name || "Team"}`}
-            >
+            <CommandGroup heading={`Sites in ${hoveredTeamData?.name || "Team"}`}>
               {hoveredTeamData?.sites.map((site) => (
                 <CommandItem
                   key={site.id}

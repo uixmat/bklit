@@ -1,24 +1,17 @@
 "use client";
 
-import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { useProject } from "@/contexts/project-context";
+import React from "react";
 import { getBrowserStats } from "@/actions/analytics-actions";
-import { Skeleton } from "@/components/ui/skeleton";
-
-import { SafariIcon } from "@/components/icons/safari";
-import { ChromeIcon } from "@/components/icons/chrome";
-import { FirefoxIcon } from "@/components/icons/firefox";
-import { EdgeIcon } from "@/components/icons/edge";
 import { BrowserIcon } from "@/components/icons/browser";
+import { ChromeIcon } from "@/components/icons/chrome";
+import { EdgeIcon } from "@/components/icons/edge";
+import { FirefoxIcon } from "@/components/icons/firefox";
+import { SafariIcon } from "@/components/icons/safari";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useProject } from "@/contexts/project-context";
 
 // BrowserStat interface is used in the component logic
 interface BrowserStat {
@@ -66,27 +59,20 @@ export function BrowserStatsCard() {
     <Card>
       <CardHeader>
         <CardTitle>Browser Usage</CardTitle>
-        <CardDescription>
-          Page visits by browser ({totalVisits} total visits).
-        </CardDescription>
+        <CardDescription>Page visits by browser ({totalVisits} total visits).</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
           {browserStats.map((stat) => {
             const percentage = ((stat.count / totalVisits) * 100).toFixed(1);
             return (
-              <div
-                key={stat.browser}
-                className="flex items-center justify-between"
-              >
+              <div key={stat.browser} className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   {getBrowserIcon(stat.browser)}
                   <span className="text-sm font-medium">{stat.browser}</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="text-sm text-muted-foreground">
-                    {stat.count} visits
-                  </span>
+                  <span className="text-sm text-muted-foreground">{stat.count} visits</span>
                   <span className="text-sm font-medium">{percentage}%</span>
                 </div>
               </div>

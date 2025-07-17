@@ -7,12 +7,7 @@ interface IconProps {
 
 export function BrowserIcon({ className, size = 16 }: IconProps) {
   return (
-    <svg
-      height={size}
-      width={size}
-      viewBox="0 0 512 512"
-      className={cn("icon", className)}
-    >
+    <svg height={size} width={size} viewBox="0 0 512 512" className={cn("icon", className)}>
       <path
         d="M256 48C141.1 48 48 141.1 48 256s93.1 208 208 208 208-93.1 208-208S370.9 48 256 48zM256 448c-105.9 0-192-86.1-192-192S150.1 64 256 64s192 86.1 192 192-86.1 192-192 192z"
         fill="#6B7280"

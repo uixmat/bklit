@@ -1,16 +1,10 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { PageHeader } from "@/components/page-header";
-import { DeleteTeamForm } from "@/components/forms/delete-team-form";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth/next";
 import { getTeamDataForSettings } from "@/actions/team-actions";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { DeleteTeamForm } from "@/components/forms/delete-team-form";
+import { PageHeader } from "@/components/page-header";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function TeamSettingsPage({
   params,
@@ -34,16 +28,11 @@ export default async function TeamSettingsPage({
 
   return (
     <div className="space-y-6 prose dark:prose-invert max-w-none">
-      <PageHeader
-        title="Team settings"
-        description="Manage your team settings."
-      />
+      <PageHeader title="Team settings" description="Manage your team settings." />
       <Card className="card">
         <CardHeader>
           <CardTitle>Delete team</CardTitle>
-          <CardDescription>
-            Delete this team and all associated data.
-          </CardDescription>
+          <CardDescription>Delete this team and all associated data.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {userMembership.role === "owner" && (

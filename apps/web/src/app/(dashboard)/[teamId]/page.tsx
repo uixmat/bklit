@@ -1,19 +1,13 @@
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { Globe, Plus, Settings, Users } from "lucide-react";
+import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth/next";
+import { getTeamData } from "@/actions/team-actions";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { PageHeader } from "@/components/page-header";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { Users, Globe, Plus, Settings } from "lucide-react";
-import { getTeamData } from "@/actions/team-actions";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function TeamDashboardPage({
   params,
@@ -37,10 +31,7 @@ export default async function TeamDashboardPage({
 
   return (
     <div className="space-y-6 prose dark:prose-invert max-w-none">
-      <PageHeader
-        title={team.name}
-        description={team.description || "Team dashboard"}
-      />
+      <PageHeader title={team.name} description={team.description || "Team dashboard"} />
 
       {/* Team Overview */}
       <Card>
@@ -56,9 +47,7 @@ export default async function TeamDashboardPage({
               </Button>
             )}
           </div>
-          <CardDescription>
-            Manage your team&apos;s projects and members
-          </CardDescription>
+          <CardDescription>Manage your team&apos;s projects and members</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -74,11 +63,7 @@ export default async function TeamDashboardPage({
             </div>
             <div className="flex items-center space-x-2">
               <span className="text-sm font-medium">Your Role:</span>
-              <Badge
-                variant={
-                  userMembership.role === "owner" ? "default" : "secondary"
-                }
-              >
+              <Badge variant={userMembership.role === "owner" ? "default" : "secondary"}>
                 {userMembership.role}
               </Badge>
             </div>
@@ -120,9 +105,7 @@ export default async function TeamDashboardPage({
               <Card key={site.id} className="hover:shadow-md transition-shadow">
                 <CardHeader>
                   <CardTitle className="text-lg">{site.name}</CardTitle>
-                  <CardDescription>
-                    {site.domain || "No domain configured"}
-                  </CardDescription>
+                  <CardDescription>{site.domain || "No domain configured"}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="flex gap-2">
@@ -173,14 +156,10 @@ export default async function TeamDashboardPage({
                     </div>
                     <div>
                       <p className="font-medium">{member.user.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {member.user.email}
-                      </p>
+                      <p className="text-sm text-muted-foreground">{member.user.email}</p>
                     </div>
                   </div>
-                  <Badge
-                    variant={member.role === "owner" ? "default" : "secondary"}
-                  >
+                  <Badge variant={member.role === "owner" ? "default" : "secondary"}>
                     {member.role}
                   </Badge>
                 </div>

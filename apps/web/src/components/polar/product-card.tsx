@@ -1,15 +1,15 @@
+import { CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from "@/components/ui/card";
-import { CheckCircle } from "lucide-react";
 
 interface ProductCardProps {
   product: any; // Should be Product
@@ -64,9 +64,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
     <Card className="flex flex-col h-full">
       <CardHeader>
         <CardTitle>{product.name || "Unnamed Product"}</CardTitle>
-        <CardDescription>
-          {product.description || "No description available."}
-        </CardDescription>
+        <CardDescription>{product.description || "No description available."}</CardDescription>
       </CardHeader>
       <CardContent className="flex-grow">
         <p className="text-3xl font-bold mb-4">{displayPrice}</p>

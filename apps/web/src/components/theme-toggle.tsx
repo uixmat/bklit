@@ -18,25 +18,13 @@ export function ThemeToggle() {
       size="sm"
       className="border rounded-lg"
     >
-      <ToggleGroupItem
-        value="light"
-        aria-label="Toggle light mode"
-        className="px-3 py-2"
-      >
+      <ToggleGroupItem value="light" aria-label="Toggle light mode" className="px-3 py-2">
         <Sun className="size-4" />
       </ToggleGroupItem>
-      <ToggleGroupItem
-        value="dark"
-        aria-label="Toggle dark mode"
-        className="px-3 py-2"
-      >
+      <ToggleGroupItem value="dark" aria-label="Toggle dark mode" className="px-3 py-2">
         <Moon className="size-4" />
       </ToggleGroupItem>
-      <ToggleGroupItem
-        value="system"
-        aria-label="Toggle system mode"
-        className="px-3 py-2"
-      >
+      <ToggleGroupItem value="system" aria-label="Toggle system mode" className="px-3 py-2">
         <Monitor className="size-4" />
       </ToggleGroupItem>
     </ToggleGroup>

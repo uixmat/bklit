@@ -1,9 +1,9 @@
 "use client";
 
-import { useSession } from "next-auth/react";
 import { useQuery } from "@tanstack/react-query";
-import { getPlanDetails, PlanDetails, PlanType } from "@/lib/plans";
+import { useSession } from "next-auth/react";
 import { getUserProjectCount } from "@/actions/user-actions";
+import { getPlanDetails, type PlanDetails, PlanType } from "@/lib/plans";
 
 interface UserPlanStatus {
   planId: PlanType;
@@ -72,10 +72,8 @@ export function useUserPlanStatus(): UserPlanStatus {
   const errorMessage = projectCountError?.message;
 
   const initialSessionTrulyLoading = sessionStatus === "loading" && !session;
-  const projectCountIsInitiallyLoading =
-    isLoadingProjectCount && projectCountData === undefined;
-  const combinedIsLoading =
-    initialSessionTrulyLoading || projectCountIsInitiallyLoading;
+  const projectCountIsInitiallyLoading = isLoadingProjectCount && projectCountData === undefined;
+  const combinedIsLoading = initialSessionTrulyLoading || projectCountIsInitiallyLoading;
 
   console.log(
     "[useUserPlanStatus] Returning: projectCount:",

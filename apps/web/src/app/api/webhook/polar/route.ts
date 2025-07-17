@@ -8,10 +8,7 @@ export const POST = Webhooks({
 
   // Assuming payload is the 'data' part of the event, or the event object itself
   async onCheckoutUpdated(payload: any) {
-    console.log(
-      "Webhook: CheckoutUpdatedEvent (RAW PAYLOAD) received",
-      payload
-    );
+    console.log("Webhook: CheckoutUpdatedEvent (RAW PAYLOAD) received", payload);
     // Access actual checkout data via payload.data
     const checkout = payload.data;
     if (!checkout) {
@@ -33,10 +30,7 @@ export const POST = Webhooks({
   },
 
   async onSubscriptionCreated(payload: any) {
-    console.log(
-      "Webhook: SubscriptionCreatedEvent (RAW PAYLOAD) received",
-      payload
-    );
+    console.log("Webhook: SubscriptionCreatedEvent (RAW PAYLOAD) received", payload);
     // Access actual subscription data via payload.data
     const subscription = payload.data;
     if (!subscription) {
@@ -59,10 +53,7 @@ export const POST = Webhooks({
         });
 
         if (user) {
-          if (
-            user.plan !== "pro" ||
-            user.polarSubscriptionId !== subscription.id
-          ) {
+          if (user.plan !== "pro" || user.polarSubscriptionId !== subscription.id) {
             await prisma.user.update({
               where: { id: user.id },
               data: {
@@ -74,9 +65,7 @@ export const POST = Webhooks({
               `User ${user.email} DB updated from onSubscriptionCreated: plan='pro', polarSubscriptionId='${subscription.id}'.`
             );
           } else {
-            console.log(
-              `User ${user.email} already up-to-date during onSubscriptionCreated.`
-            );
+            console.log(`User ${user.email} already up-to-date during onSubscriptionCreated.`);
           }
         } else {
           console.warn(
@@ -84,20 +73,13 @@ export const POST = Webhooks({
           );
         }
       } catch (error) {
-        console.error(
-          "Webhook: Error in onSubscriptionCreated:",
-          error,
-          subscription
-        );
+        console.error("Webhook: Error in onSubscriptionCreated:", error, subscription);
       }
     }
   },
 
   async onSubscriptionUpdated(payload: any) {
-    console.log(
-      "Webhook: SubscriptionUpdatedEvent (RAW PAYLOAD) received",
-      payload
-    );
+    console.log("Webhook: SubscriptionUpdatedEvent (RAW PAYLOAD) received", payload);
     // Access actual subscription data via payload.data
     const subscription = payload.data;
     if (!subscription) {
@@ -120,9 +102,7 @@ export const POST = Webhooks({
       subIdExists,
       customerExists,
       customerEmailExists,
-      rawCustomerObject: subscription
-        ? subscription.customer
-        : "subscription is null",
+      rawCustomerObject: subscription ? subscription.customer : "subscription is null",
       rawCustomerEmail:
         subscription && subscription.customer
           ? subscription.customer.email
@@ -141,9 +121,7 @@ export const POST = Webhooks({
       );
       return;
     }
-    console.log(
-      "onSubscriptionUpdated: Guard clause passed. Proceeding to try block."
-    );
+    console.log("onSubscriptionUpdated: Guard clause passed. Proceeding to try block.");
 
     try {
       let user = await prisma.user.findFirst({
@@ -169,11 +147,7 @@ export const POST = Webhooks({
           console.log(
             `Webhook: Subscription ${subscription.id} is active for user ${user.email}. Setting plan to pro.`
           );
-        } else if (
-          ["canceled", "ended", "past_due", "unpaid"].includes(
-            subscription.status
-          )
-        ) {
+        } else if (["canceled", "ended", "past_due", "unpaid"].includes(subscription.status)) {
           newPlan = "free";
           // newPolarSubscriptionId = null; // Decide if you want to clear this or keep for history
           console.log(
@@ -181,10 +155,7 @@ export const POST = Webhooks({
           );
         }
 
-        if (
-          newPlan !== user.plan ||
-          newPolarSubscriptionId !== user.polarSubscriptionId
-        ) {
+        if (newPlan !== user.plan || newPolarSubscriptionId !== user.polarSubscriptionId) {
           await prisma.user.update({
             where: { id: user.id },
             data: {
@@ -210,11 +181,7 @@ export const POST = Webhooks({
         );
       }
     } catch (error) {
-      console.error(
-        "Webhook: Error in onSubscriptionUpdated:",
-        error,
-        subscription
-      );
+      console.error("Webhook: Error in onSubscriptionUpdated:", error, subscription);
     }
   },
 

@@ -1,14 +1,14 @@
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { Users } from "lucide-react";
 import { redirect } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getPublishedPolarProducts } from "@/lib/polar";
+import { getServerSession } from "next-auth/next";
+import { getTeamBillingData } from "@/actions/billing-actions";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { BillingSuccessDialog } from "@/components/dialogs/billing-success-dialog";
 import { PageHeader } from "@/components/page-header";
 import { ProductCard } from "@/components/polar/product-card";
-import { BillingSuccessDialog } from "@/components/dialogs/billing-success-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Users } from "lucide-react";
-import { getTeamBillingData } from "@/actions/billing-actions";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getPublishedPolarProducts } from "@/lib/polar";
 
 export default async function BillingPage({
   params,
@@ -74,9 +74,7 @@ export default async function BillingPage({
           )}
           {team.plan === "pro" && (
             <div>
-              <p className="text-muted-foreground mb-3">
-                Thank you for being a Pro member!
-              </p>
+              <p className="text-muted-foreground mb-3">Thank you for being a Pro member!</p>
               <div className="text-sm text-muted-foreground space-y-1">
                 <p>• Unlimited projects per team</p>
                 <p>• Advanced analytics and insights</p>

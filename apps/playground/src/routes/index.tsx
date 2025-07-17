@@ -10,7 +10,9 @@ declare global {
 export default function Home() {
   useEffect(() => {
     document.title = "Playground Home | Bklit";
-    if (window.trackPageView) window.trackPageView();
+    if (window.trackPageView) {
+      window.trackPageView();
+    }
   }, []);
   return (
     <>
@@ -48,6 +50,7 @@ export default function Home() {
           Try navigating between pages to see the logs in action!
         </p>
         <button
+          type="button"
           onClick={() => {
             if (window.trackPageView) {
               window.trackPageView();

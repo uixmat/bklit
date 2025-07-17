@@ -10,7 +10,9 @@ declare global {
 export default function Products() {
   useEffect(() => {
     document.title = "Products | Bklit Playground";
-    if (window.trackPageView) window.trackPageView();
+    if (window.trackPageView) {
+      window.trackPageView();
+    }
   }, []);
   return (
     <>

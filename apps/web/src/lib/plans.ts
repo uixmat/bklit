@@ -1,4 +1,4 @@
-export const enum PlanType {
+export enum PlanType {
   FREE = "free",
   PRO = "pro",
 }

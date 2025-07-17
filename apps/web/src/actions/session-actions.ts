@@ -86,7 +86,7 @@ export async function endSession(sessionId: string) {
     }
 
     const duration = Math.floor(
-      (new Date().getTime() - session.startedAt.getTime()) / 1000
+      (Date.now() - session.startedAt.getTime()) / 1000
     );
 
     const didBounce = duration < 10; // 10 second bounce threshold

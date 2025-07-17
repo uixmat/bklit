@@ -1,23 +1,22 @@
 "use client";
 
-import React, { useState, useEffect, useTransition } from "react";
-import { useActionState } from "react";
-import { deleteTeamAction, TeamFormState } from "@/actions/team-actions";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import React, { useActionState, useEffect, useState, useTransition } from "react";
+import { toast } from "sonner";
+import { deleteTeamAction, type TeamFormState } from "@/actions/team-actions";
 
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogClose,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -75,9 +74,7 @@ export function DeleteTeamForm({ teamId, teamName }: DeleteTeamFormProps) {
         formAction(formData);
       });
     } else {
-      toast.error(
-        "Team name does not match. Please type it correctly to confirm."
-      );
+      toast.error("Team name does not match. Please type it correctly to confirm.");
     }
   };
 
@@ -99,17 +96,13 @@ export function DeleteTeamForm({ teamId, teamName }: DeleteTeamFormProps) {
         <DialogHeader>
           <DialogTitle>Delete Team: {teamName}</DialogTitle>
           <DialogDescription>
-            To permanently delete this team and all associated data, please
-            enter &quot;
+            To permanently delete this team and all associated data, please enter &quot;
             <span className="font-semibold">{teamName}</span>&quot; below.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label
-              htmlFor="team-name-confirmation"
-              className="text-right sr-only"
-            >
+            <Label htmlFor="team-name-confirmation" className="text-right sr-only">
               Team Name
             </Label>
             <Input

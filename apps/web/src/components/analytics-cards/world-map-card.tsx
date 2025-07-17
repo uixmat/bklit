@@ -1,15 +1,9 @@
 "use client";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { Skeleton } from "../ui/skeleton";
-import { WorldMap } from "../maps/world-map";
-import { useProject } from "@/contexts/project-context";
 import { useSession } from "next-auth/react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useProject } from "@/contexts/project-context";
+import { WorldMap } from "../maps/world-map";
+import { Skeleton } from "../ui/skeleton";
 
 export function WorldMapCard() {
   const { currentSiteId } = useProject();

@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getIoServer } from "@/lib/socketio-server"; // Import getIoServer
-import { prisma } from "@/lib/db"; // Import Prisma client
-import { getLocationFromIP, extractClientIP } from "@/lib/ip-geolocation";
+import { type NextRequest, NextResponse } from "next/server";
 import { createOrUpdateSession } from "@/actions/session-actions";
+import { prisma } from "@/lib/db"; // Import Prisma client
+import { extractClientIP, getLocationFromIP } from "@/lib/ip-geolocation";
+import { getIoServer } from "@/lib/socketio-server"; // Import getIoServer
 
 interface TrackingPayload {
   url: string;
@@ -69,14 +69,11 @@ export async function POST(request: NextRequest) {
     // Handle session tracking and page view creation in a transaction
     if (payload.sessionId) {
       try {
-        console.log(
-          "🔄 API: Updating session and saving page view in transaction...",
-          {
-            sessionId: payload.sessionId,
-            siteId: payload.siteId,
-            url: payload.url,
-          }
-        );
+        console.log("🔄 API: Updating session and saving page view in transaction...", {
+          sessionId: payload.sessionId,
+          siteId: payload.siteId,
+          url: payload.url,
+        });
 
         if (!payload.sessionId) {
           throw new Error("sessionId is required for this operation");
@@ -153,18 +150,12 @@ export async function POST(request: NextRequest) {
             sessionDbId: session.id,
           });
         });
-        console.log(
-          "✅ API: Session updated and page view saved successfully",
-          {
-            sessionId: payload.sessionId,
-            siteId: payload.siteId,
-          }
-        );
+        console.log("✅ API: Session updated and page view saved successfully", {
+          sessionId: payload.sessionId,
+          siteId: payload.siteId,
+        });
       } catch (sessionError) {
-        console.error(
-          "❌ API: Error updating session or saving page view:",
-          sessionError
-        );
+        console.error("❌ API: Error updating session or saving page view:", sessionError);
         // Continue execution - session tracking failed but page view tracking should still work
       }
     } else {
@@ -197,17 +188,11 @@ export async function POST(request: NextRequest) {
             sessionId: null,
           },
         });
-        console.log(
-          "✅ API: Page view saved to database successfully (no session)",
-          {
-            siteId: payload.siteId,
-          }
-        );
+        console.log("✅ API: Page view saved to database successfully (no session)", {
+          siteId: payload.siteId,
+        });
       } catch (dbError) {
-        console.error(
-          "❌ API: Error saving page view to database (no session):",
-          dbError
-        );
+        console.error("❌ API: Error saving page view to database (no session):", dbError);
         // Continue execution - session tracking failed but page view tracking should still work
       }
     }
@@ -220,9 +205,7 @@ export async function POST(request: NextRequest) {
         timestamp: payload.timestamp,
         siteId: payload.siteId,
       });
-      console.log(
-        `Socket event 'new_page_view' emitted to room: ${payload.siteId}`
-      );
+      console.log(`Socket event 'new_page_view' emitted to room: ${payload.siteId}`);
     } else {
       console.warn("Socket.IO server instance not found. Cannot emit event.");
     }
@@ -240,9 +223,6 @@ export async function POST(request: NextRequest) {
     if (error instanceof Error) {
       errorMessage = error.message;
     }
-    return createCorsResponse(
-      { message: "Error processing request", error: errorMessage },
-      500
-    );
+    return createCorsResponse({ message: "Error processing request", error: errorMessage }, 500);
   }
 }

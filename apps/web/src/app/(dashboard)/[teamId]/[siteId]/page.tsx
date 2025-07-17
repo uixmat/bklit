@@ -1,17 +1,11 @@
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import Link from "next/link";
 import { redirect } from "next/navigation";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { getServerSession } from "next-auth/next";
+import { getSiteData } from "@/actions/project-actions";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { getSiteData } from "@/actions/project-actions";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function ProjectDashboardPage({
   params,
@@ -67,9 +61,7 @@ export default async function ProjectDashboardPage({
         <Card className="card">
           <CardHeader>
             <CardTitle>View Analytics</CardTitle>
-            <CardDescription>
-              See tracking data for this project.
-            </CardDescription>
+            <CardDescription>See tracking data for this project.</CardDescription>
           </CardHeader>
           <CardContent>
             <Link href={`/${teamId}/${siteId}/analytics`}>
@@ -81,9 +73,7 @@ export default async function ProjectDashboardPage({
         <Card className="card">
           <CardHeader>
             <CardTitle>Tracking Setup</CardTitle>
-            <CardDescription>
-              Get instructions to integrate tracking.
-            </CardDescription>
+            <CardDescription>Get instructions to integrate tracking.</CardDescription>
           </CardHeader>
           <CardContent>
             <Link href={`/${teamId}/${siteId}/setup`}>

@@ -1,13 +1,14 @@
 "use client";
 
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { createTeamAction, TeamFormState } from "@/actions/team-actions";
-import { useActionState, useTransition, useEffect } from "react";
-import { useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
-
+import { useActionState, useEffect, useTransition } from "react";
+import { useFormStatus } from "react-dom";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
+import { createTeamAction, type TeamFormState } from "@/actions/team-actions";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -19,8 +20,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 
 const createTeamSchema = z.object({
   name: z
@@ -109,9 +108,7 @@ export default function AddTeamForm() {
               <FormControl>
                 <Input placeholder="My Awesome Team" {...field} />
               </FormControl>
-              <FormDescription>
-                A descriptive name for your team.
-              </FormDescription>
+              <FormDescription>A descriptive name for your team.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -123,23 +120,16 @@ export default function AddTeamForm() {
             <FormItem>
               <FormLabel>Description (Optional)</FormLabel>
               <FormControl>
-                <Textarea
-                  placeholder="What does your team work on?"
-                  {...field}
-                />
+                <Textarea placeholder="What does your team work on?" {...field} />
               </FormControl>
-              <FormDescription>
-                A brief description of your team&apos;s purpose.
-              </FormDescription>
+              <FormDescription>A brief description of your team&apos;s purpose.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
         <SubmitButton />
         {state.message && !state.success && !state.errors && (
-          <p className="text-sm font-medium text-destructive">
-            {state.message}
-          </p>
+          <p className="text-sm font-medium text-destructive">{state.message}</p>
         )}
       </form>
     </Form>

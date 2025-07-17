@@ -1,10 +1,9 @@
+import { ChevronsUpDown, Users } from "lucide-react";
+import Link from "next/link";
+import { useParams, usePathname, useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { getUserTeams } from "@/actions/user-actions";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -13,18 +12,14 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { ChevronsUpDown, Users } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProject } from "@/contexts/project-context";
 import { useTeams } from "@/contexts/teams-provider";
 import { useTeamPlanStatus } from "@/hooks/use-team-plan-status";
 import { useUserPlanStatus } from "@/hooks/use-user-plan-status";
-
-import React, { useState, useEffect } from "react";
-import { useRouter, useParams, usePathname } from "next/navigation";
 import { ModuleWorkspaces } from "./module-workspaces";
-import Link from "next/link";
-import { getUserTeams } from "@/actions/user-actions";
 
 interface Team {
   id: string;
@@ -46,8 +41,7 @@ interface Team {
 }
 
 export function NavWorkspace() {
-  const { isLoadingSites, activeProject, setCurrentSiteId, currentSiteId } =
-    useProject();
+  const { isLoadingSites, activeProject, setCurrentSiteId, currentSiteId } = useProject();
   const { currentTeam, isLoadingTeam, currentTeamId } = useTeams();
   const params = useParams();
   const pathname = usePathname();
@@ -55,9 +49,7 @@ export function NavWorkspace() {
   // Only treat as siteId if it's not a reserved route like billing or settings
   const segments = pathname.split("/").filter(Boolean);
   const siteId =
-    segments.length > 1 &&
-    segments[1] !== "billing" &&
-    segments[1] !== "settings"
+    segments.length > 1 && segments[1] !== "billing" && segments[1] !== "settings"
       ? segments[1]
       : undefined;
 
@@ -86,9 +78,7 @@ export function NavWorkspace() {
   const teamPlanStatus = useTeamPlanStatus(teamId || "");
   const userPlanStatus = useUserPlanStatus();
 
-  const planDetails = teamId
-    ? teamPlanStatus.planDetails
-    : userPlanStatus.planDetails;
+  const planDetails = teamId ? teamPlanStatus.planDetails : userPlanStatus.planDetails;
   const isLoadingPlanDetails = teamId
     ? teamPlanStatus.isLoading
     : userPlanStatus.isLoadingPlanDetails;
@@ -119,9 +109,7 @@ export function NavWorkspace() {
                 <BreadcrumbLink asChild>
                   <Link href={`/${teamId}`} className="flex items-center gap-2">
                     <Users className="size-4" />
-                    <span>
-                      {isLoadingTeam ? "Loading..." : currentTeam?.name}
-                    </span>
+                    <span>{isLoadingTeam ? "Loading..." : currentTeam?.name}</span>
                     <Badge variant="outline">
                       {isLoadingPlanDetails ? (
                         <Skeleton className="w-16 h-3" />

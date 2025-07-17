@@ -7,12 +7,7 @@ interface IconProps {
 
 export function EdgeIcon({ className, size = 16 }: IconProps) {
   return (
-    <svg
-      height={size}
-      viewBox="0 0 256 256"
-      width={size}
-      className={cn("icon", className)}
-    >
+    <svg height={size} viewBox="0 0 256 256" width={size} className={cn("icon", className)}>
       <defs>
         <radialGradient
           id="b"

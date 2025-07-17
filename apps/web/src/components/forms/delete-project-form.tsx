@@ -1,23 +1,22 @@
 "use client";
 
-import React, { useState, useEffect, useTransition } from "react";
-import { useActionState } from "react";
-import { deleteProjectAction, FormState } from "@/actions/project-actions";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import React, { useActionState, useEffect, useState, useTransition } from "react";
+import { toast } from "sonner";
+import { deleteProjectAction, type FormState } from "@/actions/project-actions";
 
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogClose,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,10 +31,7 @@ const initialState: FormState = {
   message: "",
 };
 
-export function DeleteProjectForm({
-  siteId,
-  projectName,
-}: DeleteProjectFormProps) {
+export function DeleteProjectForm({ siteId, projectName }: DeleteProjectFormProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [confirmationInput, setConfirmationInput] = useState("");
   const [state, formAction] = useActionState(deleteProjectAction, initialState);
@@ -79,9 +75,7 @@ export function DeleteProjectForm({
         formAction(formData);
       });
     } else {
-      toast.error(
-        "Project name does not match. Please type it correctly to confirm."
-      );
+      toast.error("Project name does not match. Please type it correctly to confirm.");
     }
   };
 
@@ -105,17 +99,13 @@ export function DeleteProjectForm({
         <DialogHeader>
           <DialogTitle>Delete Project: {projectName}</DialogTitle>
           <DialogDescription>
-            To permanently delete this project and all associated data, please
-            enter &quot;
+            To permanently delete this project and all associated data, please enter &quot;
             <span className="font-semibold">{projectName}</span>&quot; below.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label
-              htmlFor="project-name-confirmation"
-              className="text-right sr-only"
-            >
+            <Label htmlFor="project-name-confirmation" className="text-right sr-only">
               Project Name
             </Label>
             <Input

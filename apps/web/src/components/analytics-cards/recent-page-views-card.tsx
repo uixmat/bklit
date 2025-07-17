@@ -1,23 +1,14 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { getTopPages } from "@/actions/analytics-actions";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface RecentPageViewsCardProps {
   siteId: string;
   userId: string;
 }
 
-export async function RecentPageViewsCard({
-  siteId,
-  userId,
-}: RecentPageViewsCardProps) {
+export async function RecentPageViewsCard({ siteId, userId }: RecentPageViewsCardProps) {
   const topPages = await getTopPages({
     siteId,
     userId,
@@ -60,9 +51,7 @@ export function RecentPageViewsCardSkeleton() {
     <Card>
       <CardHeader>
         <CardTitle>Recent Page Views</CardTitle>
-        <CardDescription>
-          A list of the most recent page views captured.
-        </CardDescription>
+        <CardDescription>A list of the most recent page views captured.</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-2">

@@ -11,7 +11,9 @@ export default function ProductDetails() {
   const { productId } = useParams();
   useEffect(() => {
     document.title = `Product ${productId} | Bklit Playground`;
-    if (window.trackPageView) window.trackPageView();
+    if (window.trackPageView) {
+      window.trackPageView();
+    }
   }, [productId]);
   return (
     <>

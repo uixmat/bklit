@@ -1,15 +1,12 @@
 "use client";
 
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  addProjectSchema,
-  AddProjectFormValues,
-} from "@/lib/schemas/project-schema";
-import { createProjectAction, FormState } from "@/actions/project-actions";
-import { useActionState, useTransition, useEffect } from "react"; // Added useTransition
+import { useActionState, useEffect, useTransition } from "react"; // Added useTransition
 import { useFormStatus } from "react-dom"; // Correct for useFormStatus
-
+import { useForm } from "react-hook-form";
+import { toast } from "sonner"; // Assuming you'll add sonner for toasts
+import { createProjectAction, type FormState } from "@/actions/project-actions";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -20,8 +17,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner"; // Assuming you'll add sonner for toasts
+import { type AddProjectFormValues, addProjectSchema } from "@/lib/schemas/project-schema";
 
 interface AddProjectFormProps {
   onSuccess?: (newSiteId?: string) => void; // Added onSuccess prop
@@ -109,9 +105,7 @@ export default function AddProjectForm({ onSuccess }: AddProjectFormProps) {
               <FormControl>
                 <Input placeholder="My Awesome Project" {...field} />
               </FormControl>
-              <FormDescription>
-                A descriptive name for your website or application.
-              </FormDescription>
+              <FormDescription>A descriptive name for your website or application.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -125,9 +119,7 @@ export default function AddProjectForm({ onSuccess }: AddProjectFormProps) {
               <FormControl>
                 <Input placeholder="https://example.com" {...field} />
               </FormControl>
-              <FormDescription>
-                The primary domain where your project is hosted.
-              </FormDescription>
+              <FormDescription>The primary domain where your project is hosted.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -135,9 +127,7 @@ export default function AddProjectForm({ onSuccess }: AddProjectFormProps) {
         <SubmitButton />
         {/* This message display might need adjustment if react-hook-form handles all errors now */}
         {state.message && !state.success && !state.errors && (
-          <p className="text-sm font-medium text-destructive">
-            {state.message}
-          </p>
+          <p className="text-sm font-medium text-destructive">{state.message}</p>
         )}
       </form>
     </Form>

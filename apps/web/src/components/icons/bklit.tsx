@@ -7,12 +7,7 @@ interface IconProps {
 
 export function BklitLogo({ className, size = 16 }: IconProps) {
   return (
-    <svg
-      height={size}
-      width={size}
-      viewBox="0 0 400 400"
-      className={cn("icon", className)}
-    >
+    <svg height={size} width={size} viewBox="0 0 400 400" className={cn("icon", className)}>
       <g clipPath="url(#clip0_7_2)">
         <path
           d="M343.02 289.056H151.156L150.641 289.062C139.834 289.336 131.156 298.183 131.156 309.056C131.156 313.672 132.721 317.923 135.349 321.308H0L39.416 251.172H176.311C187.424 251.172 196.433 241.916 196.433 230.499C196.432 219.082 187.424 209.827 176.311 209.827H62.6504L85.8867 168.481H137.071C148.184 168.481 157.193 159.226 157.193 147.81C157.193 136.393 148.185 127.137 137.071 127.137H109.122L180.572 0L343.02 289.056Z"

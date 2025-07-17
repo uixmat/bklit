@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { endSession } from "@/actions/session-actions";
 
 // Helper function to create a response with CORS headers

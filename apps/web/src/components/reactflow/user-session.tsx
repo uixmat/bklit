@@ -2,26 +2,26 @@
 
 import { useCallback, useMemo } from "react";
 import ReactFlow, {
-  type Node,
-  type Edge,
   addEdge,
   Background,
   type Connection,
   Controls,
-  useNodesState,
-  useEdgesState,
-  Handle,
-  Position,
-  type NodeProps,
+  type Edge,
   type EdgeProps,
+  Handle,
   MarkerType,
+  type Node,
+  type NodeProps,
+  Position,
+  useEdgesState,
+  useNodesState,
 } from "reactflow";
 import "reactflow/dist/style.css";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Clock, Users, TrendingDown } from "lucide-react";
-import { format } from "date-fns";
 import dagre from "dagre";
+import { format } from "date-fns";
+import { Clock, TrendingDown, Users } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 // Types for session data
 interface PageViewEvent {
@@ -64,16 +64,14 @@ function WebPageNode({ data }: NodeProps) {
       <Card className="shadow-lg border-2 hover:shadow-xl transition-shadow">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-sm font-semibold">
-              {data.title}
-            </CardTitle>
+            <CardTitle className="text-sm font-semibold">{data.title}</CardTitle>
             <Badge
               variant={
                 data.type === "entry"
                   ? "default"
                   : data.type === "exit"
-                  ? "destructive"
-                  : "secondary"
+                    ? "destructive"
+                    : "secondary"
               }
             >
               {data.type}
@@ -191,8 +189,7 @@ function generateNodesFromSession(session: SessionData): Node[] {
     else type = "browse";
 
     const location =
-      [session.country, session.city].filter(Boolean).join(", ") ||
-      "Unknown location";
+      [session.country, session.city].filter(Boolean).join(", ") || "Unknown location";
 
     // Use the URL pathname as the title, or the full URL if no pathname
     let title = urlKey;
@@ -255,9 +252,7 @@ function generateEdgesFromSession(session: SessionData): Edge[] {
 
     // Calculate time difference
     const timeDiff = Math.floor(
-      (new Date(nextPage.timestamp).getTime() -
-        new Date(currentPage.timestamp).getTime()) /
-        1000
+      (new Date(nextPage.timestamp).getTime() - new Date(currentPage.timestamp).getTime()) / 1000
     );
 
     if (edgeMap.has(edgeKey)) {
@@ -353,14 +348,8 @@ function getLayoutedElements(nodes: Node[], edges: Edge[], direction = "TB") {
 }
 
 export function UserSession({ session }: UserSessionProps) {
-  const initialNodes = useMemo(
-    () => generateNodesFromSession(session),
-    [session]
-  );
-  const initialEdges = useMemo(
-    () => generateEdgesFromSession(session),
-    [session]
-  );
+  const initialNodes = useMemo(() => generateNodesFromSession(session), [session]);
+  const initialEdges = useMemo(() => generateEdgesFromSession(session), [session]);
 
   const { nodes: layoutedNodes, edges: layoutedEdges } = useMemo(
     () => getLayoutedElements(initialNodes, initialEdges),

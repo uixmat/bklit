@@ -1,15 +1,12 @@
-import { getRecentSessions } from "@/actions/session-actions";
 import { format } from "date-fns";
+import { getRecentSessions } from "@/actions/session-actions";
 
 interface SessionsListProps {
   siteId: string;
   limit?: number;
 }
 
-export default async function SessionsList({
-  siteId,
-  limit = 5,
-}: SessionsListProps) {
+export default async function SessionsList({ siteId, limit = 5 }: SessionsListProps) {
   const sessions = await getRecentSessions(siteId, limit);
 
   return (
@@ -17,8 +14,7 @@ export default async function SessionsList({
       {sessions.map((session) => (
         <li key={session.id} style={{ marginBottom: 24 }}>
           <div>
-            <strong>Session:</strong>{" "}
-            {format(new Date(session.startedAt), "yyyy-MM-dd HH:mm:ss")}
+            <strong>Session:</strong> {format(new Date(session.startedAt), "yyyy-MM-dd HH:mm:ss")}
             <br />
             <strong>ID:</strong> {session.sessionId}
           </div>

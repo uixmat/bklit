@@ -1,24 +1,15 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { getTopCountries } from "@/actions/analytics-actions";
-import { Skeleton } from "@/components/ui/skeleton";
 import { CircleFlag } from "react-circle-flags";
+import { getTopCountries } from "@/actions/analytics-actions";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface TopCountriesCardProps {
   siteId: string;
   userId: string;
 }
 
-export async function TopCountriesCard({
-  siteId,
-  userId,
-}: TopCountriesCardProps) {
+export async function TopCountriesCard({ siteId, userId }: TopCountriesCardProps) {
   const topCountries = await getTopCountries({ siteId, userId });
 
   return (
@@ -31,18 +22,13 @@ export async function TopCountriesCard({
         {topCountries.length > 0 ? (
           <div className="flex flex-col gap-2">
             {topCountries.map((country, i) => (
-              <div
-                key={i}
-                className="flex flex-row justify-between items-center"
-              >
+              <div key={i} className="flex flex-row justify-between items-center">
                 <div className="flex items-center gap-2">
                   <CircleFlag
                     countryCode={country.countryCode?.toLowerCase() || "us"}
                     className="size-4"
                   />
-                  <span className="font-medium text-xs">
-                    {country.country || "Unknown"}
-                  </span>
+                  <span className="font-medium text-xs">{country.country || "Unknown"}</span>
                 </div>
                 <Badge variant="secondary">{country.views}</Badge>
               </div>

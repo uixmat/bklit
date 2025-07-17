@@ -1,18 +1,14 @@
 "use client";
 
-import React from "react";
 import Link from "next/link";
-import { useUserPlanStatus } from "@/hooks/use-user-plan-status";
+import React from "react";
 import { useProject } from "@/contexts/project-context";
 import { useTeams } from "@/contexts/teams-provider";
+import { useUserPlanStatus } from "@/hooks/use-user-plan-status";
 import { PlanType } from "@/lib/plans";
 
 export function ProjectLimitBanner() {
-  const {
-    planId,
-    hasReachedLimit,
-    isLoading: isLoadingPlanStatus,
-  } = useUserPlanStatus();
+  const { planId, hasReachedLimit, isLoading: isLoadingPlanStatus } = useUserPlanStatus();
   const { currentSiteId, isLoadingSites } = useProject();
   const { currentTeamId } = useTeams();
 
@@ -26,15 +22,14 @@ export function ProjectLimitBanner() {
       role="alert"
     >
       Max projects allowed.
-      {planId.toLowerCase() === PlanType.FREE.toLowerCase() &&
-        currentSiteId && (
-          <Link
-            href={`/${currentTeamId || ""}/${currentSiteId}/billing`}
-            className="font-semibold underline hover:text-yellow-600 dark:hover:text-yellow-200"
-          >
-            Upgrade
-          </Link>
-        )}
+      {planId.toLowerCase() === PlanType.FREE.toLowerCase() && currentSiteId && (
+        <Link
+          href={`/${currentTeamId || ""}/${currentSiteId}/billing`}
+          className="font-semibold underline hover:text-yellow-600 dark:hover:text-yellow-200"
+        >
+          Upgrade
+        </Link>
+      )}
     </div>
   );
 }

@@ -4,10 +4,7 @@ export function SessionAnalyticsSkeleton() {
   return (
     <div className="space-y-3">
       {Array.from({ length: 5 }).map((_, i) => (
-        <div
-          key={i}
-          className="flex items-center justify-between p-3 rounded-lg border bg-card"
-        >
+        <div key={i} className="flex items-center justify-between p-3 rounded-lg border bg-card">
           <div className="flex-1 space-y-2">
             <Skeleton className="h-4 w-24" />
             <Skeleton className="h-3 w-16" />

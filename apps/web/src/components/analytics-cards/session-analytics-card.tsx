@@ -1,10 +1,10 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getRecentSessions } from "@/actions/session-actions";
-import { Suspense } from "react";
-import { SessionAnalyticsSkeleton } from "./skeletons";
 import { formatDistanceToNow } from "date-fns";
-import Link from "next/link";
 import { ExternalLink } from "lucide-react";
+import Link from "next/link";
+import { Suspense } from "react";
+import { getRecentSessions } from "@/actions/session-actions";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SessionAnalyticsSkeleton } from "./skeletons";
 
 interface SessionAnalyticsCardProps {
   siteId: string;
@@ -28,18 +28,13 @@ function formatDuration(seconds: number | null): string {
   return `${minutes}m ${remainingSeconds}s`;
 }
 
-async function SessionAnalyticsContent({
-  siteId,
-  teamId,
-}: SessionAnalyticsCardProps) {
+async function SessionAnalyticsContent({ siteId, teamId }: SessionAnalyticsCardProps) {
   const sessions = await getRecentSessions(siteId, 5);
 
   return (
     <div className="space-y-3">
       {sessions.length === 0 ? (
-        <p className="text-sm text-muted-foreground text-center py-4">
-          No sessions found
-        </p>
+        <p className="text-sm text-muted-foreground text-center py-4">No sessions found</p>
       ) : (
         sessions.map((session) => (
           <Link
@@ -59,9 +54,7 @@ async function SessionAnalyticsContent({
                 </div>
               </div>
               <div className="flex items-center space-x-2">
-                <div className="text-sm font-medium">
-                  {formatDuration(session.duration)}
-                </div>
+                <div className="text-sm font-medium">{formatDuration(session.duration)}</div>
                 <ExternalLink className="h-3 w-3 text-muted-foreground group-hover:text-foreground transition-colors" />
               </div>
             </div>

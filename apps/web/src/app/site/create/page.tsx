@@ -1,15 +1,9 @@
+import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { redirect } from "next/navigation";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import AddProjectForm from "@/components/forms/add-project-form";
 import { PageHeader } from "@/components/page-header";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function CreateSitePage() {
   const session = await getServerSession(authOptions);
@@ -30,8 +24,7 @@ export default async function CreateSitePage() {
           <CardHeader>
             <CardTitle>Project Details</CardTitle>
             <CardDescription>
-              Enter the details for your new project below. Click create when
-              you&apos;re done.
+              Enter the details for your new project below. Click create when you&apos;re done.
             </CardDescription>
           </CardHeader>
           <CardContent>

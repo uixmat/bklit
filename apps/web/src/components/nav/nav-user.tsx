@@ -1,10 +1,8 @@
 "use client";
 
-import { CreditCard, LogOut, User, LayoutDashboard } from "lucide-react";
-import { signOut } from "next-auth/react";
+import { CreditCard, LayoutDashboard, LogOut, User } from "lucide-react";
 import Link from "next/link";
-import { useTeams } from "@/contexts/teams-provider";
-
+import { signOut } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -15,6 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useTeams } from "@/contexts/teams-provider";
 import { ThemeToggle } from "../theme-toggle";
 
 export function NavUser({
@@ -38,9 +37,7 @@ export function NavUser({
       <DropdownMenuTrigger>
         <Avatar className="h-8 w-8 rounded-lg">
           <AvatarImage src={user.avatar} alt={user.name} />
-          <AvatarFallback className="rounded-lg">
-            {user.name?.[0]?.toUpperCase()}
-          </AvatarFallback>
+          <AvatarFallback className="rounded-lg">{user.name?.[0]?.toUpperCase()}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent

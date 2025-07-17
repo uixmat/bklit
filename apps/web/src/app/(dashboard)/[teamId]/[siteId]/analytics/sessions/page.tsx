@@ -1,12 +1,12 @@
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { redirect } from "next/navigation";
-import { getRecentSessions } from "@/actions/session-actions";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { formatDistanceToNow, format } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 import { ArrowLeft, Clock, MapPin, Monitor } from "lucide-react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth/next";
+import { getRecentSessions } from "@/actions/session-actions";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface SessionsPageProps {
   params: Promise<{ teamId: string; siteId: string }>;
@@ -50,10 +50,7 @@ function getDeviceType(userAgent: string | null): string {
   return "Desktop";
 }
 
-export default async function SessionsPage({
-  params,
-  searchParams,
-}: SessionsPageProps) {
+export default async function SessionsPage({ params, searchParams }: SessionsPageProps) {
   const { teamId, siteId } = await params;
   const { page = "1", limit = "20" } = await searchParams;
   const session = await getServerSession(authOptions);
@@ -88,9 +85,7 @@ export default async function SessionsPage({
         </div>
         <div className="text-right">
           <h1 className="text-2xl font-bold">All Sessions</h1>
-          <p className="text-sm text-muted-foreground">
-            {totalSessions} total sessions
-          </p>
+          <p className="text-sm text-muted-foreground">{totalSessions} total sessions</p>
         </div>
       </div>
 
@@ -113,9 +108,7 @@ export default async function SessionsPage({
               <Monitor className="h-4 w-4 text-muted-foreground" />
               <div>
                 <p className="text-sm font-medium">Engaged</p>
-                <p className="text-2xl font-bold">
-                  {sessions.filter((s) => !s.didBounce).length}
-                </p>
+                <p className="text-2xl font-bold">{sessions.filter((s) => !s.didBounce).length}</p>
               </div>
             </div>
           </CardContent>
@@ -126,9 +119,7 @@ export default async function SessionsPage({
               <MapPin className="h-4 w-4 text-muted-foreground" />
               <div>
                 <p className="text-sm font-medium">Bounced</p>
-                <p className="text-2xl font-bold">
-                  {sessions.filter((s) => s.didBounce).length}
-                </p>
+                <p className="text-2xl font-bold">{sessions.filter((s) => s.didBounce).length}</p>
               </div>
             </div>
           </CardContent>
@@ -142,8 +133,7 @@ export default async function SessionsPage({
                 <p className="text-2xl font-bold">
                   {formatDuration(
                     Math.round(
-                      sessions.reduce((sum, s) => sum + (s.duration || 0), 0) /
-                        sessions.length
+                      sessions.reduce((sum, s) => sum + (s.duration || 0), 0) / sessions.length
                     )
                   )}
                 </p>
@@ -161,9 +151,7 @@ export default async function SessionsPage({
         <CardContent>
           <div className="space-y-3">
             {sessions.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-8">
-                No sessions found
-              </p>
+              <p className="text-sm text-muted-foreground text-center py-8">No sessions found</p>
             ) : (
               sessions.map((session) => (
                 <Link
@@ -179,27 +167,19 @@ export default async function SessionsPage({
                             addSuffix: true,
                           })}
                         </div>
-                        <Badge
-                          variant={
-                            session.didBounce ? "destructive" : "default"
-                          }
-                        >
+                        <Badge variant={session.didBounce ? "destructive" : "default"}>
                           {session.didBounce ? "Bounced" : "Engaged"}
                         </Badge>
                       </div>
                       <div className="text-xs text-muted-foreground space-x-4">
                         <span>{session.pageViewEvents.length} pages</span>
-                        <span>
-                          {getBrowserFromUserAgent(session.userAgent)}
-                        </span>
+                        <span>{getBrowserFromUserAgent(session.userAgent)}</span>
                         <span>{getDeviceType(session.userAgent)}</span>
                         {session.country && <span>{session.country}</span>}
                       </div>
                     </div>
                     <div className="text-right space-y-1">
-                      <div className="text-sm font-medium">
-                        {formatDuration(session.duration)}
-                      </div>
+                      <div className="text-sm font-medium">{formatDuration(session.duration)}</div>
                       <div className="text-xs text-muted-foreground">
                         {format(new Date(session.startedAt), "MMM d, HH:mm")}
                       </div>

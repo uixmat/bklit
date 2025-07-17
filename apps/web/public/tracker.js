@@ -1,4 +1,4 @@
-(function () {
+(() => {
   const INACTIVITY_TIMEOUT_MS = 3 * 60 * 1000; // 3 minutes
   let inactivityTimer = null;
   let sessionEnded = false;
@@ -15,7 +15,9 @@
 
   // End session API call
   async function endSession() {
-    if (sessionEnded) return;
+    if (sessionEnded) {
+      return;
+    }
     sessionEnded = true;
     const sessionId = getSessionId();
     try {
@@ -34,8 +36,12 @@
 
   // Reset inactivity timer
   function resetInactivityTimer() {
-    if (sessionEnded) return;
-    if (inactivityTimer) clearTimeout(inactivityTimer);
+    if (sessionEnded) {
+      return;
+    }
+    if (inactivityTimer) {
+      clearTimeout(inactivityTimer);
+    }
     inactivityTimer = setTimeout(endSession, INACTIVITY_TIMEOUT_MS);
   }
 
@@ -63,8 +69,8 @@
   // Helper to wrap history methods
   function wrapHistoryMethod(type) {
     const orig = history[type];
-    return function () {
-      const rv = orig.apply(this, arguments);
+    return function (...args) {
+      const rv = orig.apply(this, args);
       window.dispatchEvent(new Event(type));
       return rv;
     };

@@ -2,13 +2,8 @@
 
 import type { Team } from "@prisma/client";
 import { useParams } from "next/navigation";
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from "react";
+import type React from "react";
+import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
 
 interface TeamsContextType {
   currentTeamId: string | null;
@@ -68,10 +63,7 @@ export const TeamsProvider: React.FC<{
     if (teamIdFromParams) {
       setCurrentTeamIdState(teamIdFromParams);
       setLastActiveTeamId(teamIdFromParams);
-    } else if (
-      lastActiveTeamId &&
-      availableTeams.some((team) => team.id === lastActiveTeamId)
-    ) {
+    } else if (lastActiveTeamId && availableTeams.some((team) => team.id === lastActiveTeamId)) {
       // If we're on a user page, maintain the last active team
       setCurrentTeamIdState(lastActiveTeamId);
     } else if (availableTeams.length > 0 && !currentTeamId) {

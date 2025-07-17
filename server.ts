@@ -1,8 +1,11 @@
-import { createServer, IncomingMessage, ServerResponse } from "http";
-import { parse } from "url";
+import {
+  createServer,
+  type IncomingMessage,
+  type ServerResponse,
+} from "node:http";
 import next from "next";
-import path from "path";
-import { fileURLToPath } from "url";
+import path from "node:path";
+import { fileURLToPath, parse } from "node:url";
 
 // const { initSocket } = require("./apps/web/src/lib/socketio-server.ts"); // Old require
 
@@ -26,7 +29,7 @@ app
         const httpServer = createServer(
           async (req: IncomingMessage, res: ServerResponse) => {
             try {
-              const parsedUrl = parse(req.url!, true);
+              const parsedUrl = parse(req.url ?? "", true);
               // Let Next.js handle all requests
               await handle(req, res, parsedUrl);
             } catch (err) {

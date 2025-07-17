@@ -31,9 +31,7 @@ interface LocationData {
   mobile: boolean;
 }
 
-export async function getLocationFromIP(
-  ip: string
-): Promise<LocationData | null> {
+export async function getLocationFromIP(ip: string): Promise<LocationData | null> {
   try {
     // Skip localhost and private IPs
     if (
