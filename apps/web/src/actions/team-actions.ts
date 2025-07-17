@@ -103,3 +103,76 @@ export async function createTeamAction(
     };
   }
 }
+
+// Action to delete a team
+export async function deleteTeamAction(
+  prevState: TeamFormState,
+  formData: FormData
+): Promise<TeamFormState> {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user || !session.user.id) {
+    return {
+      success: false,
+      message: "User not authenticated.",
+    };
+  }
+
+  const teamId = formData.get("teamId") as string;
+  const confirmedTeamName = formData.get("confirmedTeamName") as string;
+
+  if (!teamId || !confirmedTeamName) {
+    return {
+      success: false,
+      message: "Missing team ID or team name for confirmation.",
+    };
+  }
+
+  try {
+    // Check if user is the owner of the team
+    const teamMembership = await prisma.teamMember.findFirst({
+      where: {
+        teamId: teamId,
+        userId: session.user.id,
+        role: "owner",
+      },
+      include: {
+        team: true,
+      },
+    });
+
+    if (!teamMembership || !teamMembership.team) {
+      return {
+        success: false,
+        message: "Team not found or you do not have permission to delete it.",
+      };
+    }
+
+    if (teamMembership.team.name !== confirmedTeamName) {
+      return {
+        success: false,
+        message: "The entered team name does not match. Deletion cancelled.",
+      };
+    }
+
+    // Delete the team (this will cascade delete all related data)
+    await prisma.team.delete({
+      where: {
+        id: teamId,
+      },
+    });
+
+    revalidatePath("/");
+
+    return {
+      success: true,
+      message: `Team "${teamMembership.team.name}" deleted successfully.`,
+    };
+  } catch (error) {
+    console.error("Error deleting team:", error);
+    return {
+      success: false,
+      message: "Failed to delete team. Please try again.",
+    };
+  }
+}
