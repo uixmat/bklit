@@ -182,6 +182,7 @@ export const POST = Webhooks({
 						`Webhook: Subscription ${subscription.id} is active for user ${user.email}. Setting plan to pro.`,
 					);
 				} else if (
+					subscription.status &&
 					["canceled", "ended", "past_due", "unpaid"].includes(
 						subscription.status,
 					)
@@ -230,7 +231,7 @@ export const POST = Webhooks({
 		}
 	},
 
-	async onOrderCreated(payload: any) {
+	async onOrderCreated(payload: WebhookPayload) {
 		console.log("Webhook: OrderCreatedEvent (RAW PAYLOAD) received", payload);
 		const order = payload.data; // Access actual order data via payload.data
 		if (!order) {
@@ -240,7 +241,7 @@ export const POST = Webhooks({
 		// Handle one-time purchase orders if you have them
 	},
 
-	async onOrderUpdated(payload: any) {
+	async onOrderUpdated(payload: WebhookPayload) {
 		console.log("Webhook: OrderUpdatedEvent (RAW PAYLOAD) received", payload);
 		const order = payload.data; // Access actual order data via payload.data
 		if (!order) {
@@ -254,7 +255,7 @@ export const POST = Webhooks({
 	},
 
 	// Fallback for any other event types not explicitly handled above
-	async onPayload(payload: any) {
+	async onPayload(payload: WebhookPayload) {
 		console.log("Webhook: Generic onPayload received (via SDK util):", payload);
 		// You could add a switch(payload.type) here if you want to handle
 		// other specific events without dedicated handlers.
