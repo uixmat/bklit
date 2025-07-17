@@ -1,4 +1,4 @@
-import type { Server as HttpServer } from "http";
+import type { Server as HttpServer } from "node:http";
 import { type Socket, Server as SocketIOServer } from "socket.io";
 
 // Declare a global variable to hold the Socket.IO server instance.
@@ -16,7 +16,9 @@ declare global {
 // For example, in a custom server.js file.
 export const initSocket = (httpServer: HttpServer): SocketIOServer => {
   if (!global.io) {
-    console.log("Initializing Socket.IO server and attaching to HTTP server...");
+    console.log(
+      "Initializing Socket.IO server and attaching to HTTP server..."
+    );
     const io = new SocketIOServer(httpServer, {
       path: "/api/socketio", // Client will connect to this path
       addTrailingSlash: false,
@@ -34,7 +36,9 @@ export const initSocket = (httpServer: HttpServer): SocketIOServer => {
 
       socket.on("join_site_room", (siteId: string) => {
         if (!siteId) {
-          console.log(`Socket ${socket.id} attempted to join without a siteId.`);
+          console.log(
+            `Socket ${socket.id} attempted to join without a siteId.`
+          );
           return;
         }
         socket.join(siteId);

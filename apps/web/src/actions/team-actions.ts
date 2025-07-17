@@ -25,7 +25,7 @@ export type TeamFormState = {
 };
 
 export async function createTeamAction(
-  prevState: TeamFormState,
+  _prevState: TeamFormState,
   formData: FormData
 ): Promise<TeamFormState> {
   const session = await getServerSession(authOptions);
@@ -63,7 +63,8 @@ export async function createTeamAction(
     if (existingTeam) {
       return {
         success: false,
-        message: "A team with this name already exists. Please choose a different name.",
+        message:
+          "A team with this name already exists. Please choose a different name.",
       };
     }
 
@@ -105,7 +106,7 @@ export async function createTeamAction(
 
 // Action to delete a team
 export async function deleteTeamAction(
-  prevState: TeamFormState,
+  _prevState: TeamFormState,
   formData: FormData
 ): Promise<TeamFormState> {
   const session = await getServerSession(authOptions);
@@ -203,7 +204,9 @@ export async function getTeamData(teamId: string, userId: string) {
     }
 
     // Check if user is a member of this team
-    const userMembership = team.members.find((member) => member.userId === userId);
+    const userMembership = team.members.find(
+      (member) => member.userId === userId
+    );
     if (!userMembership) {
       return null;
     }
