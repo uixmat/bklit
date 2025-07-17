@@ -10,7 +10,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { PageHeader } from "@/components/page-header";
-import { DeleteProjectForm } from "@/components/forms/delete-project-form";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -56,7 +55,7 @@ export default async function ProjectDashboardPage({
     redirect("/");
   }
 
-  const { site, userMembership } = siteData;
+  const { site } = siteData;
 
   return (
     <div className="space-y-6 prose dark:prose-invert max-w-none">
@@ -117,12 +116,6 @@ export default async function ProjectDashboardPage({
           </CardContent>
         </Card>
       </div>
-
-      {userMembership.role === "owner" && (
-        <div className="pt-6 mt-6 border-t">
-          <DeleteProjectForm siteId={site.id} projectName={site.name} />
-        </div>
-      )}
     </div>
   );
 }

@@ -6,17 +6,70 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { PageHeader } from "@/components/page-header";
+import { DeleteProjectForm } from "@/components/forms/delete-project-form";
+import { prisma } from "@/lib/db";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { redirect } from "next/navigation";
 
-export default function SettingsPage() {
+async function getSiteData(siteId: string, teamId: string, userId: string) {
+  const site = await prisma.site.findFirst({
+    where: {
+      id: siteId,
+      teamId: teamId,
+    },
+    include: {
+      team: {
+        include: {
+          members: {
+            where: { userId },
+          },
+        },
+      },
+    },
+  });
+
+  if (!site || !site.team || site.team.members.length === 0) {
+    return null;
+  }
+
+  return { site, userMembership: site.team.members[0] };
+}
+
+export default async function ProjectDashboardPage({
+  params,
+}: {
+  params: Promise<{ teamId: string; siteId: string }>;
+}) {
+  const { teamId, siteId } = await params;
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user?.id) {
+    redirect("/signin");
+  }
+
+  const siteData = await getSiteData(siteId, teamId, session.user.id);
+
+  if (!siteData) {
+    redirect("/");
+  }
+
+  const { site, userMembership } = siteData;
   return (
     <div className="space-y-6 prose dark:prose-invert max-w-none">
       <PageHeader title="Site settings" description="Manage your settings." />
       <Card className="card">
         <CardHeader>
-          <CardTitle>A settings card</CardTitle>
-          <CardDescription>A description of the settings card</CardDescription>
+          <CardTitle>Delete site</CardTitle>
+          <CardDescription>
+            Delete this site and all associated data.
+          </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">Hello World</CardContent>
+        <CardContent className="space-y-6">
+          {userMembership.role === "owner" && (
+            <DeleteProjectForm siteId={site.id} projectName={site.name} />
+          )}
+        </CardContent>
       </Card>
     </div>
   );
