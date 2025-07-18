@@ -10,28 +10,10 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-
-interface Team {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | null;
-  plan: string;
-  role: string;
-  siteCount: number;
-  sites: Array<{
-    id: string;
-    name: string;
-    teamId: string | null;
-    userId: string | null;
-    domain: string | null;
-    createdAt: Date;
-    updatedAt: Date;
-  }>;
-}
+import type { UserTeamData } from "@/types/user";
 
 export interface ModuleWorkspacesProps {
-  teams: Team[];
+  teams: UserTeamData[];
   isLoadingTeams: boolean;
   handleProjectSelect: (projectId: string) => void;
   currentSiteId: string;

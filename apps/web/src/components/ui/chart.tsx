@@ -5,6 +5,12 @@ import * as RechartsPrimitive from "recharts";
 
 import { cn } from "@/lib/utils";
 
+// Chart data types for recharts compatibility
+// biome-ignore lint/suspicious/noExplicitAny: Recharts library types are complex and require any
+type ChartPayloadItem = any;
+// biome-ignore lint/suspicious/noExplicitAny: Recharts library types are complex and require any
+type ChartLabel = any;
+
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: "", dark: ".dark" } as const;
 
@@ -128,6 +134,8 @@ function ChartTooltipContent({
     indicator?: "line" | "dot" | "dashed";
     nameKey?: string;
     labelKey?: string;
+    payload?: ChartPayloadItem[];
+    label?: ChartLabel;
   }) {
   const { config } = useChart();
 
@@ -259,11 +267,12 @@ function ChartLegendContent({
   payload,
   verticalAlign = "bottom",
   nameKey,
-}: React.ComponentProps<"div"> &
-  Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
-    hideIcon?: boolean;
-    nameKey?: string;
-  }) {
+}: React.ComponentProps<"div"> & {
+  hideIcon?: boolean;
+  nameKey?: string;
+  payload?: ChartPayloadItem[];
+  verticalAlign?: string;
+}) {
   const { config } = useChart();
 
   if (!payload?.length) {
