@@ -1,6 +1,5 @@
 "use client";
 
-import type { Site } from "@prisma/client";
 import { useParams, usePathname } from "next/navigation";
 import type React from "react";
 import {
@@ -10,6 +9,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import type { Site } from "@/generated/prisma/client";
 import { useTeams } from "./teams-provider";
 
 interface ProjectContextType {

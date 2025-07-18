@@ -7,7 +7,7 @@
     "dev:track": "cd ../.. && pnpm run dev:web",
     "build": "next build",
     "start": "next start",
-    "lint": "npx @biomejs/biome lint && tsc --noEmit",
+    "lint": "npx @biomejs/biome lint && npx tsc --noEmit",
     "format": "npx @biomejs/biome format",
     "check": "npx @biomejs/biome check",
     "prisma:generate": "prisma generate",

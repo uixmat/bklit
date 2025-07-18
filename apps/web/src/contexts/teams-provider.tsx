@@ -1,6 +1,5 @@
 "use client";
 
-import type { Team } from "@prisma/client";
 import { useParams } from "next/navigation";
 import type React from "react";
 import {
@@ -10,6 +9,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import type { Team } from "@/generated/prisma/client";
 
 interface TeamsContextType {
   currentTeamId: string | null;
