@@ -7,7 +7,7 @@
     "dev:track": "cd ../.. && pnpm run dev:web",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "npx @biomejs/biome lint",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio"
