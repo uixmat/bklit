@@ -6,7 +6,6 @@
     "dev": "next dev --turbopack",
     "dev:track": "cd ../.. && pnpm run dev:web",
     "build": "next build",
-    "postinstall": "npx prisma migrate deploy",
     "start": "next start",
     "lint": "npx @biomejs/biome lint && tsc --noEmit",
     "format": "npx @biomejs/biome format",
