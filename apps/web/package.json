@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "dev:track": "cd ../.. && pnpm run dev:web",
-    "build": "prisma generate && next build",
+    "build": "next build",
     "postinstall": "npx prisma migrate deploy",
     "start": "next start",
     "lint": "npx @biomejs/biome lint && tsc --noEmit",
