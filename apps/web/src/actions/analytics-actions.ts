@@ -5,8 +5,8 @@ import { z } from "zod";
 import { cleanupStaleSessions } from "@/actions/session-actions";
 import { prisma } from "@/lib/db";
 import { findCountryCoordinates } from "@/lib/maps/country-coordinates";
+import type { BrowserStats, TopPageData } from "@/types/analytics";
 import type {
-  BrowserStats,
   CityResult,
   CountryCodeResult,
   CountryStats,
@@ -14,8 +14,7 @@ import type {
   CountryWithVisits,
   TopCountryData,
   TopCountryResult,
-  TopPageData,
-} from "@/types";
+} from "@/types/geo";
 
 const getTopCountriesSchema = z.object({
   siteId: z.string(),

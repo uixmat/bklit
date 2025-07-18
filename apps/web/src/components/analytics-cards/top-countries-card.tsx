@@ -9,11 +9,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { AnalyticsCardProps } from "@/types/analytics-cards";
 
-interface TopCountriesCardProps {
-  siteId: string;
-  userId: string;
-}
+type TopCountriesCardProps = AnalyticsCardProps;
 
 export async function TopCountriesCard({
   siteId,

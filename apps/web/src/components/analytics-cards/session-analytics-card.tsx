@@ -4,12 +4,8 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { getRecentSessions } from "@/actions/session-actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { SessionAnalyticsCardProps } from "@/types/analytics-cards";
 import { SessionAnalyticsSkeleton } from "./skeletons";
-
-interface SessionAnalyticsCardProps {
-  siteId: string;
-  teamId?: string;
-}
 
 function formatDuration(seconds: number | null): string {
   if (!seconds) return "0s";

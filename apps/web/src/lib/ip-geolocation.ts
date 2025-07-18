@@ -1,4 +1,4 @@
-import type { GeoLocation, IpGeoResponse } from "@/types";
+import type { GeoLocation, IpGeoResponse } from "@/types/geo";
 
 interface LocationData extends GeoLocation {
   ip: string;

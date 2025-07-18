@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import type { SessionData } from "@/types";
+import type { SessionData } from "@/types/geo";
 
 // Generate a simple visitor ID for returning user detection
 function generateVisitorId(userAgent: string): string {

@@ -35,3 +35,8 @@ export interface AnalyticsStats {
   uniquePages: number;
   uniqueVisits: number;
 }
+
+// Live users data
+export interface LiveUsersData {
+  count: number;
+}

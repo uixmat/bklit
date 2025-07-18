@@ -7,7 +7,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { getPlanDetails, PlanType } from "@/lib/plans"; // Import plan helpers
 import { addProjectSchema } from "@/lib/schemas/project-schema";
-import type { ProjectFormState } from "@/types";
+import type { ProjectFormState } from "@/types/user";
 
 export type FormState = ProjectFormState;
 

@@ -3,7 +3,7 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import type { TeamMembershipWithTeam, UserTeamData } from "@/types";
+import type { TeamMembershipWithTeam, UserTeamData } from "@/types/user";
 
 export async function getUserProjectCount(): Promise<number | null> {
   const session = await getServerSession(authOptions);
