@@ -3,6 +3,7 @@ import { createOrUpdateSession } from "@/actions/session-actions";
 import { prisma } from "@/lib/db";
 import { extractClientIP, getLocationFromIP } from "@/lib/ip-geolocation";
 import { getIoServer } from "@/lib/socketio-server";
+import type { GeoLocation } from "@/types/geo";
 
 interface TrackingPayload {
   url: string;
@@ -46,7 +47,7 @@ export async function POST(request: NextRequest) {
 
     // Extract client IP and get location data
     const clientIP = extractClientIP(request);
-    let locationData = null;
+    let locationData: GeoLocation | null = null;
 
     if (clientIP) {
       try {
