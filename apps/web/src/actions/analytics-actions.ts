@@ -6,6 +6,21 @@ import { cleanupStaleSessions } from "@/actions/session-actions";
 import { prisma } from "@/lib/db";
 import { findCountryCoordinates } from "@/lib/maps/country-coordinates";
 
+// Type definitions for analytics data
+interface TopCountryResult {
+  country: string | null;
+  countryCode: string | null;
+  _count: {
+    country: number;
+  };
+}
+
+interface TopCountryData {
+  country: string;
+  countryCode: string;
+  views: number;
+}
+
 const getTopCountriesSchema = z.object({
   siteId: z.string(),
   userId: z.string(),
@@ -53,11 +68,13 @@ export async function getTopCountries(
         take: 5,
       });
 
-      return topCountries.map((c) => ({
-        country: c.country || "",
-        countryCode: c.countryCode || "",
-        views: Number(c._count.country) || 0,
-      }));
+      return topCountries.map(
+        (c: TopCountryResult): TopCountryData => ({
+          country: c.country || "",
+          countryCode: c.countryCode || "",
+          views: Number(c._count.country) || 0,
+        }),
+      );
     },
     [`${siteId}-top-countries`],
     {

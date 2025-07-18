@@ -12,6 +12,7 @@
       "!**/.next/**",
       "!.cursor/**",
       "!.vscode/**",
+      "!.vercel/**",
       "!**/dist/**",
       "!**/node_modules/**",
       "!**/apps/playground/**",
