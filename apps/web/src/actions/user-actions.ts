@@ -3,38 +3,7 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-
-// Type definitions for user actions
-interface TeamMembershipWithTeam {
-  team: {
-    id: string;
-    name: string;
-    slug: string;
-    description: string | null;
-    plan: string;
-    sites: Array<{
-      id: string;
-      name: string;
-      domain: string | null;
-    }>;
-  };
-  role: string;
-}
-
-interface UserTeamData {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | null;
-  plan: string;
-  role: string;
-  siteCount: number;
-  sites: Array<{
-    id: string;
-    name: string;
-    domain: string | null;
-  }>;
-}
+import type { TeamMembershipWithTeam, UserTeamData } from "@/types";
 
 export async function getUserProjectCount(): Promise<number | null> {
   const session = await getServerSession(authOptions);

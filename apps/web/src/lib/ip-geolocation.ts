@@ -1,34 +1,7 @@
-interface IPLocationData {
-  status: string;
-  message?: string;
-  country: string;
-  countryCode: string;
-  region: string;
-  regionName: string;
-  city: string;
-  zip: string;
-  lat: number;
-  lon: number;
-  timezone: string;
-  currency: string;
-  isp: string;
-  mobile: boolean;
-  query: string;
-}
+import type { GeoLocation, IpGeoResponse } from "@/types";
 
-interface LocationData {
+interface LocationData extends GeoLocation {
   ip: string;
-  country: string;
-  countryCode: string;
-  region: string;
-  regionName: string;
-  city: string;
-  zip: string;
-  lat: number;
-  lon: number;
-  timezone: string;
-  isp: string;
-  mobile: boolean;
 }
 
 export async function getLocationFromIP(
@@ -62,7 +35,7 @@ export async function getLocationFromIP(
       return null;
     }
 
-    const data: IPLocationData = await response.json();
+    const data: IpGeoResponse = await response.json();
 
     if (data.status === "success") {
       return {
