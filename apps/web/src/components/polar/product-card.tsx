@@ -10,30 +10,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
-interface Benefit {
-  id?: string;
-  description?: string;
-}
-
-interface Price {
-  type: "recurring" | "one_time";
-  price_amount?: number;
-  recurring_interval?: string;
-}
-
-interface Product {
-  id?: string;
-  name?: string;
-  description?: string;
-  type?: string;
-  prices?: Price[];
-  benefits?: Benefit[];
-  features?: Benefit[];
-}
+import type { PolarBenefit, PolarProduct } from "@/lib/polar";
 
 interface ProductCardProps {
-  product: Product;
+  product: PolarProduct;
 }
 
 export const ProductCard = ({ product }: ProductCardProps) => {
@@ -72,7 +52,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         <p className="text-3xl font-bold mb-4">{displayPrice}</p>
         {benefits.length > 0 && (
           <ul className="space-y-2">
-            {benefits.map((benefit: Benefit, index: number) => (
+            {benefits.map((benefit: PolarBenefit, index: number) => (
               <li key={benefit.id || index} className="flex items-center">
                 <CheckCircle className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
                 <span>{benefit.description || "Benefit"}</span>

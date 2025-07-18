@@ -1,5 +1,27 @@
 import { Polar } from "@polar-sh/sdk";
 
+// Type definitions for Polar products
+export interface PolarBenefit {
+  id?: string;
+  description?: string;
+}
+
+export interface PolarPrice {
+  type: "recurring" | "one_time";
+  price_amount?: number;
+  recurring_interval?: string;
+}
+
+export interface PolarProduct {
+  id?: string;
+  name?: string;
+  description?: string;
+  type?: string;
+  prices?: PolarPrice[];
+  benefits?: PolarBenefit[];
+  features?: PolarBenefit[];
+}
+
 const SERVER_POLAR_ACCESS_TOKEN = process.env.POLAR_ACCESS_TOKEN;
 const POLAR_SERVER_MODE = process.env.POLAR_SERVER_MODE;
 
@@ -31,7 +53,7 @@ console.log(
 
 export default polar;
 
-export async function getPublishedPolarProducts(): Promise<unknown[]> {
+export async function getPublishedPolarProducts(): Promise<PolarProduct[]> {
   if (!SERVER_POLAR_ACCESS_TOKEN) {
     console.error(
       "Polar access token is not configured. Cannot fetch products.",
@@ -45,14 +67,14 @@ export async function getPublishedPolarProducts(): Promise<unknown[]> {
       // Add limit if you expect many products, e.g., limit: 100
     });
 
-    const products: unknown[] = [];
+    const products: PolarProduct[] = [];
     for await (const page of productsIterator) {
       // Check if the iterated item has the structure { result: { items: [...] } }
       if (page?.result && Array.isArray(page.result.items)) {
-        products.push(...page.result.items);
+        products.push(...(page.result.items as PolarProduct[]));
       } else if (Array.isArray(page)) {
         // Fallback for direct array (less likely now)
-        products.push(...page);
+        products.push(...(page as PolarProduct[]));
       } else if (
         page &&
         typeof page === "object" &&
@@ -60,7 +82,7 @@ export async function getPublishedPolarProducts(): Promise<unknown[]> {
         Array.isArray((page as { items?: unknown[] }).items)
       ) {
         // Fallback for { items: [...] } (less likely now)
-        products.push(...(page as { items: unknown[] }).items);
+        products.push(...(page as { items: PolarProduct[] }).items);
       } else {
         console.warn(
           "Unexpected page structure in Polar products iterator (or no items found in page.result.items):",
