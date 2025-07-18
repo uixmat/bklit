@@ -14,6 +14,7 @@ export interface GeoLocation {
   currency?: string;
   isp?: string;
   mobile?: boolean;
+  ip?: string;
 }
 
 // IP geolocation response
