@@ -54,9 +54,9 @@ export async function getTopCountries(
       });
 
       return topCountries.map((c) => ({
-        country: c.country,
-        countryCode: c.countryCode,
-        views: c._count.country,
+        country: c.country || "",
+        countryCode: c.countryCode || "",
+        views: Number(c._count.country) || 0,
       }));
     },
     [`${siteId}-top-countries`],

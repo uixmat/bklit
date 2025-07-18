@@ -128,7 +128,7 @@ export function WorldMap({ siteId, userId }: WorldMapProps) {
         const validData = visitData.filter((d) => {
           const hasCoordinates = d.coordinates !== null;
           const hasValidVisits =
-            typeof d.totalVisits === "number" && !isNaN(d.totalVisits);
+            typeof d.totalVisits === "number" && !Number.isNaN(d.totalVisits);
           if (!hasCoordinates || !hasValidVisits) {
             console.warn("Invalid data for marker:", d);
           }
