@@ -655,7 +655,7 @@ export async function getBrowserStats(
       // Parse user agents to extract browser information
       const browserStats: Record<string, number> = {};
 
-      pageViews.forEach((view) => {
+      pageViews.forEach((view: { userAgent: string | null }) => {
         const userAgent = view.userAgent || "";
         let browser = "Unknown";
 

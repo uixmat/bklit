@@ -23,26 +23,8 @@ import { useProject } from "@/contexts/project-context";
 import { useTeams } from "@/contexts/teams-provider";
 import { useTeamPlanStatus } from "@/hooks/use-team-plan-status";
 import { useUserPlanStatus } from "@/hooks/use-user-plan-status";
+import type { UserTeamData } from "@/types/user";
 import { ModuleWorkspaces } from "./module-workspaces";
-
-interface Team {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | null;
-  plan: string;
-  role: string;
-  siteCount: number;
-  sites: Array<{
-    id: string;
-    name: string;
-    teamId: string | null;
-    userId: string | null;
-    domain: string | null;
-    createdAt: Date;
-    updatedAt: Date;
-  }>;
-}
 
 export function NavWorkspace() {
   const { isLoadingSites, activeProject, setCurrentSiteId, currentSiteId } =
@@ -61,7 +43,7 @@ export function NavWorkspace() {
       : undefined;
 
   // Pre-fetch teams data
-  const [teams, setTeams] = useState<Team[]>([]);
+  const [teams, setTeams] = useState<UserTeamData[]>([]);
   const [isLoadingTeams, setIsLoadingTeams] = useState(true);
 
   useEffect(() => {

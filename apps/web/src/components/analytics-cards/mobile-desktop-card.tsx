@@ -88,7 +88,7 @@ export function MobileDesktopCard() {
             </Pie>
             <ChartTooltip content={<ChartTooltipContent />} />
             <ChartLegend
-              content={<ChartLegendContent payload="horizontal" />}
+              content={<ChartLegendContent verticalAlign="horizontal" />}
             />
           </PieChart>
         </ChartContainer>
