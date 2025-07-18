@@ -12,6 +12,29 @@ export interface BrowserStats {
   count: number;
 }
 
+// Session data structure
+export interface SessionData {
+  id: string;
+  sessionId: string;
+  siteId: string;
+  startedAt: Date;
+  endedAt: Date | null;
+  duration: number | null;
+  didBounce: boolean;
+  visitorId: string | null;
+  entryPage: string;
+  exitPage: string | null;
+  userAgent: string | null;
+  country: string | null;
+  city: string | null;
+  pageViewEvents: Array<{
+    id: string;
+    url: string;
+    timestamp: Date;
+    createdAt: Date;
+  }>;
+}
+
 // Session analytics data
 export interface SessionAnalyticsData {
   totalSessions: number;
@@ -19,7 +42,7 @@ export interface SessionAnalyticsData {
   bounceRate: number;
   avgSessionDuration: number;
   avgPageViews: number;
-  recentSessions: any[]; // This could be more specific based on your session type
+  recentSessions: SessionData[];
 }
 
 // Mobile/Desktop statistics

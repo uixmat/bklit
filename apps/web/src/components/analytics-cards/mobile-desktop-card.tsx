@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/chart";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProject } from "@/contexts/project-context";
-import type { MobileDesktopStats } from "@/types/analytics";
 import type { PieChartData } from "@/types/analytics-cards";
 
 const chartConfig = {
