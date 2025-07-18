@@ -17,25 +17,14 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProject } from "@/contexts/project-context";
-
-interface AnalyticsStats {
-  totalViews: number;
-  recentViews: number;
-  uniquePages: number;
-  uniqueVisits: number;
-}
-
-interface SessionAnalytics {
-  totalSessions: number;
-  bounceRate: number;
-}
+import type { AnalyticsStats } from "@/types/analytics";
+import type { SessionAnalyticsSummary } from "@/types/analytics-cards";
 
 export function ViewsCard({ userId }: { userId: string }) {
   const { currentSiteId } = useProject();
   const [stats, setStats] = useState<AnalyticsStats | null>(null);
-  const [sessionStats, setSessionStats] = useState<SessionAnalytics | null>(
-    null,
-  );
+  const [sessionStats, setSessionStats] =
+    useState<SessionAnalyticsSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [liveUsers, setLiveUsers] = useState(0);
   const socketRef = useRef<Socket | null>(null);

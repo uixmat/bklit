@@ -3,6 +3,7 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import type { TeamMembershipWithTeam, UserTeamData } from "@/types/user";
 
 export async function getUserProjectCount(): Promise<number | null> {
   const session = await getServerSession(authOptions);
@@ -98,16 +99,18 @@ export async function getUserTeams() {
     });
 
     // Transform to return teams with site counts
-    const teams = teamMemberships.map((membership) => ({
-      id: membership.team.id,
-      name: membership.team.name,
-      slug: membership.team.slug,
-      description: membership.team.description,
-      plan: membership.team.plan,
-      role: membership.role,
-      siteCount: membership.team.sites.length,
-      sites: membership.team.sites,
-    }));
+    const teams = teamMemberships.map(
+      (membership: TeamMembershipWithTeam): UserTeamData => ({
+        id: membership.team.id,
+        name: membership.team.name,
+        slug: membership.team.slug,
+        description: membership.team.description,
+        plan: membership.team.plan,
+        role: membership.role,
+        siteCount: membership.team.sites.length,
+        sites: membership.team.sites,
+      }),
+    );
 
     return teams;
   } catch (error) {

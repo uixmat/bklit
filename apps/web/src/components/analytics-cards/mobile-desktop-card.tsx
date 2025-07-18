@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/chart";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProject } from "@/contexts/project-context";
+import type { PieChartData } from "@/types/analytics-cards";
 
 const chartConfig = {
   desktop: {
@@ -50,7 +51,7 @@ export function MobileDesktopCard() {
     return <MobileDesktopCardSkeleton />;
   }
 
-  const chartData = [
+  const chartData: PieChartData[] = [
     { name: "desktop", value: stats.desktop },
     { name: "mobile", value: stats.mobile },
   ];

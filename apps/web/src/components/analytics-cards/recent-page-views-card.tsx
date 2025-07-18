@@ -8,11 +8,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { AnalyticsCardProps } from "@/types/analytics-cards";
 
-interface RecentPageViewsCardProps {
-  siteId: string;
-  userId: string;
-}
+type RecentPageViewsCardProps = AnalyticsCardProps;
 
 export async function RecentPageViewsCard({
   siteId,

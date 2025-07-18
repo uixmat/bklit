@@ -17,12 +17,7 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProject } from "@/contexts/project-context";
-
-// BrowserStat interface is used in the component logic
-interface BrowserStat {
-  browser: string;
-  count: number;
-}
+import type { BrowserStats } from "@/types/analytics";
 
 // Function to get the appropriate icon for each browser
 function getBrowserIcon(browser: string) {
@@ -44,7 +39,7 @@ export function BrowserStatsCard() {
   const { currentSiteId } = useProject();
   const { data: session } = useSession();
 
-  const { data: browserStats, isLoading } = useQuery<BrowserStat[]>({
+  const { data: browserStats, isLoading } = useQuery<BrowserStats[]>({
     queryKey: ["browser-stats", currentSiteId],
     queryFn: () =>
       getBrowserStats({

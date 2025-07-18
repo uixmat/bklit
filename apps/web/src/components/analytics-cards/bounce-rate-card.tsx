@@ -17,6 +17,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { useProject } from "@/contexts/project-context";
+import type { BounceRateData, PieChartData } from "@/types/analytics-cards";
 
 const chartConfig = {
   bounced: {
@@ -30,7 +31,7 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 function useBounceRate(siteId: string | undefined, days = 30) {
-  return useQuery({
+  return useQuery<BounceRateData | null>({
     queryKey: ["bounce-rate", siteId],
     queryFn: async () => {
       if (!siteId) return null;
@@ -66,7 +67,7 @@ export function BounceRateCard() {
 
   const nonBouncedSessions = data.totalSessions - data.bouncedSessions;
 
-  const chartData = [
+  const chartData: PieChartData[] = [
     { name: "bounced", value: data.bouncedSessions },
     { name: "engaged", value: nonBouncedSessions },
   ];

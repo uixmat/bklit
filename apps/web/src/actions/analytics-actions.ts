@@ -5,6 +5,16 @@ import { z } from "zod";
 import { cleanupStaleSessions } from "@/actions/session-actions";
 import { prisma } from "@/lib/db";
 import { findCountryCoordinates } from "@/lib/maps/country-coordinates";
+import type { BrowserStats, TopPageData } from "@/types/analytics";
+import type {
+  CityResult,
+  CountryCodeResult,
+  CountryStats,
+  CountryWithCities,
+  CountryWithVisits,
+  TopCountryData,
+  TopCountryResult,
+} from "@/types/geo";
 
 const getTopCountriesSchema = z.object({
   siteId: z.string(),
@@ -53,11 +63,13 @@ export async function getTopCountries(
         take: 5,
       });
 
-      return topCountries.map((c) => ({
-        country: c.country || "",
-        countryCode: c.countryCode || "",
-        views: Number(c._count.country) || 0,
-      }));
+      return topCountries.map(
+        (c: TopCountryResult): TopCountryData => ({
+          country: c.country || "",
+          countryCode: c.countryCode || "",
+          views: Number(c._count.country) || 0,
+        }),
+      );
     },
     [`${siteId}-top-countries`],
     {
@@ -237,38 +249,40 @@ export async function getVisitsByCountry(
 
       // Get city breakdown for each country
       const countriesWithCities = await Promise.all(
-        countriesWithVisits.map(async (country) => {
-          const cities = await prisma.pageViewEvent.groupBy({
-            by: ["city"],
-            where: {
-              siteId,
-              country: country.country,
-              city: { not: null },
-            },
-            _count: {
-              city: true,
-            },
-            orderBy: {
-              _count: {
-                city: "desc",
+        countriesWithVisits.map(
+          async (country: CountryWithVisits): Promise<CountryWithCities> => {
+            const cities = await prisma.pageViewEvent.groupBy({
+              by: ["city"],
+              where: {
+                siteId,
+                country: country.country,
+                city: { not: null },
               },
-            },
-          });
+              _count: {
+                city: true,
+              },
+              orderBy: {
+                _count: {
+                  city: "desc",
+                },
+              },
+            });
 
-          return {
-            country: country.country || "",
-            countryCode: country.countryCode || "",
-            totalVisits: country._count.country,
-            coordinates:
-              country.lat && country.lon
-                ? ([country.lon, country.lat] as [number, number])
-                : null,
-            cities: cities.map((city) => ({
-              name: city.city || "",
-              visits: city._count.city,
-            })),
-          };
-        }),
+            return {
+              country: country.country || "",
+              countryCode: country.countryCode || "",
+              totalVisits: country._count.country,
+              coordinates:
+                country.lat && country.lon
+                  ? ([country.lon, country.lat] as [number, number])
+                  : null,
+              cities: cities.map((city: CityResult) => ({
+                name: city.city || "",
+                visits: city._count.city,
+              })),
+            };
+          },
+        ),
       );
 
       return countriesWithCities.filter(
@@ -327,62 +341,64 @@ export async function getCountryVisitStats(
 
       // Get detailed stats for each country
       const countriesWithStats = await Promise.all(
-        countriesWithVisits.map(async (country) => {
-          const countryCode = country.countryCode || "";
-          const coordinates = findCountryCoordinates(countryCode);
+        countriesWithVisits.map(
+          async (country: TopCountryResult): Promise<CountryStats> => {
+            const countryCode = country.countryCode || "";
+            const coordinates = findCountryCoordinates(countryCode);
 
-          // Debug logging to see what country codes we're getting
-          if (!coordinates) {
-            throw new Error(
-              `No coordinates found for country code: ${countryCode}, country: ${country.country}`,
-            );
-          }
+            // Debug logging to see what country codes we're getting
+            if (!coordinates) {
+              throw new Error(
+                `No coordinates found for country code: ${countryCode}, country: ${country.country}`,
+              );
+            }
 
-          // Get mobile vs desktop breakdown
-          const mobileVisits = await prisma.pageViewEvent.count({
-            where: {
-              siteId,
-              country: country.country,
-              mobile: true,
-            },
-          });
+            // Get mobile vs desktop breakdown
+            const mobileVisits = await prisma.pageViewEvent.count({
+              where: {
+                siteId,
+                country: country.country,
+                mobile: true,
+              },
+            });
 
-          const desktopVisits = await prisma.pageViewEvent.count({
-            where: {
-              siteId,
-              country: country.country,
-              mobile: false,
-            },
-          });
+            const desktopVisits = await prisma.pageViewEvent.count({
+              where: {
+                siteId,
+                country: country.country,
+                mobile: false,
+              },
+            });
 
-          // Get unique visits by IP
-          const uniqueVisits = await prisma.pageViewEvent.groupBy({
-            by: ["ip"],
-            where: {
-              siteId,
-              country: country.country,
-              ip: { not: null },
-            },
-            _count: {
-              ip: true,
-            },
-          });
+            // Get unique visits by IP
+            const uniqueVisits = await prisma.pageViewEvent.groupBy({
+              by: ["ip"],
+              where: {
+                siteId,
+                country: country.country,
+                ip: { not: null },
+              },
+              _count: {
+                ip: true,
+              },
+            });
 
-          return {
-            country: country.country || "",
-            countryCode,
-            totalVisits: Number(country._count.country) || 0,
-            mobileVisits: Number(mobileVisits) || 0,
-            desktopVisits: Number(desktopVisits) || 0,
-            uniqueVisits: Number(uniqueVisits.length) || 0,
-            coordinates: coordinates
-              ? ([coordinates.longitude, coordinates.latitude] as [
-                  number,
-                  number,
-                ])
-              : null,
-          };
-        }),
+            return {
+              country: country.country || "",
+              countryCode,
+              totalVisits: Number(country._count.country) || 0,
+              mobileVisits: Number(mobileVisits) || 0,
+              desktopVisits: Number(desktopVisits) || 0,
+              uniqueVisits: Number(uniqueVisits.length) || 0,
+              coordinates: coordinates
+                ? ([coordinates.longitude, coordinates.latitude] as [
+                    number,
+                    number,
+                  ])
+                : null,
+            };
+          },
+        ),
       );
 
       // Debug: Log all countries and their coordinate status
@@ -403,7 +419,7 @@ export async function getCountryVisitStats(
 
       console.log(
         "Final result:",
-        result.map((c) => ({
+        result.map((c: CountryStats) => ({
           country: c.country,
           countryCode: c.countryCode,
           hasCoordinates: c.coordinates !== null,
@@ -458,7 +474,7 @@ export async function debugCountryCodes(
 
   console.log(
     "Unique country codes in database:",
-    uniqueCountryCodes.map((c) => ({
+    uniqueCountryCodes.map((c: CountryCodeResult) => ({
       country: c.country,
       countryCode: c.countryCode,
       count: c._count.countryCode,
@@ -584,7 +600,7 @@ export async function getTopPages(params: z.input<typeof getTopPagesSchema>) {
       const topPages = Object.entries(pathCounts)
         .sort((a, b) => b[1] - a[1])
         .slice(0, limit)
-        .map(([path, count]) => ({ path, count }));
+        .map(([path, count]): TopPageData => ({ path, count }));
 
       return topPages;
     },
@@ -669,7 +685,7 @@ export async function getBrowserStats(
 
       // Convert to array format for easier consumption
       const browserData = Object.entries(browserStats)
-        .map(([browser, count]) => ({ browser, count }))
+        .map(([browser, count]): BrowserStats => ({ browser, count }))
         .sort((a, b) => b.count - a.count);
 
       return browserData;

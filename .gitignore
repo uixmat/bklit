@@ -58,3 +58,4 @@ coverage
 # Optional: If you have these at the root and they are user-specific
 # .envrc
 #Brewfile.lock.json 
+.vercel

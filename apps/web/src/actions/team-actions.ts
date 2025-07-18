@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import type { TeamFormState } from "@/types/user";
 
 const createTeamSchema = z.object({
   name: z
@@ -17,12 +18,7 @@ const createTeamSchema = z.object({
     .optional(),
 });
 
-export type TeamFormState = {
-  success: boolean;
-  message: string;
-  errors?: Record<string, string[] | undefined>;
-  newTeamId?: string;
-};
+export type { TeamFormState };
 
 export async function createTeamAction(
   _prevState: TeamFormState,
