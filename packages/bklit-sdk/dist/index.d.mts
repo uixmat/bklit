@@ -1,7 +1,7 @@
 interface BklitOptions {
     siteId: string;
     apiHost?: string;
-    environment?: 'development' | 'production';
+    environment?: "development" | "production";
     debug?: boolean;
 }
 declare function initBklit(options: BklitOptions): void;
@@ -11,7 +11,7 @@ declare global {
         trackPageView?: () => void;
         bklitSiteId?: string;
         bklitApiHost?: string;
-        bklitEnvironment?: 'development' | 'production';
+        bklitEnvironment?: "development" | "production";
         bklitDebug?: boolean;
     }
 }

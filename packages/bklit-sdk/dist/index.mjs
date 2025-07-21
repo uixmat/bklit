@@ -54,12 +54,7 @@ function initBklit(options) {
   if (typeof window === "undefined") {
     return;
   }
-  const {
-    siteId,
-    apiHost,
-    environment,
-    debug
-  } = options;
+  const { siteId, apiHost, environment, debug } = options;
   const defaultConfig = getDefaultConfig(environment);
   const finalConfig = {
     apiHost: apiHost || defaultConfig.apiHost,
@@ -77,7 +72,7 @@ function initBklit(options) {
       apiHost: finalConfig.apiHost,
       environment: finalConfig.environment,
       debug: finalConfig.debug,
-      userAgent: navigator.userAgent.substring(0, 50) + "..."
+      userAgent: `${navigator.userAgent.substring(0, 50)}...`
     });
   }
   window.bklitSiteId = siteId;
@@ -172,7 +167,7 @@ function initBklit(options) {
             siteId
           });
         }
-        const endSessionUrl = finalConfig.apiHost + "/session-end";
+        const endSessionUrl = `${finalConfig.apiHost}/session-end`;
         const response = await fetch(endSessionUrl, {
           method: "POST",
           headers: {

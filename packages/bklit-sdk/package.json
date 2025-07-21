@@ -1,47 +1,23 @@
 {
   "name": "bklit",
-  "version": "0.0.1",
-  "description": "A lightweight analytics SDK for tracking page views, sessions, and user behavior",
-  "author": "Bklit Analytics",
-  "module": "./dist/index.mjs",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
-    }
-  },
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/bklit/bklit"
-  },
-  "bugs": {
-    "url": "https://github.com/bklit/bklit/issues"
-  },
-  "homepage": "https://github.com/bklit/bklit#readme",
-  "private": false,
- 
-  "files": [
-    "dist"
-  ],
+  "version": "0.1.0",
+  "private": true,
+  "main": "src/index.ts",
+  "sideEffects": false,
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --clean",
-    "build:dev": "BKLIT_ENVIRONMENT=development BKLIT_DEBUG=true tsup src/index.ts --format esm,cjs --dts --clean",
-    "build:prod": "BKLIT_ENVIRONMENT=production tsup src/index.ts --format esm,cjs --dts --clean",
-    "dev": "tsup src/index.ts --format esm,cjs --dts --watch"
+    "dev": "tsup src/index.ts --format esm,cjs --dts --watch",
+    "clean": "rm -rf .turbo node_modules dist",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "typecheck": "tsc --noEmit"
   },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {},
   "devDependencies": {
-    "tsup": "^8.0.2"
-  },
-  "keywords": [
-    "analytics",
-    "tracking",
-    "sdk",
-    "page-views",
-    "sessions",
-    "user-behavior"
-  ]
+    "tsup": "^8.0.2",
+    "typescript": "^5.4.5"
+  }
 }
