@@ -1,7 +1,16 @@
 {
   "name": "bklit",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "A lightweight analytics SDK for tracking page views, sessions, and user behavior",
+  "author": "Bklit Analytics",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bklit/bklit"
+  },
+  "bugs": {
+    "url": "https://github.com/bklit/bklit/issues"
+  },
+  "homepage": "https://github.com/bklit/bklit#readme",
   "private": false,
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -11,11 +20,12 @@
   ],
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+    "build:dev": "BKLIT_ENVIRONMENT=development BKLIT_DEBUG=true tsup src/index.ts --format esm,cjs --dts --clean",
+    "build:prod": "BKLIT_ENVIRONMENT=production tsup src/index.ts --format esm,cjs --dts --clean",
     "dev": "tsup src/index.ts --format esm,cjs --dts --watch"
   },
   "devDependencies": {
-    "tsup": "^8.0.2",
-    "typescript": "^5.4.5"
+    "tsup": "^8.0.2"
   },
   "license": "MIT",
   "keywords": [
@@ -25,14 +35,5 @@
     "page-views",
     "sessions",
     "user-behavior"
-  ],
-  "author": "Bklit Analytics",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/your-username/bklit.git"
-  },
-  "bugs": {
-    "url": "https://github.com/your-username/bklit/issues"
-  },
-  "homepage": "https://github.com/your-username/bklit#readme"
+  ]
 }
