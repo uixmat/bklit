@@ -1,11 +1,11 @@
 // packages/bklit-sdk/src/index.ts
 
-import { getDefaultConfig, validateConfig, type BklitConfig } from './config';
+import { type BklitConfig, getDefaultConfig, validateConfig } from "./config";
 
 interface BklitOptions {
   siteId: string;
   apiHost?: string;
-  environment?: 'development' | 'production';
+  environment?: "development" | "production";
   debug?: boolean;
 }
 
@@ -19,12 +19,7 @@ export function initBklit(options: BklitOptions): void {
     return;
   }
 
-  const { 
-    siteId, 
-    apiHost, 
-    environment,
-    debug
-  } = options;
+  const { siteId, apiHost, environment, debug } = options;
 
   // Get default configuration and merge with options
   const defaultConfig = getDefaultConfig(environment);
@@ -48,7 +43,7 @@ export function initBklit(options: BklitOptions): void {
       apiHost: finalConfig.apiHost,
       environment: finalConfig.environment,
       debug: finalConfig.debug,
-      userAgent: navigator.userAgent.substring(0, 50) + "...",
+      userAgent: `${navigator.userAgent.substring(0, 50)}...`,
     });
   }
 
@@ -136,13 +131,13 @@ export function initBklit(options: BklitOptions): void {
         }
       } else {
         console.error(
-          `❌ Bklit SDK: Failed to track page view for site ${siteId}. Status: ${response.statusText}`
+          `❌ Bklit SDK: Failed to track page view for site ${siteId}. Status: ${response.statusText}`,
         );
       }
     } catch (error) {
       console.error(
         `❌ Bklit SDK: Error tracking page view for site ${siteId}:`,
-        error
+        error,
       );
     }
   }
@@ -165,7 +160,7 @@ export function initBklit(options: BklitOptions): void {
           });
         }
 
-        const endSessionUrl = finalConfig.apiHost + "/session-end";
+        const endSessionUrl = `${finalConfig.apiHost}/session-end`;
         const response = await fetch(endSessionUrl, {
           method: "POST",
           headers: {
@@ -254,7 +249,7 @@ function generateSessionId(): string {
 export function trackPageView() {
   if (typeof window === "undefined") {
     console.warn(
-      "❌ Bklit SDK: trackPageView can only be called in browser environment"
+      "❌ Bklit SDK: trackPageView can only be called in browser environment",
     );
     return;
   }
@@ -265,7 +260,7 @@ export function trackPageView() {
   }
 
   const debug = window.bklitDebug || false;
-  
+
   if (debug) {
     console.log("🎯 Bklit SDK: Manual page view tracking triggered");
   }
@@ -279,7 +274,7 @@ export function trackPageView() {
     userAgent: navigator.userAgent,
     sessionId: currentSessionId,
     referrer: document.referrer || undefined,
-    environment: window.bklitEnvironment || 'production',
+    environment: window.bklitEnvironment || "production",
   };
 
   if (debug) {
@@ -291,7 +286,8 @@ export function trackPageView() {
     });
   }
 
-  const apiHost = window.bklitApiHost || getDefaultConfig(window.bklitEnvironment).apiHost;
+  const apiHost =
+    window.bklitApiHost || getDefaultConfig(window.bklitEnvironment).apiHost;
 
   fetch(apiHost, {
     method: "POST",
@@ -328,7 +324,7 @@ declare global {
     trackPageView?: () => void;
     bklitSiteId?: string;
     bklitApiHost?: string;
-    bklitEnvironment?: 'development' | 'production';
+    bklitEnvironment?: "development" | "production";
     bklitDebug?: boolean;
   }
 }

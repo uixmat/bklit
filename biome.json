@@ -15,8 +15,6 @@
       "!.vercel/**",
       "!**/dist/**",
       "!**/node_modules/**",
-      "!**/apps/playground/**",
-      "!**/packages/**",
       "!**/generated/**",
       "!**/.svg",
       "!**/.lock",

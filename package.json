@@ -3,12 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev:web": "dotenv -e ./apps/web/.env tsx server.ts",
+    "dev": "pnpm build:sdk:dev && concurrently \"pnpm dev:web\" \"pnpm dev:playground\" \"pnpm prisma:studio:web\"",
+    "dev:web": "pnpm --filter tracker dev",
     "dev:playground": "VITE_NGROK_URL=$(cat .ngrok-url) pnpm --filter playground dev",
-    "build:web": "pnpm --filter tracker build",
-    "build:playground": "pnpm --filter playground build",
-    "dev:sdk": "pnpm --filter bklit dev",
-    "build:sdk": "pnpm --filter bklit build",
+    "build:sdk:dev": "pnpm --filter bklit build:dev",
     "prisma:generate:web": "prisma generate --schema=./apps/web/prisma/schema.prisma",
     "prisma:migrate:web": "dotenv -e ./apps/web/.env -- prisma migrate dev --schema=./apps/web/prisma/schema.prisma",
     "prisma:studio:web": "prisma studio --schema=./apps/web/prisma/schema.prisma"
@@ -16,6 +14,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.1.2",
     "@types/node": "^20.0.0",
+    "concurrently": "^9.2.0",
     "dotenv-cli": "^7.4.2",
     "next": "15.3.2",
     "prisma": "^6.8.2",

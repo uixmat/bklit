@@ -48,6 +48,7 @@ export default function Home() {
           Try navigating between pages to see the logs in action!
         </p>
         <button
+          type="button"
           onClick={() => {
             if (window.trackPageView) {
               window.trackPageView();

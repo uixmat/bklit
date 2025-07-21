@@ -5,10 +5,13 @@ var ENV_VARS = {
   BKLIT_DEBUG: "BKLIT_DEBUG"
 };
 var DEFAULT_API_HOSTS = {
-  development: "http://localhost:3000/api/track",
-  production: "https://api.yourdomain.com/api/track"
+  development: "http://192.168.1.94:3000/api/track",
+  production: "https://bklit.com/api/track"
 };
 function getEnvVar(key) {
+  if (typeof window !== "undefined") {
+    return void 0;
+  }
   if (typeof process !== "undefined" && process.env) {
     return process.env[key];
   }

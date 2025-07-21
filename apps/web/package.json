@@ -4,7 +4,6 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "dev:track": "cd ../.. && pnpm run dev:web",
     "build": "next build",
     "start": "next start",
     "lint": "npx @biomejs/biome lint && npx tsc --noEmit",

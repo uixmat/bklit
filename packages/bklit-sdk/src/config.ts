@@ -15,17 +15,25 @@ const ENV_VARS = {
 
 // Default API hosts for different environments
 const DEFAULT_API_HOSTS = {
-  development: 'http://localhost:3000/api/track',
-  production: 'https://api.yourdomain.com/api/track',
+  development: 'http://192.168.1.94:3000/api/track',
+  production: 'https://bklit.com/api/track',
 } as const;
 
 /**
- * Get environment variable value
+ * Get environment variable value - Vite and Node.js compatible
  */
 function getEnvVar(key: string): string | undefined {
+  // For browser environments, we'll rely on the options passed to initBklit
+  // rather than trying to access environment variables directly
+  if (typeof window !== 'undefined') {
+    return undefined;
+  }
+  
+  // Only try process.env in Node.js environments
   if (typeof process !== 'undefined' && process.env) {
     return process.env[key];
   }
+  
   return undefined;
 }
 

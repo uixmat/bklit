@@ -5,7 +5,6 @@ import { initBklit } from "bklit";
 import routes from "./routes";
 import "./index.css";
 
-// IMPORTANT: Replace with a real Site ID from your main tracker application dashboard
 const YOUR_SITE_ID = "cmcuk7myh00022k0xgh1kh599";
 
 // Get the ngrok URL from environment variable
@@ -42,7 +41,12 @@ if (YOUR_SITE_ID) {
 
 const router = createBrowserRouter(routes);
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
+const rootElement = document.getElementById("root");
+if (!rootElement) {
+  throw new Error("Root element not found");
+}
+
+ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
     <RouterProvider router={router} />
   </React.StrictMode>
