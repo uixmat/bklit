@@ -1,7 +1,5 @@
 // src/index.ts
-import { io } from "socket.io-client";
 var DEFAULT_API_HOST = "http://localhost:3000/api/track";
-var bklitSocket = null;
 var currentSessionId = null;
 var lastTrackedUrl = null;
 var lastTrackedTime = 0;
@@ -89,59 +87,6 @@ function initBklit(options) {
   }
   console.log("\u{1F3AF} Bklit SDK: Initializing page view tracking...");
   trackPageView2();
-  if (bklitSocket && bklitSocket.connected) {
-    bklitSocket.emit("join_site_room", siteId);
-  } else {
-    let socketURL = DEFAULT_API_HOST.substring(
-      0,
-      DEFAULT_API_HOST.indexOf("/api/track")
-    );
-    if (apiHost !== DEFAULT_API_HOST) {
-      try {
-        const url = new URL(apiHost);
-        socketURL = url.origin;
-      } catch (e) {
-        console.error(
-          "Bklit SDK: Invalid apiHost for deriving socket URL",
-          apiHost,
-          e
-        );
-        return;
-      }
-    }
-    bklitSocket = io(socketURL, {
-      path: "/api/socketio",
-      // Standard path for our Socket.IO server
-      addTrailingSlash: false,
-      transports: ["polling", "websocket"],
-      // Try polling first for ngrok compatibility
-      timeout: 3e4,
-      // Increase timeout for ngrok connections
-      forceNew: true
-      // Force new connection to avoid issues
-      // autoConnect: false, // We will connect manually if needed
-    });
-    bklitSocket.on("connect", () => {
-      console.log("Bklit SDK: Socket connected to server:", bklitSocket?.id);
-      bklitSocket?.emit("join_site_room", siteId);
-    });
-    bklitSocket.on("disconnect", (reason) => {
-      console.log(
-        "Bklit SDK: Socket disconnected from server. Reason:",
-        reason
-      );
-    });
-    bklitSocket.on("connect_error", (error) => {
-      console.log(
-        "Bklit SDK: Socket.IO connection not available (this is normal for ngrok tunnels)"
-      );
-      console.log(
-        "Bklit SDK: Page tracking is still working - only live visitor count is disabled"
-      );
-      bklitSocket?.disconnect();
-      bklitSocket = null;
-    });
-  }
   const handlePageUnload = async () => {
     if (currentSessionId) {
       try {
@@ -178,12 +123,6 @@ function initBklit(options) {
         console.error("\u274C Bklit SDK: Error ending session:", error);
       }
     }
-    if (bklitSocket && bklitSocket.connected) {
-      bklitSocket.emit("leave_site_room", siteId);
-      bklitSocket.disconnect();
-      bklitSocket = null;
-      console.log("Bklit SDK: Socket disconnected on page unload.");
-    }
   };
   window.removeEventListener("beforeunload", handlePageUnload);
   window.addEventListener("beforeunload", handlePageUnload);
@@ -203,11 +142,11 @@ function initBklit(options) {
   window.addEventListener("popstate", handleRouteChange);
   const originalPushState = history.pushState;
   const originalReplaceState = history.replaceState;
-  history.pushState = function(...args) {
+  history.pushState = (...args) => {
     originalPushState.apply(history, args);
     setTimeout(handleRouteChange, 0);
   };
-  history.replaceState = function(...args) {
+  history.replaceState = (...args) => {
     originalReplaceState.apply(history, args);
     setTimeout(handleRouteChange, 0);
   };

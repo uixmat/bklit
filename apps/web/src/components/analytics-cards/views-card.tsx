@@ -1,8 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { io, type Socket } from "socket.io-client";
-import { toast } from "sonner";
+import { useEffect, useState } from "react";
 import {
   getAnalyticsStats,
   getLiveUsers,
@@ -27,12 +25,6 @@ export function ViewsCard({ userId }: { userId: string }) {
     useState<SessionAnalyticsSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [liveUsers, setLiveUsers] = useState(0);
-  const socketRef = useRef<Socket | null>(null);
-  const previousLiveUsersRef = useRef<number>(0);
-
-  useEffect(() => {
-    previousLiveUsersRef.current = liveUsers;
-  }, [liveUsers]);
 
   useEffect(() => {
     if (!currentSiteId) return;
@@ -66,38 +58,6 @@ export function ViewsCard({ userId }: { userId: string }) {
     }, 30000);
 
     return () => clearInterval(interval);
-  }, [currentSiteId, userId]);
-
-  useEffect(() => {
-    if (!currentSiteId) return;
-
-    socketRef.current = io({
-      path: "/api/socketio",
-      addTrailingSlash: false,
-    });
-    const socket = socketRef.current;
-
-    socket.on("connect", () => {
-      socket.emit("join_site_room", currentSiteId);
-    });
-
-    socket.on("new_page_view", () => {
-      // Show notification when new page view is tracked
-      toast.info("A new page view was tracked!");
-
-      // Optionally refresh live users count
-      getLiveUsers({ siteId: currentSiteId, userId }).then(setLiveUsers);
-    });
-
-    socket.on("disconnect", () => {});
-
-    return () => {
-      if (socket) {
-        socket.emit("leave_site_room", currentSiteId);
-        socket.disconnect();
-        socketRef.current = null;
-      }
-    };
   }, [currentSiteId, userId]);
 
   if (loading || !stats || !sessionStats) {

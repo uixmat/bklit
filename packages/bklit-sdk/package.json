@@ -13,14 +13,10 @@
     "build": "tsup src/index.ts --format esm,cjs --dts --clean",
     "dev": "tsup src/index.ts --format esm,cjs --dts --watch"
   },
-  "dependencies": {
-    "socket.io-client": "^4.7.5"
-  },
   "devDependencies": {
     "tsup": "^8.0.2",
     "typescript": "^5.4.5"
   },
-  "peerDependencies": {},
   "license": "MIT",
   "keywords": [
     "analytics",

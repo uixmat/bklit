@@ -2,7 +2,6 @@ import { type NextRequest, NextResponse } from "next/server";
 import { createOrUpdateSession } from "@/actions/session-actions";
 import { prisma } from "@/lib/db";
 import { extractClientIP, getLocationFromIP } from "@/lib/ip-geolocation";
-import { getIoServer } from "@/lib/socketio-server";
 import type { GeoLocation } from "@/types/geo";
 
 interface TrackingPayload {
@@ -64,7 +63,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Note: Redis storage removed - all data is now stored in PostgreSQL
-    // Real-time features are handled via Socket.IO and session tracking
+    // Real-time features are handled via session tracking
 
     // Handle session tracking and page view creation in a transaction
     if (payload.sessionId) {
@@ -210,21 +209,6 @@ export async function POST(request: NextRequest) {
         );
         // Continue execution - session tracking failed but page view tracking should still work
       }
-    }
-
-    // Emit real-time notification via Socket.IO
-    const io = getIoServer();
-    if (io) {
-      io.to(payload.siteId).emit("new_page_view", {
-        url: payload.url,
-        timestamp: payload.timestamp,
-        siteId: payload.siteId,
-      });
-      console.log(
-        `Socket event 'new_page_view' emitted to room: ${payload.siteId}`,
-      );
-    } else {
-      console.warn("Socket.IO server instance not found. Cannot emit event.");
     }
 
     console.log("✅ API: Page view tracking completed successfully", {
