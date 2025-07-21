@@ -52,8 +52,6 @@
     "react-hook-form": "^7.56.4",
     "reactflow": "^11.11.4",
     "recharts": "^3.1.0",
-    "socket.io": "^4.8.1",
-    "socket.io-client": "^4.7.5",
     "sonner": "^1.5.0",
     "tailwind-merge": "^2.4.0",
     "topojson-client": "^3.1.0",
