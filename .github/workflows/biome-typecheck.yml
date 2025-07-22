@@ -1,0 +1,47 @@
+name: Biome & Types
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  biome-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.12.0"
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Set up Biome
+        uses: biomejs/setup-biome@v1
+
+      - name: Run Biome lint
+        run: |
+          echo "::group::Running Biome Lint"
+          npx biome lint .
+          echo "✅ Biome lint passed!"
+          echo "::endgroup::"
+
+      - name: Check apps/web and packages/bklit-sdk
+        run: |
+          echo "::group::Running TypeScript and Biome Checks"
+          pnpm --filter tracker lint
+          pnpm --filter bklit lint
+          pnpm --filter bklit typecheck
+          echo "✅ All checks passed!"
+          echo "::endgroup::"
