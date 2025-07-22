@@ -1,4 +1,4 @@
-name: Lint with Biome and TypeScript
+name: Lint with Biome
 
 on:
   push:
@@ -18,6 +18,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22.12.0"
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
 
       - name: Install dependencies
         run: pnpm install
