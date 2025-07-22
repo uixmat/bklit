@@ -1,4 +1,4 @@
-name: Lint with Biome
+name: Biome & Types
 
 on:
   push:
@@ -37,9 +37,11 @@ jobs:
           echo "✅ Biome lint passed!"
           echo "::endgroup::"
 
-      - name: Type check with TypeScript
+      - name: Check apps/web and packages/bklit-sdk
         run: |
-          echo "::group::Running TypeScript Type Check"
-          npx tsc --noEmit
-          echo "✅ TypeScript type check passed!"
+          echo "::group::Running TypeScript and Biome Checks"
+          pnpm --filter tracker lint
+          pnpm --filter bklit lint
+          pnpm --filter bklit typecheck
+          echo "✅ All checks passed!"
           echo "::endgroup::"
