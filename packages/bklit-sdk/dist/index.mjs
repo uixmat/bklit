@@ -33,7 +33,9 @@ function validateConfig(config) {
     throw new Error(`Invalid API host URL: ${config.apiHost}`);
   }
   if (config.environment && !["development", "production"].includes(config.environment)) {
-    throw new Error(`Invalid environment: ${config.environment}. Must be one of: development, production`);
+    throw new Error(
+      `Invalid environment: ${config.environment}. Must be one of: development, production`
+    );
   }
 }
 function isValidUrl(url) {
