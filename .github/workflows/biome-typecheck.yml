@@ -1,0 +1,40 @@
+name: Lint with Biome and TypeScript
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  biome-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.12.0"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Set up Biome
+        uses: biomejs/setup-biome@v1
+
+      - name: Run Biome lint
+        run: |
+          echo "::group::Running Biome Lint"
+          npx biome lint .
+          echo "✅ Biome lint passed!"
+          echo "::endgroup::"
+
+      - name: Type check with TypeScript
+        run: |
+          echo "::group::Running TypeScript Type Check"
+          npx tsc --noEmit
+          echo "✅ TypeScript type check passed!"
+          echo "::endgroup::"
