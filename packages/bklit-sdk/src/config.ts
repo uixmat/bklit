@@ -2,21 +2,21 @@
 
 export interface BklitConfig {
   apiHost: string;
-  environment: 'development' | 'production';
+  environment: "development" | "production";
   debug: boolean;
 }
 
 // Environment variable names
 const ENV_VARS = {
-  BKLIT_API_HOST: 'BKLIT_API_HOST',
-  BKLIT_ENVIRONMENT: 'BKLIT_ENVIRONMENT',
-  BKLIT_DEBUG: 'BKLIT_DEBUG',
+  BKLIT_API_HOST: "BKLIT_API_HOST",
+  BKLIT_ENVIRONMENT: "BKLIT_ENVIRONMENT",
+  BKLIT_DEBUG: "BKLIT_DEBUG",
 } as const;
 
 // Default API hosts for different environments
 const DEFAULT_API_HOSTS = {
-  development: 'http://192.168.1.94:3000/api/track',
-  production: 'https://bklit.com/api/track',
+  development: "http://192.168.1.94:3000/api/track",
+  production: "https://bklit.com/api/track",
 } as const;
 
 /**
@@ -25,15 +25,15 @@ const DEFAULT_API_HOSTS = {
 function getEnvVar(key: string): string | undefined {
   // For browser environments, we'll rely on the options passed to initBklit
   // rather than trying to access environment variables directly
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     return undefined;
   }
-  
+
   // Only try process.env in Node.js environments
-  if (typeof process !== 'undefined' && process.env) {
+  if (typeof process !== "undefined" && process.env) {
     return process.env[key];
   }
-  
+
   return undefined;
 }
 
@@ -41,18 +41,21 @@ function getEnvVar(key: string): string | undefined {
  * Get default configuration based on environment
  */
 export function getDefaultConfig(environment?: string): BklitConfig {
-  const env = environment || getEnvVar(ENV_VARS.BKLIT_ENVIRONMENT) || 'production';
-  
+  const env =
+    environment || getEnvVar(ENV_VARS.BKLIT_ENVIRONMENT) || "production";
+
   // Get API host from environment variable or use default
-  const apiHost = getEnvVar(ENV_VARS.BKLIT_API_HOST) || DEFAULT_API_HOSTS[env as keyof typeof DEFAULT_API_HOSTS];
-  
+  const apiHost =
+    getEnvVar(ENV_VARS.BKLIT_API_HOST) ||
+    DEFAULT_API_HOSTS[env as keyof typeof DEFAULT_API_HOSTS];
+
   // Determine debug mode
   const debugEnv = getEnvVar(ENV_VARS.BKLIT_DEBUG);
-  const debug = debugEnv ? debugEnv === 'true' : env === 'development';
+  const debug = debugEnv ? debugEnv === "true" : env === "development";
 
   return {
     apiHost,
-    environment: env as 'development' | 'production',
+    environment: env as "development" | "production",
     debug,
   };
 }
@@ -64,9 +67,14 @@ export function validateConfig(config: Partial<BklitConfig>): void {
   if (config.apiHost && !isValidUrl(config.apiHost)) {
     throw new Error(`Invalid API host URL: ${config.apiHost}`);
   }
-  
-  if (config.environment && !['development', 'production'].includes(config.environment)) {
-    throw new Error(`Invalid environment: ${config.environment}. Must be one of: development, production`);
+
+  if (
+    config.environment &&
+    !["development", "production"].includes(config.environment)
+  ) {
+    throw new Error(
+      `Invalid environment: ${config.environment}. Must be one of: development, production`,
+    );
   }
 }
 
@@ -87,4 +95,4 @@ function isValidUrl(url: string): boolean {
  */
 export function getBuildTimeConfig(): BklitConfig {
   return getDefaultConfig();
-} 
+}
