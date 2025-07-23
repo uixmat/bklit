@@ -28,7 +28,8 @@ async function SessionAnalyticsContent({
   siteId,
   teamId,
 }: SessionAnalyticsCardProps) {
-  const sessions = await getRecentSessions(siteId, 5);
+  const sessionsResult = await getRecentSessions(siteId, 5);
+  const sessions = sessionsResult.data;
 
   return (
     <div className="space-y-3">
