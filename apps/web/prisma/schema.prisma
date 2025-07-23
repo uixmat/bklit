@@ -50,8 +50,6 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
-  plan          String    @default("free") // "free" or "pro"
-  polarSubscriptionId String? @unique // Store Polar subscription ID if they are on a paid plan
 
   accounts Account[]
   sessions Session[]
@@ -86,6 +84,9 @@ model Team {
   
   // Sites/projects belonging to this team
   sites Site[]
+
+  // Subscription data
+  subscriptions Subscription[]
 
   @@index([slug])
 }
@@ -129,6 +130,71 @@ model Site {
 
   @@index([userId])
   @@index([teamId])
+}
+
+// New models for subscription management
+model SubscriptionPlan {
+  id          String   @id @default(cuid())
+  polarProductId String @unique // Polar product ID
+  name        String
+  description String?
+  type        String   @default("recurring") // "recurring" or "one_time"
+  priceAmount Int      // Price in cents
+  currency    String   @default("USD")
+  interval    String?  // "month", "year", etc. for recurring plans
+  isActive    Boolean  @default(true)
+  isArchived  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Benefits/features
+  benefits SubscriptionPlanBenefit[]
+  
+  // Subscriptions using this plan
+  subscriptions Subscription[]
+
+  @@index([polarProductId])
+  @@index([isActive])
+}
+
+model SubscriptionPlanBenefit {
+  id        String   @id @default(cuid())
+  planId    String
+  plan      SubscriptionPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  name      String
+  description String?
+  type      String?  // "feature", "limit", etc.
+  value     String?  // e.g., "unlimited", "5", etc.
+  createdAt DateTime @default(now())
+
+  @@index([planId])
+}
+
+model Subscription {
+  id                    String   @id @default(cuid())
+  polarSubscriptionId   String   @unique // Polar subscription ID
+  polarCustomerId       String?  // Polar customer ID
+  status                String   // "active", "canceled", "past_due", etc.
+  currentPeriodStart    DateTime?
+  currentPeriodEnd      DateTime?
+  cancelAtPeriodEnd     Boolean  @default(false)
+  canceledAt            DateTime?
+  endedAt               DateTime?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Plan relationship
+  planId String
+  plan   SubscriptionPlan @relation(fields: [planId], references: [id])
+
+  // Team relationship (subscriptions are always for teams)
+  teamId String
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@index([polarSubscriptionId])
+  @@index([status])
+  @@index([teamId])
+  @@index([planId])
 }
 
 model PageViewEvent {

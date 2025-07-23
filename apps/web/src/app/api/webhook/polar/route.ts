@@ -1,5 +1,6 @@
 import { Webhooks } from "@polar-sh/nextjs";
-import { prisma } from "@/lib/db"; // Your Prisma client
+import { prisma } from "@/lib/db";
+import { syncSubscriptionFromPolar } from "@/lib/polar/subscriptions";
 
 // Define webhook payload types
 interface WebhookPayload {
@@ -49,58 +50,32 @@ export const POST = Webhooks({
       "Webhook: SubscriptionCreatedEvent (RAW PAYLOAD) received",
       payload,
     );
-    // Access actual subscription data via payload.data
     const subscription = payload.data;
-    if (!subscription) {
-      console.warn("onSubscriptionCreated: payload.data is undefined!");
+    if (!subscription?.id) {
+      console.warn("onSubscriptionCreated: subscription ID is undefined!");
       return;
     }
 
-    if (
-      subscription?.id &&
-      subscription.customer?.email &&
-      subscription.status === "active"
-    ) {
-      console.log(
-        "onSubscriptionCreated: Entered main logic block. About to try Prisma operations.",
-      );
-      try {
+    try {
+      // Find team by customer email (assuming customer email matches team owner)
+      if (subscription.customer?.email) {
         const user = await prisma.user.findUnique({
           where: { email: subscription.customer.email },
+          include: {
+            teamMemberships: {
+              where: { role: "owner" },
+              include: { team: true },
+            },
+          },
         });
 
-        if (user) {
-          if (
-            user.plan !== "pro" ||
-            user.polarSubscriptionId !== subscription.id
-          ) {
-            await prisma.user.update({
-              where: { id: user.id },
-              data: {
-                plan: "pro",
-                polarSubscriptionId: subscription.id,
-              },
-            });
-            console.log(
-              `User ${user.email} DB updated from onSubscriptionCreated: plan='pro', polarSubscriptionId='${subscription.id}'.`,
-            );
-          } else {
-            console.log(
-              `User ${user.email} already up-to-date during onSubscriptionCreated.`,
-            );
-          }
-        } else {
-          console.warn(
-            `Webhook (onSubscriptionCreated): User with email ${subscription.customer.email} (from subscription ${subscription.id}) not found.`,
-          );
+        if (user?.teamMemberships?.[0]?.team) {
+          const team = user.teamMemberships[0].team;
+          await syncSubscriptionFromPolar(subscription.id, team.id);
         }
-      } catch (error) {
-        console.error(
-          "Webhook: Error in onSubscriptionCreated:",
-          error,
-          subscription,
-        );
       }
+    } catch (error) {
+      console.error("Webhook: Error in onSubscriptionCreated:", error);
     }
   },
 
@@ -109,119 +84,39 @@ export const POST = Webhooks({
       "Webhook: SubscriptionUpdatedEvent (RAW PAYLOAD) received",
       payload,
     );
-    // Access actual subscription data via payload.data
     const subscription = payload.data;
-    if (!subscription) {
-      console.warn("onSubscriptionUpdated: payload.data is undefined!");
+    if (!subscription?.id) {
+      console.warn("onSubscriptionUpdated: subscription ID is undefined!");
       return;
     }
-
-    // Debugging the guard clause (now on subscription which is payload.data)
-    const subExists = !!subscription;
-    const subIdExists = !!subscription?.id;
-    const customerExists = !!subscription?.customer;
-    const customerEmailExists = !!subscription?.customer?.email;
-
-    console.log("onSubscriptionUpdated - Guard Debug (on payload.data):", {
-      subExists,
-      subIdExists,
-      customerExists,
-      customerEmailExists,
-      rawCustomerObject: subscription
-        ? subscription.customer
-        : "subscription is null",
-      rawCustomerEmail: subscription?.customer
-        ? subscription.customer.email
-        : "customer or subscription is null",
-    });
-
-    if (
-      !subscription || // This check is now on payload.data
-      !subscription.id ||
-      !subscription.customer ||
-      !subscription.customer.email
-    ) {
-      console.warn(
-        "Webhook: SubscriptionUpdated event missing critical data (id, customer, or customer.email) - POST-DEBUGGING",
-        subscription,
-      );
-      return;
-    }
-    console.log(
-      "onSubscriptionUpdated: Guard clause passed. Proceeding to try block.",
-    );
 
     try {
-      let user = await prisma.user.findFirst({
+      // Find team by subscription ID first, then by customer email
+      let team = await prisma.team.findFirst({
         where: { polarSubscriptionId: subscription.id },
       });
 
-      if (!user) {
-        console.log(
-          `Webhook (onSubscriptionUpdated): User not found by polarSubscriptionId ${subscription.id}, trying email ${subscription.customer.email}`,
-        );
-        user = await prisma.user.findUnique({
+      if (!team && subscription.customer?.email) {
+        const user = await prisma.user.findUnique({
           where: { email: subscription.customer.email },
+          include: {
+            teamMemberships: {
+              where: { role: "owner" },
+              include: { team: true },
+            },
+          },
         });
+
+        if (user?.teamMemberships?.[0]?.team) {
+          team = user.teamMemberships[0].team;
+        }
       }
 
-      if (user) {
-        let newPlan = user.plan;
-        let newPolarSubscriptionId = user.polarSubscriptionId;
-
-        if (subscription.status === "active") {
-          newPlan = "pro";
-          newPolarSubscriptionId = subscription.id;
-          console.log(
-            `Webhook: Subscription ${subscription.id} is active for user ${user.email}. Setting plan to pro.`,
-          );
-        } else if (
-          subscription.status &&
-          ["canceled", "ended", "past_due", "unpaid"].includes(
-            subscription.status,
-          )
-        ) {
-          newPlan = "free";
-          // newPolarSubscriptionId = null; // Decide if you want to clear this or keep for history
-          console.log(
-            `Webhook: Subscription ${subscription.id} is ${subscription.status} for user ${user.email}. Setting plan to free.`,
-          );
-        }
-
-        if (
-          newPlan !== user.plan ||
-          newPolarSubscriptionId !== user.polarSubscriptionId
-        ) {
-          await prisma.user.update({
-            where: { id: user.id },
-            data: {
-              plan: newPlan,
-              polarSubscriptionId: newPolarSubscriptionId,
-            },
-          });
-          console.log(
-            `User ${
-              user.email
-            } DB updated from onSubscriptionUpdated: plan='${newPlan}', polarSubscriptionId='${
-              newPolarSubscriptionId || "cleared"
-            }'.`,
-          );
-        } else {
-          console.log(
-            `User ${user.email} plan and subscriptionId already up-to-date (onSubscriptionUpdated).`,
-          );
-        }
-      } else {
-        console.warn(
-          `Webhook (onSubscriptionUpdated): User with email ${subscription.customer.email} (from subscription ${subscription.id}) not found.`,
-        );
+      if (team) {
+        await syncSubscriptionFromPolar(subscription.id, team.id);
       }
     } catch (error) {
-      console.error(
-        "Webhook: Error in onSubscriptionUpdated:",
-        error,
-        subscription,
-      );
+      console.error("Webhook: Error in onSubscriptionUpdated:", error);
     }
   },
 

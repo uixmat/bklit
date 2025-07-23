@@ -14,12 +14,12 @@ export interface PlanDetails {
 
 export const PLAN_DETAILS: Record<PlanType, PlanDetails> = {
   [PlanType.FREE]: {
-    name: "Free",
+    name: "Free Team",
     projectLimit: 1,
     teamMemberLimit: 1,
   },
   [PlanType.PRO]: {
-    name: "Pro",
+    name: "Pro Team",
     projectLimit: 5,
     teamMemberLimit: 5,
   },

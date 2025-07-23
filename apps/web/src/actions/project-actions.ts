@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 // import { z } from 'zod'; // Unused, schema is imported directly
 import { prisma } from "@/lib/db";
-import { getPlanDetails, PlanType } from "@/lib/plans"; // Import plan helpers
+
 import { addProjectSchema } from "@/lib/schemas/project-schema";
 import type { ProjectFormState } from "@/types/user";
 
@@ -47,23 +47,8 @@ export async function createProjectAction(
     };
   }
 
-  // Use session.user.plan as it's updated via JWT callback and more likely to be fresh after plan changes
-  const currentPlanId = session.user.plan || PlanType.FREE;
-  const planDetails = getPlanDetails(currentPlanId);
-  const projectCount = dbUser._count.sites;
-
-  if (projectCount >= planDetails.projectLimit) {
-    let message = `Your current ${planDetails.name} plan allows up to ${planDetails.projectLimit} project(s).`;
-    if (currentPlanId === PlanType.FREE) {
-      message += " Please upgrade to the Pro plan to create more projects.";
-    } else {
-      message += " You have reached the maximum limit for your plan."; // Generic for Pro or other future plans
-    }
-    return {
-      success: false,
-      message: message,
-    };
-  }
+  // For now, allow unlimited projects per user (team-based limits will be enforced elsewhere)
+  const _projectCount = dbUser._count.sites;
 
   try {
     const newSite = await prisma.site.create({

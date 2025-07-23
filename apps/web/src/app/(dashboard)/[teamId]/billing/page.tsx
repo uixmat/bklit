@@ -4,11 +4,12 @@ import { getServerSession } from "next-auth/next";
 import { BillingSuccessDialog } from "@/components/dialogs/billing-success-dialog";
 import { PageHeader } from "@/components/page-header";
 import { ProductCard } from "@/components/polar/product-card";
+import { TeamSubscriptionStatus } from "@/components/polar/subscription-status";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { getPublishedPolarProducts } from "@/lib/polar";
+import { getLocalSubscriptionPlans } from "@/lib/polar/products";
 
 async function getTeamPlan(teamId: string) {
   const team = await prisma.team.findUnique({
@@ -46,7 +47,7 @@ export default async function BillingPage({
   }
 
   const team = await getTeamPlan(teamId);
-  const products = await getPublishedPolarProducts();
+  const products = await getLocalSubscriptionPlans();
   const showSuccessMessage = resolvedSearchParams?.purchase === "success";
 
   return (
@@ -56,6 +57,8 @@ export default async function BillingPage({
         description={`Manage subscription and billing information for ${team.name}.`}
       />
       <BillingSuccessDialog isOpenInitially={showSuccessMessage} />
+
+      <TeamSubscriptionStatus teamId={teamId} />
 
       <Card className="card">
         <CardHeader>
@@ -82,7 +85,7 @@ export default async function BillingPage({
                 Upgrade to access more features and support our development.
               </p>
               <div className="text-sm text-muted-foreground space-y-1">
-                <p>• Limited to 3 projects per team</p>
+                <p>• Limited to 1 project per team</p>
                 <p>• Basic analytics and insights</p>
                 <p>• Community support</p>
               </div>
@@ -91,10 +94,10 @@ export default async function BillingPage({
           {team.plan === "pro" && (
             <div>
               <p className="text-muted-foreground mb-3">
-                Thank you for being a Pro member!
+                Thank you for being a Pro Team member!
               </p>
               <div className="text-sm text-muted-foreground space-y-1">
-                <p>• Unlimited projects per team</p>
+                <p>• Up to 5 projects per team</p>
                 <p>• Advanced analytics and insights</p>
                 <p>• Priority support</p>
                 <p>• Custom domains</p>
