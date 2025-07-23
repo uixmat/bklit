@@ -78,7 +78,7 @@ export function PolarPricingTable({
 			return (
 				<Button asChild className="w-full">
 					<Link
-						href={`/checkout?product=${plan.polarProductId}&team=${currentTeamId}`}
+						href={`/checkout?products=${plan.polarProductId}&team=${currentTeamId}`}
 					>
 						Upgrade to Pro
 					</Link>
