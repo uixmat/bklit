@@ -147,9 +147,7 @@ exports.Prisma.UserScalarFieldEnum = {
   name: 'name',
   email: 'email',
   emailVerified: 'emailVerified',
-  image: 'image',
-  plan: 'plan',
-  polarSubscriptionId: 'polarSubscriptionId'
+  image: 'image'
 };
 
 exports.Prisma.VerificationTokenScalarFieldEnum = {
@@ -184,6 +182,47 @@ exports.Prisma.SiteScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   userId: 'userId',
+  teamId: 'teamId'
+};
+
+exports.Prisma.SubscriptionPlanScalarFieldEnum = {
+  id: 'id',
+  polarProductId: 'polarProductId',
+  name: 'name',
+  description: 'description',
+  type: 'type',
+  priceAmount: 'priceAmount',
+  currency: 'currency',
+  interval: 'interval',
+  isActive: 'isActive',
+  isArchived: 'isArchived',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SubscriptionPlanBenefitScalarFieldEnum = {
+  id: 'id',
+  planId: 'planId',
+  name: 'name',
+  description: 'description',
+  type: 'type',
+  value: 'value',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.SubscriptionScalarFieldEnum = {
+  id: 'id',
+  polarSubscriptionId: 'polarSubscriptionId',
+  polarCustomerId: 'polarCustomerId',
+  status: 'status',
+  currentPeriodStart: 'currentPeriodStart',
+  currentPeriodEnd: 'currentPeriodEnd',
+  cancelAtPeriodEnd: 'cancelAtPeriodEnd',
+  canceledAt: 'canceledAt',
+  endedAt: 'endedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  planId: 'planId',
   teamId: 'teamId'
 };
 
@@ -279,6 +318,9 @@ exports.Prisma.ModelName = {
   Team: 'Team',
   TeamMember: 'TeamMember',
   Site: 'Site',
+  SubscriptionPlan: 'SubscriptionPlan',
+  SubscriptionPlanBenefit: 'SubscriptionPlanBenefit',
+  Subscription: 'Subscription',
   PageViewEvent: 'PageViewEvent',
   EventDefinition: 'EventDefinition',
   TrackedEvent: 'TrackedEvent',

@@ -30,7 +30,6 @@ export const authOptions: AuthOptions = {
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.sub as string;
-        session.user.plan = token.plan as string; // Assign plan from token to session
       }
       return session;
     },
@@ -39,21 +38,6 @@ export const authOptions: AuthOptions = {
       if (user) {
         // user object is available on sign-in or when JWT is first created
         token.sub = user.id;
-        // Fetch the user from DB to get the plan, as `user` object here might not have it yet
-        // or it might be stale if plan changes during session.
-        // However, for initial sign-up, user.plan from Prisma adapter should have the default.
-        // For subsequent JWT creations, we might need to re-fetch if plan can change and needs to be JWT-fresh.
-        // For now, let's assume user.plan is on the user object if available (e.g. from adapter on signup)
-        if (user.plan) {
-          token.plan = user.plan;
-        } else {
-          // If user.plan is not on the user object from the adapter (e.g. for existing users before plan field)
-          // or if we want to ensure it's always fresh, fetch it.
-          const dbUser = await prisma.user.findUnique({
-            where: { id: user.id },
-          });
-          token.plan = dbUser?.plan;
-        }
       }
       return token;
     },

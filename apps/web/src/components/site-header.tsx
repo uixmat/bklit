@@ -31,7 +31,6 @@ export function SiteHeader() {
                 name: clientSession.user.name || "",
                 email: clientSession.user.email || "",
                 avatar: clientSession.user.image || "",
-                plan: clientSession.user.plan,
                 id: clientSession.user.id,
               }}
             />

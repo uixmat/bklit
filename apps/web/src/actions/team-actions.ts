@@ -45,6 +45,24 @@ export async function createTeamAction(
   }
 
   try {
+    // Ensure user exists in database (in case they were deleted during reset)
+    let user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+    });
+
+    if (!user) {
+      // Create user if they don't exist
+      user = await prisma.user.create({
+        data: {
+          id: session.user.id,
+          name: session.user.name,
+          email: session.user.email,
+          image: session.user.image,
+        },
+      });
+      console.log("Created missing user:", user.id);
+    }
+
     // Generate a URL-friendly slug from the team name
     const slug = validatedFields.data.name
       .toLowerCase()

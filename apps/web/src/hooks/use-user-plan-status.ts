@@ -47,7 +47,9 @@ export function useUserPlanStatus(): UserPlanStatus {
     refetchOnMount: "always",
   });
 
-  const currentPlanId = (session?.user?.plan as PlanType) || PlanType.FREE;
+  // For now, default to free plan since this hook seems to be for user-level plan checking
+  // In the future, this might need to be updated to work with team-based plans
+  const currentPlanId = PlanType.FREE;
   const currentPlanDetails = getPlanDetails(currentPlanId);
 
   const finalProjectCount = projectCountData ?? 0;
