@@ -1,22 +1,20 @@
-import { Users } from "lucide-react";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth/next";
 import { BillingSuccessDialog } from "@/components/dialogs/billing-success-dialog";
 import { PageHeader } from "@/components/page-header";
-import { ProductCard } from "@/components/polar/product-card";
-import { TeamSubscriptionStatus } from "@/components/polar/subscription-status";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+import { PolarPricingTable } from "@/components/polar-pricing-table";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { getLocalSubscriptionPlans } from "@/lib/polar/products";
 
 async function getTeamPlan(teamId: string) {
   const team = await prisma.team.findUnique({
     where: { id: teamId },
-    select: { plan: true, name: true },
+    select: { plan: true, name: true, polarSubscriptionId: true },
   });
-  return team || { plan: "free", name: "Unknown Team" };
+  return (
+    team || { plan: "free", name: "Unknown Team", polarSubscriptionId: null }
+  );
 }
 
 export default async function BillingPage({
@@ -47,7 +45,6 @@ export default async function BillingPage({
   }
 
   const team = await getTeamPlan(teamId);
-  const products = await getLocalSubscriptionPlans();
   const showSuccessMessage = resolvedSearchParams?.purchase === "success";
 
   return (
@@ -58,69 +55,18 @@ export default async function BillingPage({
       />
       <BillingSuccessDialog isOpenInitially={showSuccessMessage} />
 
-      <TeamSubscriptionStatus teamId={teamId} />
-
-      <Card className="card">
-        <CardHeader>
-          <CardTitle>Current Plan</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="mb-4">
-            <p className="text-sm text-muted-foreground mb-2">Team</p>
-            <div className="flex items-center gap-2">
-              <Users className="size-4 text-muted-foreground" />
-              <p className="text-lg font-semibold">{team.name}</p>
-              <Badge variant="outline" className="ml-2">
-                {team.plan} Plan
-              </Badge>
-            </div>
-          </div>
-          <p className="text-lg">
-            This team is currently on the{" "}
-            <span className="font-semibold capitalize">{team.plan}</span> plan.
-          </p>
-          {team.plan === "free" && (
-            <div>
-              <p className="text-muted-foreground mb-3">
-                Upgrade to access more features and support our development.
-              </p>
-              <div className="text-sm text-muted-foreground space-y-1">
-                <p>• Limited to 1 project per team</p>
-                <p>• Basic analytics and insights</p>
-                <p>• Community support</p>
-              </div>
-            </div>
-          )}
-          {team.plan === "pro" && (
-            <div>
-              <p className="text-muted-foreground mb-3">
-                Thank you for being a Pro Team member!
-              </p>
-              <div className="text-sm text-muted-foreground space-y-1">
-                <p>• Up to 5 projects per team</p>
-                <p>• Advanced analytics and insights</p>
-                <p>• Priority support</p>
-                <p>• Custom domains</p>
-              </div>
-              {/* TODO: Add link to Polar customer portal if available/integrated */}
-              {/* <Button variant="outline">Manage Subscription</Button> */}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {products.length > 0 && (
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl text-center mb-6">
-            Available Plans
-          </h2>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+      <div className="mt-12">
+        <div className="flex items-center justify-between mb-6">
+          <h2>Available Plans</h2>
         </div>
-      )}
+        <div className="flex justify-center">
+          <PolarPricingTable
+            currentTeamId={teamId}
+            currentPlanId={team.plan}
+            showCurrentPlan={true}
+          />
+        </div>
+      </div>
     </div>
   );
 }

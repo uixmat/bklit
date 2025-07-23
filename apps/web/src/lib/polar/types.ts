@@ -6,8 +6,9 @@ export interface PolarBenefit {
 
 export interface PolarPrice {
   type: "recurring" | "one_time";
-  price_amount?: number;
-  recurring_interval?: string;
+  priceAmount?: number; // Changed from price_amount to match actual API
+  priceCurrency?: string; // Added to match actual API
+  recurringInterval?: string; // Changed from recurring_interval to match actual API
 }
 
 export interface PolarProduct {

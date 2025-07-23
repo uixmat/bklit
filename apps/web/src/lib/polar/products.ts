@@ -51,7 +51,7 @@ export async function syncPolarProductsToDatabase(): Promise<void> {
       if (!product.id) continue;
 
       const firstPrice = product.prices?.[0];
-      if (!firstPrice || !firstPrice.price_amount) continue;
+      if (!firstPrice || !firstPrice.priceAmount) continue;
 
       // Create or update subscription plan
       await prisma.subscriptionPlan.upsert({
@@ -60,8 +60,8 @@ export async function syncPolarProductsToDatabase(): Promise<void> {
           name: product.name || "Unknown Product",
           description: product.description,
           type: firstPrice.type,
-          priceAmount: firstPrice.price_amount,
-          interval: firstPrice.recurring_interval,
+          priceAmount: firstPrice.priceAmount,
+          interval: firstPrice.recurringInterval,
           isActive: !product.type?.includes("archived"),
           updatedAt: new Date(),
         },
@@ -70,8 +70,8 @@ export async function syncPolarProductsToDatabase(): Promise<void> {
           name: product.name || "Unknown Product",
           description: product.description,
           type: firstPrice.type,
-          priceAmount: firstPrice.price_amount,
-          interval: firstPrice.recurring_interval,
+          priceAmount: firstPrice.priceAmount,
+          interval: firstPrice.recurringInterval,
           isActive: !product.type?.includes("archived"),
         },
       });
@@ -147,4 +147,4 @@ export async function getLocalSubscriptionPlans(): Promise<
 
 // Environment variable for specific product IDs
 export const POLAR_PRO_PRODUCT_ID =
-  process.env.NEXT_PUBLIC_POLAR_PRO_PRODUCT_ID;
+  process.env.NEXT_PUBLIC_POLAR_PRO_PLAN_PRODUCT_ID;
