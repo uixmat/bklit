@@ -2,14 +2,18 @@
 
 import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth/next";
+import { z } from "zod";
 import { authOptions } from "@/lib/auth";
-// import { z } from 'zod'; // Unused, schema is imported directly
 import { prisma } from "@/lib/db";
-import { getPlanDetails, PlanType } from "@/lib/plans"; // Import plan helpers
+import { getPlanDetails, PlanType } from "@/lib/plans";
 import { addProjectSchema } from "@/lib/schemas/project-schema";
 import type { ProjectFormState } from "@/types/user";
 
 export type FormState = ProjectFormState;
+
+// ============================================================================
+// CREATE PROJECT ACTION
+// ============================================================================
 
 export async function createProjectAction(
   _prevState: FormState,
@@ -57,7 +61,7 @@ export async function createProjectAction(
     if (currentPlanId === PlanType.FREE) {
       message += " Please upgrade to the Pro plan to create more projects.";
     } else {
-      message += " You have reached the maximum limit for your plan."; // Generic for Pro or other future plans
+      message += " You have reached the maximum limit for your plan.";
     }
     return {
       success: false,
@@ -74,8 +78,7 @@ export async function createProjectAction(
       },
     });
 
-    revalidatePath("/"); // Revalidates all pages, good for dynamic content
-    // Consider more specific revalidation if needed, e.g., revalidatePath(`/${newSite.id}`)
+    revalidatePath("/");
     return {
       success: true,
       message: "Project created successfully!",
@@ -90,7 +93,10 @@ export async function createProjectAction(
   }
 }
 
-// New action to delete a project
+// ============================================================================
+// DELETE PROJECT ACTION
+// ============================================================================
+
 export async function deleteProjectAction(
   _prevState: FormState,
   formData: FormData,
@@ -143,20 +149,290 @@ export async function deleteProjectAction(
       },
     });
 
-    revalidatePath("/"); // Revalidate paths after deletion
-    // Consider revalidating specific paths if more targeted revalidation is beneficial
-    // e.g., revalidatePath('/dashboard') or a user-specific projects list page.
+    revalidatePath("/");
 
     return {
       success: true,
-      message: `Project \"${project.name}\" deleted successfully.`,
-      // newSiteId is not relevant here, but FormState includes it as optional
+      message: `Project "${project.name}" deleted successfully.`,
     };
   } catch (error) {
     console.error("Error deleting project:", error);
     return {
       success: false,
       message: "Failed to delete project. Please try again.",
+    };
+  }
+}
+
+// ============================================================================
+// GET USER PROJECTS WITH PAGINATION
+// ============================================================================
+
+const getUserProjectsSchema = z.object({
+  userId: z.string(),
+  limit: z.number().min(1).max(100).default(20),
+  offset: z.number().min(0).default(0),
+  cursor: z.string().optional(),
+});
+
+export async function getUserProjects(
+  params: z.infer<typeof getUserProjectsSchema>,
+) {
+  const validation = getUserProjectsSchema.safeParse(params);
+
+  if (!validation.success) {
+    throw new Error(validation.error.message);
+  }
+
+  const { userId, limit, offset, cursor } = validation.data;
+
+  try {
+    // Cursor-based pagination for better performance
+    const whereClause = cursor
+      ? {
+          userId,
+          createdAt: { lt: new Date(cursor) },
+        }
+      : { userId };
+
+    const [projects, totalCount] = await Promise.all([
+      prisma.site.findMany({
+        where: whereClause,
+        include: {
+          _count: {
+            select: {
+              pageViewEvents: true,
+              trackedEvents: true,
+              trackedSessions: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: limit,
+      }),
+      prisma.site.count({
+        where: { userId },
+      }),
+    ]);
+
+    return {
+      data: projects,
+      pagination: {
+        total: totalCount,
+        limit,
+        offset,
+        hasMore: projects.length === limit,
+        nextCursor:
+          projects.length > 0
+            ? projects[projects.length - 1].createdAt.toISOString()
+            : null,
+      },
+    };
+  } catch (error) {
+    console.error("Error getting user projects:", error);
+    throw error;
+  }
+}
+
+// ============================================================================
+// GET TEAM PROJECTS WITH PAGINATION
+// ============================================================================
+
+const getTeamProjectsSchema = z.object({
+  teamId: z.string(),
+  limit: z.number().min(1).max(100).default(20),
+  offset: z.number().min(0).default(0),
+  cursor: z.string().optional(),
+});
+
+export async function getTeamProjects(
+  params: z.infer<typeof getTeamProjectsSchema>,
+) {
+  const validation = getTeamProjectsSchema.safeParse(params);
+
+  if (!validation.success) {
+    throw new Error(validation.error.message);
+  }
+
+  const { teamId, limit, offset, cursor } = validation.data;
+
+  try {
+    // Cursor-based pagination for better performance
+    const whereClause = cursor
+      ? {
+          teamId,
+          createdAt: { lt: new Date(cursor) },
+        }
+      : { teamId };
+
+    const [projects, totalCount] = await Promise.all([
+      prisma.site.findMany({
+        where: whereClause,
+        include: {
+          _count: {
+            select: {
+              pageViewEvents: true,
+              trackedEvents: true,
+              trackedSessions: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: limit,
+      }),
+      prisma.site.count({
+        where: { teamId },
+      }),
+    ]);
+
+    return {
+      data: projects,
+      pagination: {
+        total: totalCount,
+        limit,
+        offset,
+        hasMore: projects.length === limit,
+        nextCursor:
+          projects.length > 0
+            ? projects[projects.length - 1].createdAt.toISOString()
+            : null,
+      },
+    };
+  } catch (error) {
+    console.error("Error getting team projects:", error);
+    throw error;
+  }
+}
+
+// ============================================================================
+// GET PROJECT STATISTICS WITH AGGREGATION
+// ============================================================================
+
+export async function getProjectStatistics(siteId: string) {
+  try {
+    const [pageViewStats, eventStats, sessionStats, projectInfo] =
+      await Promise.all([
+        // Get page view statistics
+        prisma.pageViewEvent.aggregate({
+          where: { siteId },
+          _count: { id: true },
+        }),
+        // Get event statistics
+        prisma.trackedEvent.aggregate({
+          where: { siteId },
+          _count: { id: true },
+        }),
+        // Get session statistics
+        prisma.trackedSession.aggregate({
+          where: { siteId },
+          _count: { id: true },
+          _avg: { duration: true },
+        }),
+        // Get project information
+        prisma.site.findUnique({
+          where: { id: siteId },
+          select: {
+            id: true,
+            name: true,
+            domain: true,
+            createdAt: true,
+            updatedAt: true,
+            userId: true,
+            teamId: true,
+          },
+        }),
+      ]);
+
+    return {
+      project: projectInfo,
+      pageViewStats,
+      eventStats,
+      sessionStats,
+    };
+  } catch (error) {
+    console.error("Error getting project statistics:", error);
+    throw error;
+  }
+}
+
+// ============================================================================
+// UPDATE PROJECT ACTION
+// ============================================================================
+
+const updateProjectSchema = z.object({
+  siteId: z.string(),
+  name: z.string().min(1).max(100),
+  domain: z.string().url().optional().or(z.literal("")),
+});
+
+export async function updateProjectAction(
+  _prevState: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user || !session.user.id) {
+    return {
+      success: false,
+      message: "User not authenticated.",
+    };
+  }
+
+  const rawFormData = Object.fromEntries(formData.entries());
+  const validatedFields = updateProjectSchema.safeParse(rawFormData);
+
+  if (!validatedFields.success) {
+    return {
+      success: false,
+      message: "Validation failed.",
+      errors: validatedFields.error.flatten().fieldErrors,
+    };
+  }
+
+  try {
+    const { siteId, name, domain } = validatedFields.data;
+
+    // Check if user owns the project
+    const project = await prisma.site.findUnique({
+      where: {
+        id: siteId,
+        userId: session.user.id,
+      },
+    });
+
+    if (!project) {
+      return {
+        success: false,
+        message:
+          "Project not found or you do not have permission to update it.",
+      };
+    }
+
+    // Update the project
+    await prisma.site.update({
+      where: { id: siteId },
+      data: {
+        name,
+        domain: domain || null,
+        updatedAt: new Date(),
+      },
+    });
+
+    revalidatePath("/");
+
+    return {
+      success: true,
+      message: "Project updated successfully!",
+    };
+  } catch (error) {
+    console.error("Error updating project:", error);
+    return {
+      success: false,
+      message: "Failed to update project. Please try again.",
     };
   }
 }

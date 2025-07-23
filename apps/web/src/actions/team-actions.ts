@@ -7,6 +7,12 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import type { TeamFormState } from "@/types/user";
 
+export type { TeamFormState };
+
+// ============================================================================
+// CREATE TEAM ACTION
+// ============================================================================
+
 const createTeamSchema = z.object({
   name: z
     .string()
@@ -17,8 +23,6 @@ const createTeamSchema = z.object({
     .max(200, { message: "Description must be 200 characters or less." })
     .optional(),
 });
-
-export type { TeamFormState };
 
 export async function createTeamAction(
   _prevState: TeamFormState,
@@ -100,7 +104,10 @@ export async function createTeamAction(
   }
 }
 
-// Action to delete a team
+// ============================================================================
+// DELETE TEAM ACTION
+// ============================================================================
+
 export async function deleteTeamAction(
   _prevState: TeamFormState,
   formData: FormData,
@@ -170,5 +177,201 @@ export async function deleteTeamAction(
       success: false,
       message: "Failed to delete team. Please try again.",
     };
+  }
+}
+
+// ============================================================================
+// GET USER TEAMS WITH PAGINATION
+// ============================================================================
+
+const getUserTeamsSchema = z.object({
+  userId: z.string(),
+  limit: z.number().min(1).max(100).default(20),
+  offset: z.number().min(0).default(0),
+  cursor: z.string().optional(),
+});
+
+export async function getUserTeams(params: z.infer<typeof getUserTeamsSchema>) {
+  const validation = getUserTeamsSchema.safeParse(params);
+
+  if (!validation.success) {
+    throw new Error(validation.error.message);
+  }
+
+  const { userId, limit, offset, cursor } = validation.data;
+
+  try {
+    // Cursor-based pagination for better performance
+    const whereClause = cursor
+      ? {
+          userId,
+          team: {
+            createdAt: { lt: new Date(cursor) },
+          },
+        }
+      : { userId };
+
+    const [teamMemberships, totalCount] = await Promise.all([
+      prisma.teamMember.findMany({
+        where: whereClause,
+        include: {
+          team: {
+            include: {
+              _count: {
+                select: {
+                  members: true,
+                  sites: true,
+                },
+              },
+            },
+          },
+        },
+        orderBy: {
+          team: {
+            createdAt: "desc",
+          },
+        },
+        take: limit,
+      }),
+      prisma.teamMember.count({
+        where: { userId },
+      }),
+    ]);
+
+    return {
+      data: teamMemberships,
+      pagination: {
+        total: totalCount,
+        limit,
+        offset,
+        hasMore: teamMemberships.length === limit,
+        nextCursor:
+          teamMemberships.length > 0
+            ? teamMemberships[
+                teamMemberships.length - 1
+              ].team.createdAt.toISOString()
+            : null,
+      },
+    };
+  } catch (error) {
+    console.error("Error getting user teams:", error);
+    throw error;
+  }
+}
+
+// ============================================================================
+// GET TEAM MEMBERS WITH PAGINATION
+// ============================================================================
+
+const getTeamMembersSchema = z.object({
+  teamId: z.string(),
+  limit: z.number().min(1).max(100).default(20),
+  offset: z.number().min(0).default(0),
+  cursor: z.string().optional(),
+});
+
+export async function getTeamMembers(
+  params: z.infer<typeof getTeamMembersSchema>,
+) {
+  const validation = getTeamMembersSchema.safeParse(params);
+
+  if (!validation.success) {
+    throw new Error(validation.error.message);
+  }
+
+  const { teamId, limit, offset, cursor } = validation.data;
+
+  try {
+    // Cursor-based pagination for better performance
+    const whereClause = cursor
+      ? {
+          teamId,
+          joinedAt: { lt: new Date(cursor) },
+        }
+      : { teamId };
+
+    const [members, totalCount] = await Promise.all([
+      prisma.teamMember.findMany({
+        where: whereClause,
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              image: true,
+            },
+          },
+        },
+        orderBy: {
+          joinedAt: "desc",
+        },
+        take: limit,
+      }),
+      prisma.teamMember.count({
+        where: { teamId },
+      }),
+    ]);
+
+    return {
+      data: members,
+      pagination: {
+        total: totalCount,
+        limit,
+        offset,
+        hasMore: members.length === limit,
+        nextCursor:
+          members.length > 0
+            ? members[members.length - 1].joinedAt.toISOString()
+            : null,
+      },
+    };
+  } catch (error) {
+    console.error("Error getting team members:", error);
+    throw error;
+  }
+}
+
+// ============================================================================
+// GET TEAM STATISTICS WITH AGGREGATION
+// ============================================================================
+
+export async function getTeamStatistics(teamId: string) {
+  try {
+    const [memberStats, siteStats, teamInfo] = await Promise.all([
+      // Get member statistics
+      prisma.teamMember.groupBy({
+        by: ["role"],
+        where: { teamId },
+        _count: { id: true },
+      }),
+      // Get site statistics
+      prisma.site.aggregate({
+        where: { teamId },
+        _count: { id: true },
+      }),
+      // Get team information
+      prisma.team.findUnique({
+        where: { id: teamId },
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          description: true,
+          plan: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      }),
+    ]);
+
+    return {
+      team: teamInfo,
+      memberStats,
+      siteStats,
+    };
+  } catch (error) {
+    console.error("Error getting team statistics:", error);
+    throw error;
   }
 }

@@ -1,3 +1,5 @@
+"use server";
+
 import { prisma } from "@/lib/db";
 import type { SessionData } from "@/types/geo";
 
@@ -91,45 +93,65 @@ export async function endSession(sessionId: string) {
   }
 }
 
-// Get session analytics for a site
+// Get session analytics for a site with aggregation
 export async function getSessionAnalytics(siteId: string, days: number = 30) {
   try {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
-    const sessions = await prisma.trackedSession.findMany({
-      where: {
-        siteId,
-        startedAt: {
-          gte: startDate,
+    // Use aggregation for better performance
+    const [sessionStats, recentSessions] = await Promise.all([
+      // Get aggregated session statistics
+      prisma.trackedSession.groupBy({
+        by: ["didBounce"],
+        where: {
+          siteId,
+          startedAt: { gte: startDate },
         },
-      },
-      include: {
-        pageViewEvents: {
-          orderBy: { timestamp: "asc" },
+        _count: { id: true },
+        _avg: { duration: true },
+      }),
+      // Get recent sessions with pagination
+      prisma.trackedSession.findMany({
+        where: {
+          siteId,
+          startedAt: { gte: startDate },
         },
-      },
-      orderBy: {
-        startedAt: "desc",
-      },
-    });
+        include: {
+          pageViewEvents: {
+            orderBy: { timestamp: "asc" },
+          },
+        },
+        orderBy: {
+          startedAt: "desc",
+        },
+        take: 10, // Limit to 10 sessions
+      }),
+    ]);
 
-    const totalSessions = sessions.length;
-    const bouncedSessions = sessions.filter((s) => s.didBounce).length;
+    // Calculate statistics from aggregated data
+    const totalSessions = sessionStats.reduce(
+      (sum, stat) => sum + stat._count.id,
+      0,
+    );
+    const bouncedSessions =
+      sessionStats.find((stat) => stat.didBounce)?._count.id || 0;
     const bounceRate =
       totalSessions > 0 ? (bouncedSessions / totalSessions) * 100 : 0;
 
+    // Calculate average session duration
     const avgSessionDuration =
-      sessions.length > 0
-        ? sessions.reduce((sum, s) => sum + (s.duration || 0), 0) /
-          sessions.length
-        : 0;
+      sessionStats.reduce((sum, stat) => {
+        return sum + (stat._avg.duration || 0) * stat._count.id;
+      }, 0) / totalSessions || 0;
 
+    // Calculate average page views per session
+    const totalPageViews = recentSessions.reduce(
+      (sum, session) => sum + session.pageViewEvents.length,
+      0,
+    );
     const avgPageViews =
-      sessions.length > 0
-        ? sessions.reduce((sum, s) => sum + s.pageViewEvents.length, 0) /
-          sessions.length
-        : 0;
+      recentSessions.length > 0 ? totalPageViews / recentSessions.length : 0;
 
     return {
       totalSessions,
@@ -137,7 +159,7 @@ export async function getSessionAnalytics(siteId: string, days: number = 30) {
       bounceRate: Math.round(bounceRate * 100) / 100,
       avgSessionDuration: Math.round(avgSessionDuration),
       avgPageViews: Math.round(avgPageViews * 100) / 100,
-      sessions: sessions.slice(0, 10), // Return last 10 sessions
+      sessions: recentSessions,
     };
   } catch (error) {
     console.error("Error getting session analytics:", error);
@@ -145,21 +167,53 @@ export async function getSessionAnalytics(siteId: string, days: number = 30) {
   }
 }
 
-// Get recent sessions with page flow
-export async function getRecentSessions(siteId: string, limit: number = 10) {
+// Get recent sessions with page flow and pagination
+export async function getRecentSessions(
+  siteId: string,
+  limit: number = 10,
+  offset: number = 0,
+  cursor?: string,
+) {
   try {
-    return await prisma.trackedSession.findMany({
-      where: { siteId },
-      include: {
-        pageViewEvents: {
-          orderBy: { timestamp: "asc" },
+    // Cursor-based pagination for better performance
+    const whereClause = cursor
+      ? {
+          siteId,
+          startedAt: { lt: new Date(cursor) },
+        }
+      : { siteId };
+
+    const [sessions, totalCount] = await Promise.all([
+      prisma.trackedSession.findMany({
+        where: whereClause,
+        include: {
+          pageViewEvents: {
+            orderBy: { timestamp: "asc" },
+          },
         },
+        orderBy: {
+          startedAt: "desc",
+        },
+        take: limit,
+      }),
+      prisma.trackedSession.count({
+        where: { siteId },
+      }),
+    ]);
+
+    return {
+      data: sessions,
+      pagination: {
+        total: totalCount,
+        limit,
+        offset,
+        hasMore: sessions.length === limit,
+        nextCursor:
+          sessions.length > 0
+            ? sessions[sessions.length - 1].startedAt.toISOString()
+            : null,
       },
-      orderBy: {
-        startedAt: "desc",
-      },
-      take: limit,
-    });
+    };
   } catch (error) {
     console.error("Error getting recent sessions:", error);
     throw error;
@@ -217,6 +271,85 @@ export async function getSessionById(sessionId: string) {
     return session;
   } catch (error) {
     console.error("Error getting session by ID:", error);
+    throw error;
+  }
+}
+
+// Get sessions by visitor ID for returning user analysis
+export async function getSessionsByVisitorId(
+  visitorId: string,
+  siteId: string,
+  limit: number = 10,
+) {
+  try {
+    return await prisma.trackedSession.findMany({
+      where: {
+        visitorId,
+        siteId,
+      },
+      include: {
+        pageViewEvents: {
+          orderBy: { timestamp: "asc" },
+        },
+      },
+      orderBy: {
+        startedAt: "desc",
+      },
+      take: limit,
+    });
+  } catch (error) {
+    console.error("Error getting sessions by visitor ID:", error);
+    throw error;
+  }
+}
+
+// Get session statistics with aggregation
+export async function getSessionStatistics(siteId: string, days: number = 30) {
+  try {
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+
+    // Use aggregation for comprehensive statistics
+    const [dailyStats, bounceStats, durationStats] = await Promise.all([
+      // Daily session counts
+      prisma.trackedSession.groupBy({
+        by: ["startedAt"],
+        where: {
+          siteId,
+          startedAt: { gte: startDate },
+        },
+        _count: { id: true },
+        orderBy: { startedAt: "asc" },
+      }),
+      // Bounce rate statistics
+      prisma.trackedSession.groupBy({
+        by: ["didBounce"],
+        where: {
+          siteId,
+          startedAt: { gte: startDate },
+        },
+        _count: { id: true },
+      }),
+      // Duration statistics
+      prisma.trackedSession.aggregate({
+        where: {
+          siteId,
+          startedAt: { gte: startDate },
+          duration: { not: null },
+        },
+        _avg: { duration: true },
+        _min: { duration: true },
+        _max: { duration: true },
+      }),
+    ]);
+
+    return {
+      dailyStats,
+      bounceStats,
+      durationStats,
+    };
+  } catch (error) {
+    console.error("Error getting session statistics:", error);
     throw error;
   }
 }
