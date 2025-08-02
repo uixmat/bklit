@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/db";
+import { prisma } from "@bklit/db";
 import polar, { SERVER_POLAR_ACCESS_TOKEN } from "./client";
 import type { PolarProduct, SubscriptionPlanData } from "./types";
 

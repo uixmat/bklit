@@ -1,7 +1,7 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import type { AuthOptions } from "next-auth";
 import GitHubProvider from "next-auth/providers/github";
-import { prisma } from "@/lib/db";
+import { prisma } from "@bklit/db";
 
 if (!process.env.GITHUB_ID) {
   throw new Error("Missing GITHUB_ID in .env");

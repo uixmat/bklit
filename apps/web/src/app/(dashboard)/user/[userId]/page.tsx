@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/db";
+import { prisma } from "@bklit/db";
 
 async function getUserTeams(userId: string) {
   return await prisma.teamMember.findMany({

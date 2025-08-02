@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/db";
+import { prisma } from "@bklit/db";
 import type { SessionData } from "@/types/geo";
 
 // Generate a simple visitor ID for returning user detection

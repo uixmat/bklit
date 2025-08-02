@@ -3,7 +3,7 @@
 import { unstable_cache as cache } from "next/cache";
 import { z } from "zod";
 import { cleanupStaleSessions } from "@/actions/session-actions";
-import { prisma } from "@/lib/db";
+import { prisma } from "@bklit/db";
 import { findCountryCoordinates } from "@/lib/maps/country-coordinates";
 import type { BrowserStats, TopPageData } from "@/types/analytics";
 import type {

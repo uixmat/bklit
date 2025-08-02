@@ -5,7 +5,7 @@ import { PageHeader } from "@/components/page-header";
 
 import { PolarPricingTable } from "@/components/polar-pricing-table";
 import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/db";
+import { prisma } from "@bklit/db";
 
 async function getTeamPlan(teamId: string) {
   const team = await prisma.team.findUnique({

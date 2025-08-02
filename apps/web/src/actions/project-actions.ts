@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 // import { z } from 'zod'; // Unused, schema is imported directly
-import { prisma } from "@/lib/db";
+import { prisma } from "@bklit/db";
 
 import { addProjectSchema } from "@/lib/schemas/project-schema";
 import type { ProjectFormState } from "@/types/user";

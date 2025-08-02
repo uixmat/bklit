@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/db";
+import { prisma } from "@bklit/db";
 import type { SubscriptionData } from "./types";
 
 // TODO: Fix Polar API integration - need to check correct API structure
