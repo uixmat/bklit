@@ -3,6 +3,7 @@ import { Globe, Plus, Settings, Users } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth/next";
+import { AddProjectForm } from "@/components/forms/add-project-form";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { authOptions } from "@/lib/auth";
 
 async function getTeamData(teamId: string, userId: string) {
@@ -124,12 +133,23 @@ export default async function TeamDashboardPage({
             Projects
           </h2>
           {userMembership.role === "owner" && (
-            <Button asChild>
-              <Link href={`/${teamId}/projects/create`}>
-                <Plus className="mr-2 size-4" />
-                Create Project
-              </Link>
-            </Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus />
+                  Create Project
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Create a new project</DialogTitle>
+                  <DialogDescription>
+                    Create a new project to get started.
+                  </DialogDescription>
+                </DialogHeader>
+                <AddProjectForm />
+              </DialogContent>
+            </Dialog>
           )}
         </div>
 

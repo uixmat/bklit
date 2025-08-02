@@ -41,7 +41,7 @@ function SubmitButton() {
   );
 }
 
-export default function AddProjectForm({ onSuccess }: AddProjectFormProps) {
+export function AddProjectForm({ onSuccess }: AddProjectFormProps) {
   // Added onSuccess to props
   const [state, formAction] = useActionState(createProjectAction, initialState);
   const [, startTransition] = useTransition();
