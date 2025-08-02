@@ -2,25 +2,30 @@
   "name": "bklit",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22.14.0",
+    "pnpm": ">=9.6.0"
+  },
+  "packageManager": "pnpm@10.11.1",
   "scripts": {
-    "dev": "pnpm build:sdk:dev && concurrently \"pnpm dev:web\" \"pnpm dev:playground\" \"pnpm prisma:studio:web\"",
-    "dev:web": "pnpm --filter tracker dev",
-    "dev:playground": "VITE_NGROK_URL=$(cat .ngrok-url) pnpm --filter playground dev",
-    "build:sdk:dev": "pnpm --filter bklit build:dev",
-    "check:biome:types": "pnpm --filter tracker lint && pnpm --filter bklit lint && pnpm --filter bklit typecheck",
-    "prisma:generate:web": "prisma generate --schema=./apps/web/prisma/schema.prisma",
-    "prisma:migrate:web": "dotenv -e ./apps/web/.env -- prisma migrate dev --schema=./apps/web/prisma/schema.prisma",
-    "prisma:studio:web": "prisma studio --schema=./apps/web/prisma/schema.prisma"
+    "build": "turbo run build",
+    "clean": "git clean -xdf node_modules",
+    "clean:workspaces": "turbo run clean",
+    "auth:generate": "pnpm -F @bklit/auth generate",
+    "db:generate": "turbo -F @bklit/db generate",
+    "db:migrate": "turbo -F @bklit/db migrate",
+    "db:studio": "turbo -F @bklit/db studio",
+    "dev": "turbo watch dev --continue",
+    "dev:web": "turbo watch dev -F @bklit/web...",
+    "format-and-lint": "biome check .",
+    "format-and-lint:fix": "biome check . --write",
+    "postinstall": "#pnpm lint:ws",
+    "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.1.2",
-    "@types/node": "^20.0.0",
-    "concurrently": "^9.2.0",
-    "dotenv-cli": "^7.4.2",
-    "next": "15.3.2",
-    "prisma": "^6.8.2",
-    "tsx": "^4.7.0",
-    "typescript": "^5.4.5"
-  },
-  "packageManager": "pnpm@9.15.0+sha512.76e2379760a4328ec4415815bcd6628dee727af3779aaa4c914e3944156c4299921a89f976381ee107d41f12cfa4b66681ca9c718f0668fa0831ed4c6d8ba56c"
+    "@turbo/gen": "^2.5.4",
+    "turbo": "^2.5.4",
+    "typescript": "catalog:"
+  }
 }

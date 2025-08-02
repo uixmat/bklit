@@ -1,3 +1,4 @@
+import { prisma } from "@bklit/db";
 import { Plus, Users } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -13,7 +14,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/db";
 
 async function getUserTeams(userId: string) {
   return await prisma.teamMember.findMany({

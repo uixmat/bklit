@@ -1,4 +1,4 @@
-import { initBklit } from "bklit";
+import { initBklit } from "@bklit/sdk";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";

@@ -1,3 +1,4 @@
+import { prisma } from "@bklit/db";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth/next";
 import { DeleteTeamForm } from "@/components/forms/delete-team-form";
@@ -10,7 +11,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/db";
 
 async function getTeamData(teamId: string, userId: string) {
   const team = await prisma.team.findUnique({

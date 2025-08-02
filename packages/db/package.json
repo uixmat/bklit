@@ -1,0 +1,30 @@
+{
+  "name": "@bklit/db",
+  "version": "0.1.0",
+  "private": true,
+  "module": true,
+  "exports": {
+    ".": "./db.ts",
+    "./env": "./env.ts"
+  },
+  "scripts": {
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "dev": "pnpm run studio",
+    "generate": "pnpm with-env prisma generate --schema=./prisma/schema.prisma",
+    "migrate": "pnpm with-env prisma migrate dev --schema=./prisma/schema.prisma",
+    "studio": "pnpm with-env prisma studio --schema=./prisma/schema.prisma",
+    "with-env": "dotenv -e ../../.env --"
+  },
+  "dependencies": {
+    "@t3-oss/env-nextjs": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.1.2",
+    "@prisma/client": "^6.8.2",
+    "@bklit/tsconfig": "workspace:*",
+    "dotenv-cli": "^10.0.0",
+    "prisma": "^6.8.2",
+    "typescript": "catalog:"
+  }
+}

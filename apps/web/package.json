@@ -1,20 +1,17 @@
 {
-  "name": "tracker",
+  "name": "@bklit/web",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
-    "lint": "npx @biomejs/biome lint && npx tsc --noEmit",
-    "format": "npx @biomejs/biome format",
-    "check": "npx @biomejs/biome check",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio"
+    "dev": "pnpm with-env next dev --turbopack",
+    "build": "pnpm with-env next build",
+    "start": "pnpm with-env next start",
+    "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.9.1",
+    "@bklit/db": "workspace:*",
     "@hookform/resolvers": "^5.0.1",
     "@polar-sh/nextjs": "^0.4.0",
     "@polar-sh/sdk": "^0.29.0",
@@ -33,7 +30,7 @@
     "@radix-ui/react-tooltip": "^1.2.6",
     "@tanstack/react-query": "^5.76.1",
     "@types/dagre": "^0.7.53",
-    "bklit": "workspace:*",
+    "@t3-oss/env-nextjs": "catalog:",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -54,19 +51,20 @@
     "sonner": "^1.5.0",
     "tailwind-merge": "^2.4.0",
     "topojson-client": "^3.1.0",
-    "zod": "^3.24.4"
+    "zod": "catalog:"
   },
   "devDependencies": {
+    "@bklit/tsconfig": "workspace:*",
     "@tailwindcss/postcss": "^4",
     "@types/d3": "^7.4.3",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/topojson-client": "^3.1.5",
+    "dotenv-cli": "catalog:",
     "prisma": "^6.8.2",
     "tailwindcss": "^4",
     "tw-animate-css": "^1.3.0",
-    "typescript": "^5"
-  },
-  "packageManager": "pnpm@9.15.0+sha512.76e2379760a4328ec4415815bcd6628dee727af3779aaa4c914e3944156c4299921a89f976381ee107d41f12cfa4b66681ca9c718f0668fa0831ed4c6d8ba56c"
+    "typescript": "catalog:"
+  }
 }

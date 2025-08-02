@@ -1,6 +1,6 @@
+import { prisma } from "@bklit/db";
 import { type NextRequest, NextResponse } from "next/server";
 import { createOrUpdateSession } from "@/actions/session-actions";
-import { prisma } from "@/lib/db";
 import { extractClientIP, getLocationFromIP } from "@/lib/ip-geolocation";
 import type { GeoLocation } from "@/types/geo";
 

@@ -1,10 +1,10 @@
 "use server";
 
+import { prisma } from "@bklit/db";
 import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/db";
 import type { TeamFormState } from "@/types/user";
 
 const createTeamSchema = z.object({
