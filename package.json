@@ -17,11 +17,8 @@
     "db:studio": "turbo -F @bklit/db studio",
     "dev": "turbo watch dev --continue",
     "dev:web": "turbo watch dev -F @bklit/web...",
-    "format": "turbo run format --continue -- --cache --cache-location .cache/.prettiercache",
-    "format:fix": "turbo run format --continue -- --write --cache --cache-location .cache/.prettiercache",
-    "lint": "turbo run lint --continue -- --cache --cache-location .cache/.eslintcache",
-    "lint:fix": "turbo run lint --continue -- --fix --cache --cache-location .cache/.eslintcache",
-    "lint:ws": "pnpm dlx sherif@latest",
+    "format-and-lint": "biome check .",
+    "format-and-lint:fix": "biome check . --write",
     "postinstall": "#pnpm lint:ws",
     "typecheck": "turbo run typecheck"
   },

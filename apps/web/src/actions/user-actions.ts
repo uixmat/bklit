@@ -1,8 +1,8 @@
 "use server";
 
+import { prisma } from "@bklit/db";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import { prisma } from "@bklit/db";
 import type { TeamMembershipWithTeam, UserTeamData } from "@/types/user";
 
 export async function getUserProjectCount(): Promise<number | null> {

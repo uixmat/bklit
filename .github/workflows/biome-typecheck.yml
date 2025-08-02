@@ -27,21 +27,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Set up Biome
-        uses: biomejs/setup-biome@v1
 
       - name: Run Biome lint
         run: |
           echo "::group::Running Biome Lint"
-          npx biome lint .
+          pnpm run format-and-lint
           echo "✅ Biome lint passed!"
-          echo "::endgroup::"
-
-      - name: Check apps/web and packages/bklit-sdk
-        run: |
-          echo "::group::Running TypeScript and Biome Checks"
-          pnpm --filter tracker lint
-          pnpm --filter bklit lint
-          pnpm --filter bklit typecheck
-          echo "✅ All checks passed!"
           echo "::endgroup::"

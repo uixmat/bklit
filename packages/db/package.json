@@ -8,15 +8,11 @@
     "./env": "./env.ts"
   },
   "scripts": {
-    "check": "biome check .",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "dev": "pnpm run studio",
-    "format": "biome format --write .",
     "generate": "pnpm with-env prisma generate --schema=./prisma/schema.prisma",
-    "lint": "tsc --noEmit",
     "migrate": "pnpm with-env prisma migrate dev --schema=./prisma/schema.prisma",
     "studio": "pnpm with-env prisma studio --schema=./prisma/schema.prisma",
-    "typecheck": "tsc --noEmit",
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {

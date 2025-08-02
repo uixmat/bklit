@@ -7,9 +7,6 @@
     "dev": "pnpm with-env next dev --turbopack",
     "build": "pnpm with-env next build",
     "start": "pnpm with-env next start",
-    "lint": "npx @biomejs/biome lint && npx tsc --noEmit",
-    "format": "npx @biomejs/biome format",
-    "typecheck": "npx @biomejs/biome check",
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {

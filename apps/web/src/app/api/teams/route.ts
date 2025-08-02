@@ -1,7 +1,7 @@
+import { prisma } from "@bklit/db";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import { prisma } from "@bklit/db";
 
 export async function GET() {
   try {

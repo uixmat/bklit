@@ -1,3 +1,4 @@
+import { prisma } from "@bklit/db";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth/next";
 import { DeleteProjectForm } from "@/components/forms/delete-project-form";
@@ -10,7 +11,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { authOptions } from "@/lib/auth";
-import { prisma } from "@bklit/db";
 
 async function getSiteData(siteId: string, teamId: string, userId: string) {
   const site = await prisma.site.findFirst({
