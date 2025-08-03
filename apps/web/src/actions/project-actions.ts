@@ -3,8 +3,7 @@
 // import { z } from 'zod'; // Unused, schema is imported directly
 import { prisma } from "@bklit/db";
 import { revalidatePath } from "next/cache";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { authenticated } from "@/lib/auth";
 
 import { addProjectSchema } from "@/lib/schemas/project-schema";
 import type { ProjectFormState } from "@/types/user";
@@ -15,7 +14,7 @@ export async function createProjectAction(
   _prevState: FormState,
   formData: FormData,
 ): Promise<FormState> {
-  const session = await getServerSession(authOptions);
+  const session = await authenticated();
 
   if (!session || !session.user || !session.user.id) {
     return {
@@ -37,7 +36,7 @@ export async function createProjectAction(
 
   const dbUser = await prisma.user.findUnique({
     where: { id: session.user.id },
-    include: { _count: { select: { sites: true } } },
+    include: { _count: { select: { projects: true } } },
   });
 
   if (!dbUser) {
@@ -51,7 +50,7 @@ export async function createProjectAction(
   const _projectCount = dbUser._count.sites;
 
   try {
-    const newSite = await prisma.site.create({
+    const newSite = await prisma.project.create({
       data: {
         name: validatedFields.data.name,
         domain: validatedFields.data.domain || null,
@@ -100,7 +99,7 @@ export async function deleteProjectAction(
   }
 
   try {
-    const project = await prisma.site.findUnique({
+    const project = await prisma.project.findUnique({
       where: {
         id: siteId,
         userId: session.user.id, // Ensure the user owns this project
@@ -122,7 +121,7 @@ export async function deleteProjectAction(
       };
     }
 
-    await prisma.site.delete({
+    await prisma.project.delete({
       where: {
         id: siteId,
       },

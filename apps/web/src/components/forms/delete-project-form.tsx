@@ -2,7 +2,7 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { authClient } from "@/auth/client";
 import { useActionState, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { deleteProjectAction, type FormState } from "@/actions/project-actions";
@@ -41,7 +41,7 @@ export function DeleteProjectForm({
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { data: session } = useSession();
+  const { data: session } = authClient.useSession();
 
   useEffect(() => {
     if (state.message) {

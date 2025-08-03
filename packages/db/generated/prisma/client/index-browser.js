@@ -120,110 +120,87 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
-exports.Prisma.AccountScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  type: 'type',
-  provider: 'provider',
-  providerAccountId: 'providerAccountId',
-  refresh_token: 'refresh_token',
-  access_token: 'access_token',
-  expires_at: 'expires_at',
-  token_type: 'token_type',
-  scope: 'scope',
-  id_token: 'id_token',
-  session_state: 'session_state'
-};
-
-exports.Prisma.SessionScalarFieldEnum = {
-  id: 'id',
-  sessionToken: 'sessionToken',
-  userId: 'userId',
-  expires: 'expires'
-};
-
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   name: 'name',
   email: 'email',
   emailVerified: 'emailVerified',
-  image: 'image'
-};
-
-exports.Prisma.VerificationTokenScalarFieldEnum = {
-  identifier: 'identifier',
-  token: 'token',
-  expires: 'expires'
-};
-
-exports.Prisma.TeamScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  slug: 'slug',
-  description: 'description',
-  plan: 'plan',
-  polarSubscriptionId: 'polarSubscriptionId',
+  image: 'image',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.TeamMemberScalarFieldEnum = {
+exports.Prisma.SessionScalarFieldEnum = {
   id: 'id',
-  role: 'role',
-  joinedAt: 'joinedAt',
+  expiresAt: 'expiresAt',
+  token: 'token',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  ipAddress: 'ipAddress',
+  userAgent: 'userAgent',
   userId: 'userId',
-  teamId: 'teamId'
+  activeOrganizationId: 'activeOrganizationId'
 };
 
-exports.Prisma.SiteScalarFieldEnum = {
+exports.Prisma.AccountScalarFieldEnum = {
+  id: 'id',
+  accountId: 'accountId',
+  providerId: 'providerId',
+  userId: 'userId',
+  accessToken: 'accessToken',
+  refreshToken: 'refreshToken',
+  idToken: 'idToken',
+  accessTokenExpiresAt: 'accessTokenExpiresAt',
+  refreshTokenExpiresAt: 'refreshTokenExpiresAt',
+  scope: 'scope',
+  password: 'password',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.VerificationScalarFieldEnum = {
+  id: 'id',
+  identifier: 'identifier',
+  value: 'value',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.OrganizationScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  logo: 'logo',
+  createdAt: 'createdAt',
+  metadata: 'metadata'
+};
+
+exports.Prisma.MemberScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  userId: 'userId',
+  role: 'role',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.InvitationScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  email: 'email',
+  role: 'role',
+  status: 'status',
+  expiresAt: 'expiresAt',
+  inviterId: 'inviterId'
+};
+
+exports.Prisma.ProjectScalarFieldEnum = {
   id: 'id',
   name: 'name',
   domain: 'domain',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  userId: 'userId',
-  teamId: 'teamId'
-};
-
-exports.Prisma.SubscriptionPlanScalarFieldEnum = {
-  id: 'id',
-  polarProductId: 'polarProductId',
-  name: 'name',
-  description: 'description',
-  type: 'type',
-  priceAmount: 'priceAmount',
-  currency: 'currency',
-  interval: 'interval',
-  isActive: 'isActive',
-  isArchived: 'isArchived',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
-exports.Prisma.SubscriptionPlanBenefitScalarFieldEnum = {
-  id: 'id',
-  planId: 'planId',
-  name: 'name',
-  description: 'description',
-  type: 'type',
-  value: 'value',
-  createdAt: 'createdAt'
-};
-
-exports.Prisma.SubscriptionScalarFieldEnum = {
-  id: 'id',
-  polarSubscriptionId: 'polarSubscriptionId',
-  polarCustomerId: 'polarCustomerId',
-  status: 'status',
-  currentPeriodStart: 'currentPeriodStart',
-  currentPeriodEnd: 'currentPeriodEnd',
-  cancelAtPeriodEnd: 'cancelAtPeriodEnd',
-  canceledAt: 'canceledAt',
-  endedAt: 'endedAt',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  planId: 'planId',
-  teamId: 'teamId'
+  organizationId: 'organizationId'
 };
 
 exports.Prisma.PageViewEventScalarFieldEnum = {
@@ -244,7 +221,7 @@ exports.Prisma.PageViewEventScalarFieldEnum = {
   isp: 'isp',
   mobile: 'mobile',
   userAgent: 'userAgent',
-  siteId: 'siteId',
+  projectId: 'projectId',
   sessionId: 'sessionId'
 };
 
@@ -255,7 +232,7 @@ exports.Prisma.EventDefinitionScalarFieldEnum = {
   trackingId: 'trackingId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  siteId: 'siteId'
+  projectId: 'projectId'
 };
 
 exports.Prisma.TrackedEventScalarFieldEnum = {
@@ -264,13 +241,13 @@ exports.Prisma.TrackedEventScalarFieldEnum = {
   metadata: 'metadata',
   createdAt: 'createdAt',
   eventDefinitionId: 'eventDefinitionId',
-  siteId: 'siteId'
+  projectId: 'projectId'
 };
 
 exports.Prisma.TrackedSessionScalarFieldEnum = {
   id: 'id',
   sessionId: 'sessionId',
-  siteId: 'siteId',
+  projectId: 'projectId',
   startedAt: 'startedAt',
   endedAt: 'endedAt',
   duration: 'duration',
@@ -311,16 +288,14 @@ exports.Prisma.JsonNullValueFilter = {
 
 
 exports.Prisma.ModelName = {
-  Account: 'Account',
-  Session: 'Session',
   User: 'User',
-  VerificationToken: 'VerificationToken',
-  Team: 'Team',
-  TeamMember: 'TeamMember',
-  Site: 'Site',
-  SubscriptionPlan: 'SubscriptionPlan',
-  SubscriptionPlanBenefit: 'SubscriptionPlanBenefit',
-  Subscription: 'Subscription',
+  Session: 'Session',
+  Account: 'Account',
+  Verification: 'Verification',
+  Organization: 'Organization',
+  Member: 'Member',
+  Invitation: 'Invitation',
+  Project: 'Project',
   PageViewEvent: 'PageViewEvent',
   EventDefinition: 'EventDefinition',
   TrackedEvent: 'TrackedEvent',

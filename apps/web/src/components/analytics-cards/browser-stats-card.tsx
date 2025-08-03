@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useSession } from "next-auth/react";
+import { authClient } from "@/auth/client";
 import { getBrowserStats } from "@/actions/analytics-actions";
 import { BrowserIcon } from "@/components/icons/browser";
 import { ChromeIcon } from "@/components/icons/chrome";
@@ -37,7 +37,7 @@ function getBrowserIcon(browser: string) {
 
 export function BrowserStatsCard() {
   const { currentSiteId } = useProject();
-  const { data: session } = useSession();
+  const { data: session } = authClient.useSession();
 
   const { data: browserStats, isLoading } = useQuery<BrowserStats[]>({
     queryKey: ["browser-stats", currentSiteId],

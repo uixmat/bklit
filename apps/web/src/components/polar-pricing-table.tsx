@@ -77,8 +77,8 @@ export function PolarPricingTable({
     if (plan.id === "pro" && currentPlanId !== "pro") {
       return (
         <Button asChild className="w-full">
-          <Link
-            href={`/checkout?product=${plan.polarProductId}&team=${currentTeamId}`}
+          <Link 
+            href={`/checkout?product=${plan.polarProductId}&organization=${currentOrganizationId}`}
           >
             Upgrade to Pro
           </Link>

@@ -1,43 +1,42 @@
 import { prisma } from "@bklit/db";
 import { type NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
-import { getTeamSubscription } from "@/lib/polar/subscriptions";
+import { authenticated } from "@/lib/auth";
+import { getOrganizationSubscription } from "@/lib/polar/subscriptions";
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await authenticated({ redirect: false });
     const { searchParams } = new URL(request.url);
-    const teamId = searchParams.get("teamId");
+    const organizationId = searchParams.get("organizationId");
 
     if (!session || !session.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (!teamId) {
+    if (!organizationId) {
       return NextResponse.json(
-        { error: "Team ID is required" },
+        { error: "Organization ID is required" },
         { status: 400 },
       );
     }
 
-    // Check if user is a member of this team
-    const teamMembership = await prisma.teamMember.findFirst({
+    // Check if user is a member of this organization
+    const organizationMembership = await prisma.organizationMember.findFirst({
       where: {
-        teamId,
+        organizationId,
         userId: session.user.id,
       },
     });
 
-    if (!teamMembership) {
-      return NextResponse.json({ error: "Team not found" }, { status: 404 });
+    if (!organizationMembership) {
+      return NextResponse.json({ error: "Organization not found" }, { status: 404 });
     }
 
-    const subscription = await getTeamSubscription(teamId);
+    const subscription = await getOrganizationSubscription(organizationId);
 
     return NextResponse.json(subscription);
-  } catch (error) {
-    console.error("Error fetching team subscription:", error);
+  } catch (error) { 
+    console.error("Error fetching organization subscription:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

@@ -2,10 +2,10 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { authClient } from "@/auth/client";
 import { useActionState, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { deleteTeamAction, type TeamFormState } from "@/actions/team-actions";
+import { deleteOrganizationAction, type OrganizationFormState } from "@/actions/organization-actions";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -21,24 +21,24 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-interface DeleteTeamFormProps {
-  teamId: string;
-  teamName: string;
+interface DeleteOrganizationFormProps {
+  organizationId: string;
+  organizationName: string;
 }
 
-const initialState: TeamFormState = {
+const initialState: OrganizationFormState = {
   success: false,
   message: "",
 };
 
-export function DeleteTeamForm({ teamId, teamName }: DeleteTeamFormProps) {
+export function DeleteOrganizationForm({ organizationId, organizationName }: DeleteOrganizationFormProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [confirmationInput, setConfirmationInput] = useState("");
-  const [state, formAction] = useActionState(deleteTeamAction, initialState);
+  const [state, formAction] = useActionState(deleteOrganizationAction, initialState);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { data: session } = useSession();
+  const { data: session } = authClient.useSession();
 
   useEffect(() => {
     if (state.message) {
@@ -51,7 +51,7 @@ export function DeleteTeamForm({ teamId, teamName }: DeleteTeamFormProps) {
 
         if (session?.user?.id) {
           queryClient.invalidateQueries({
-            queryKey: ["userTeams", session.user.id],
+            queryKey: ["userOrganizations", session.user.id],
           });
         }
 
@@ -63,16 +63,16 @@ export function DeleteTeamForm({ teamId, teamName }: DeleteTeamFormProps) {
   }, [state, router, queryClient, session]);
 
   const handleSubmitDeletion = () => {
-    if (confirmationInput === teamName) {
+    if (confirmationInput === organizationName) {
       const formData = new FormData();
-      formData.append("teamId", teamId);
-      formData.append("confirmedTeamName", confirmationInput);
+      formData.append("organizationId", organizationId);
+      formData.append("confirmedOrganizationName", confirmationInput);
       startTransition(() => {
         formAction(formData);
       });
     } else {
       toast.error(
-        "Team name does not match. Please type it correctly to confirm.",
+        "Organization name does not match. Please type it correctly to confirm.",
       );
     }
   };
@@ -87,31 +87,31 @@ export function DeleteTeamForm({ teamId, teamName }: DeleteTeamFormProps) {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button size="lg" variant="destructive">
-          Delete team
+          Delete organization
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Delete Team: {teamName}</DialogTitle>
+          <DialogTitle>Delete Organization: {organizationName}</DialogTitle>
           <DialogDescription>
-            To permanently delete this team and all associated data, please
+            To permanently delete this organization and all associated data, please
             enter &quot;
-            <span className="font-semibold">{teamName}</span>&quot; below.
+            <span className="font-semibold">{organizationName}</span>&quot; below.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label
-              htmlFor="team-name-confirmation"
+              htmlFor="organization-name-confirmation"
               className="text-right sr-only"
             >
-              Team Name
+              Organization Name
             </Label>
             <Input
-              id="team-name-confirmation"
+              id="organization-name-confirmation"
               value={confirmationInput}
               onChange={(e) => setConfirmationInput(e.target.value)}
-              placeholder={teamName}
+              placeholder={organizationName}
               className="col-span-4"
             />
           </div>
@@ -123,9 +123,9 @@ export function DeleteTeamForm({ teamId, teamName }: DeleteTeamFormProps) {
           <Button
             variant="destructive"
             onClick={handleSubmitDeletion}
-            disabled={isPending || confirmationInput !== teamName}
+            disabled={isPending || confirmationInput !== organizationName}
           >
-            {isPending ? "Deleting..." : "Delete Team"}
+            {isPending ? "Deleting..." : "Delete Organization"}
           </Button>
         </DialogFooter>
       </DialogContent>

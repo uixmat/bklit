@@ -12,8 +12,8 @@ export function PricingComparison({ currentPlan }: PricingComparisonProps) {
 
   // Define all features for comparison
   const allFeatures = [
-    { name: "Projects", key: "projectLimit" },
-    { name: "Team Members", key: "teamMemberLimit" },
+    { name: "Projects", key: "projectLimit" },  
+    { name: "Organization Members", key: "organizationMemberLimit" },
     { name: "Page View Tracking", key: "pageViews" },
     { name: "Custom Event Tracking", key: "customEvents" },
     { name: "Session Recordings", key: "sessionRecordings" },
@@ -29,8 +29,8 @@ export function PricingComparison({ currentPlan }: PricingComparisonProps) {
     switch (featureKey) {
       case "projectLimit":
         return plan.projectLimit;
-      case "teamMemberLimit":
-        return plan.teamMemberLimit;
+      case "organizationMemberLimit":
+        return plan.organizationMemberLimit;
       case "pageViews":
         return true; // Both plans have this
       case "customEvents":

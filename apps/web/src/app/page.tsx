@@ -1,24 +1,16 @@
 import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth/next";
-import { getUserFirstTeam } from "@/actions/user-actions";
-import { authOptions } from "@/lib/auth";
+
+import { auth } from "@/auth/server";
+import { headers } from "next/headers";
 
 export default async function RootPage() {
-  const session = await getServerSession(authOptions);
+  const member = await auth.api.getActiveMember({
+    headers: await headers(),
+  });
 
-  if (!session || !session.user?.id) {
-    // User is not authenticated, redirect to marketing page
-    redirect("/home");
+  if (member?.organizationId) {
+    return redirect(`/${member.organizationId}`);
   }
 
-  // User is authenticated, check if they have a team
-  const firstTeam = await getUserFirstTeam();
-
-  if (firstTeam) {
-    // User has a team, redirect to team dashboard
-    redirect(`/${firstTeam.id}`);
-  } else {
-    // User has no team, redirect directly to team creation
-    redirect("/teams/create");
-  }
+  redirect("/organizations/create");
 }

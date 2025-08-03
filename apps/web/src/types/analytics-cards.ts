@@ -8,7 +8,7 @@ export interface AnalyticsCardProps {
 
 export interface SessionAnalyticsCardProps {
   siteId: string;
-  teamId?: string;
+  organizationId?: string;
 }
 
 // Extended analytics types for cards

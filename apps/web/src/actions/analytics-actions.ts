@@ -34,7 +34,7 @@ export async function getTopCountries(
 
   return await cache(
     async () => {
-      const site = await prisma.site.findFirst({
+      const site = await prisma.project.findFirst({
         where: {
           id: siteId,
           userId: userId,
@@ -98,7 +98,7 @@ export async function getAnalyticsStats(
 
   return await cache(
     async () => {
-      const site = await prisma.site.findFirst({
+      const site = await prisma.project.findFirst({
         where: {
           id: siteId,
           userId: userId,
@@ -174,7 +174,7 @@ export async function getRecentPageViews(
 
   return await cache(
     async () => {
-      const site = await prisma.site.findFirst({
+      const site = await prisma.project.findFirst({
         where: {
           id: siteId,
           userId: userId,
@@ -223,7 +223,7 @@ export async function getVisitsByCountry(
 
   return await cache(
     async () => {
-      const site = await prisma.site.findFirst({
+      const site = await prisma.project.findFirst({
         where: {
           id: siteId,
           userId: userId,
@@ -315,7 +315,7 @@ export async function getCountryVisitStats(
 
   return await cache(
     async () => {
-      const site = await prisma.site.findFirst({
+      const site = await prisma.project.findFirst({
         where: {
           id: siteId,
           userId: userId,
@@ -448,7 +448,7 @@ export async function debugCountryCodes(
 
   const { siteId, userId } = validation.data;
 
-  const site = await prisma.site.findFirst({
+  const site = await prisma.project.findFirst({
     where: {
       id: siteId,
       userId: userId,
@@ -502,7 +502,7 @@ export async function getMobileDesktopStats(
 
   return await cache(
     async () => {
-      const site = await prisma.site.findFirst({
+      const site = await prisma.project.findFirst({
         where: {
           id: siteId,
           userId: userId,
@@ -569,7 +569,7 @@ export async function getTopPages(params: z.input<typeof getTopPagesSchema>) {
 
   return await cache(
     async () => {
-      const site = await prisma.site.findFirst({
+      const site = await prisma.project.findFirst({
         where: {
           id: siteId,
           userId: userId,
@@ -630,7 +630,7 @@ export async function getBrowserStats(
 
   return await cache(
     async () => {
-      const site = await prisma.site.findFirst({
+      const site = await prisma.project.findFirst({
         where: {
           id: siteId,
           userId: userId,
@@ -717,7 +717,7 @@ export async function getSessionAnalytics(
 
   return await cache(
     async () => {
-      const site = await prisma.site.findFirst({
+      const site = await prisma.project.findFirst({
         where: {
           id: siteId,
           userId: userId,
@@ -798,7 +798,7 @@ export async function getLiveUsers(params: z.infer<typeof getLiveUsersSchema>) {
 
   return await cache(
     async () => {
-      const site = await prisma.site.findFirst({
+      const site = await prisma.project.findFirst({
         where: {
           id: siteId,
           userId: userId,

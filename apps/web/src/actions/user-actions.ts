@@ -1,12 +1,12 @@
 "use server";
 
 import { prisma } from "@bklit/db";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
-import type { TeamMembershipWithTeam, UserTeamData } from "@/types/user";
+import { authenticated } from "@/lib/auth";
+
+import { auth } from "@/auth/server";
 
 export async function getUserProjectCount(): Promise<number | null> {
-  const session = await getServerSession(authOptions);
+  const session = await authenticated();
 
   if (!session || !session.user || !session.user.id) {
     // Or throw new Error("User not authenticated");
@@ -14,10 +14,10 @@ export async function getUserProjectCount(): Promise<number | null> {
   }
 
   try {
-    const count = await prisma.site.count({
-      where: {
-        userId: session.user.id,
-      },
+    const count = await prisma.project.count({
+      // where: {
+      //   organizationId: session.user.activeOrganizationId,
+      // },
     });
     return count;
   } catch (error) {
@@ -27,14 +27,14 @@ export async function getUserProjectCount(): Promise<number | null> {
 }
 
 export async function getUserSites() {
-  const session = await getServerSession(authOptions);
+  const session = await authenticated();
 
   if (!session || !session.user || !session.user.id) {
     return null;
   }
 
   try {
-    const sites = await prisma.site.findMany({
+    const sites = await prisma.project.findMany({
       where: {
         userId: session.user.id,
       },
@@ -49,72 +49,17 @@ export async function getUserSites() {
   }
 }
 
-export async function getUserFirstTeam() {
-  const session = await getServerSession(authOptions);
-
-  if (!session || !session.user || !session.user.id) {
-    return null;
-  }
-
-  try {
-    const teamMembership = await prisma.teamMember.findFirst({
-      where: {
-        userId: session.user.id,
-      },
-      include: {
-        team: true,
-      },
-      orderBy: {
-        joinedAt: "asc", // Get the first (oldest) team membership
-      },
-    });
-
-    return teamMembership?.team || null;
-  } catch (error) {
-    console.error("Error fetching user's first team:", error);
-    // Don't throw the error, just return null so the dashboard can handle it gracefully
-    return null;
-  }
-}
-
 export async function getUserTeams() {
-  const session = await getServerSession(authOptions);
+  const session = await authenticated();
 
   if (!session || !session.user || !session.user.id) {
     return null;
   }
 
   try {
-    // Get user's team memberships with team data
-    const teamMemberships = await prisma.teamMember.findMany({
-      where: { userId: session.user.id },
-      include: {
-        team: {
-          include: {
-            sites: true,
-          },
-        },
-      },
-      orderBy: { joinedAt: "desc" },
-    });
-
-    // Transform to return teams with site counts
-    const teams = teamMemberships.map(
-      (membership: TeamMembershipWithTeam): UserTeamData => ({
-        id: membership.team.id,
-        name: membership.team.name,
-        slug: membership.team.slug,
-        description: membership.team.description,
-        plan: membership.team.plan,
-        role: membership.role,
-        siteCount: membership.team.sites.length,
-        sites: membership.team.sites,
-      }),
-    );
-
-    return teams;
+    return auth.api.listOrganizations();
   } catch (error) {
-    console.error("Error fetching user teams:", error);
+    console.error("Error fetching user organizations:", error);
     return null;
   }
 }

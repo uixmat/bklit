@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth/next";
 import AddProjectForm from "@/components/forms/add-project-form";
 import { PageHeader } from "@/components/page-header";
 import {
@@ -9,14 +8,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { authOptions } from "@/lib/auth";
+import { authenticated } from "@/lib/auth";
 
 export default async function CreateSitePage() {
-  const session = await getServerSession(authOptions);
-
-  if (!session || !session.user?.id) {
-    redirect("/signin");
-  }
+  await authenticated();
 
   return (
     <div className="space-y-6">
