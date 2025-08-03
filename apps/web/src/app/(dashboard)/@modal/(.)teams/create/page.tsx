@@ -4,10 +4,10 @@ import type { Metadata } from "next";
 import Modal from "./modal";
 
 export const metadata: Metadata = {
-	title: "Create team",
+  title: "Create team",
 };
 
 export default function CreateTeamModal() {
-	console.log("Rendered CreateTeamModal (page.tsx).");
-	return <Modal />;
+  console.log("Rendered CreateTeamModal (page.tsx).");
+  return <Modal />;
 }
