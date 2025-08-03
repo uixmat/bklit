@@ -1,4 +1,4 @@
-import AddOrganizationForm from "@/components/forms/add-organization-form";
+import { AddOrganizationForm } from "@/components/forms/add-organization-form";
 import { PageHeader } from "@/components/page-header";
 import {
   Card,
@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { authenticated } from "@/lib/auth";
 
-export default async function CreateOrganizationPage() {
+export default async function CreateTeamPage() {
   await authenticated();
 
   return (
@@ -24,8 +24,8 @@ export default async function CreateOrganizationPage() {
           <CardHeader>
             <CardTitle>Organization Details</CardTitle>
             <CardDescription>
-              Enter the details for your new organization below. Click create when
-              you&apos;re done.
+              Enter the details for your new organization below. Click create
+              when you&apos;re done.
             </CardDescription>
           </CardHeader>
           <CardContent>
