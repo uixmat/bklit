@@ -18,7 +18,7 @@ export interface TeamMembershipWithTeam {
 }
 
 // User team data for display
-export interface UserTeamData {
+export interface UserOrganizationData {
   id: string;
   name: string;
   slug: string;

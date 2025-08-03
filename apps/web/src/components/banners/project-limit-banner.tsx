@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useProject } from "@/contexts/project-context";
-import { useTeams } from "@/contexts/teams-provider";
+import { useWorkspace } from "@/contexts/workspace-provider";
 import { useUserPlanStatus } from "@/hooks/use-user-plan-status";
 import { PlanType } from "@/lib/plans";
 
@@ -12,10 +11,9 @@ export function ProjectLimitBanner() {
     hasReachedLimit,
     isLoading: isLoadingPlanStatus,
   } = useUserPlanStatus();
-  const { currentSiteId, isLoadingSites } = useProject();
-  const { currentTeamId } = useTeams();
+  const { activeOrganization, activeProject } = useWorkspace();
 
-  if (isLoadingPlanStatus || isLoadingSites || !hasReachedLimit) {
+  if (isLoadingPlanStatus || !hasReachedLimit) {
     return null;
   }
 
@@ -26,9 +24,9 @@ export function ProjectLimitBanner() {
     >
       Max projects allowed.
       {planId.toLowerCase() === PlanType.FREE.toLowerCase() &&
-        currentSiteId && (
+        activeProject && (
           <Link
-            href={`/${currentTeamId || ""}/${currentSiteId}/billing`}
+            href={`/${activeOrganization?.id || ""}/${activeProject.id}/billing`}
             className="font-semibold underline hover:text-yellow-600 dark:hover:text-yellow-200"
           >
             Upgrade

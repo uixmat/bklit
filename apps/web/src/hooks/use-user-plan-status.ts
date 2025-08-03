@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useSession } from "next-auth/react";
+import { authClient } from "@/auth/client";
 import { getUserProjectCount } from "@/actions/user-actions";
 import { getPlanDetails, type PlanDetails, PlanType } from "@/lib/plans";
 
@@ -16,15 +16,15 @@ interface UserPlanStatus {
 }
 
 export function useUserPlanStatus(): UserPlanStatus {
-  const { data: session, status: sessionStatus } = useSession();
+  const { data: session, isPending: sessionStatus } = authClient.useSession();
   const userId = session?.user?.id;
 
   let calculatedIsLoadingPlanDetails = false;
-  if (sessionStatus === "loading") {
+  if (sessionStatus) {
     if (!session) {
       calculatedIsLoadingPlanDetails = true;
     }
-  } else if (sessionStatus === "unauthenticated") {
+  } else if (!session) {
     calculatedIsLoadingPlanDetails = true;
   }
 

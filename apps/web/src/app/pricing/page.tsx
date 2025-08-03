@@ -7,10 +7,10 @@ export default function PricingPage() {
     <div className="space-y-12">
       <PageHeader
         title="Simple, Transparent Pricing"
-        description="Choose the perfect plan for your team. All plans include a 14-day free trial."
+        description="Choose the perfect plan for your organization. All plans include a 14-day free trial."
       />
 
-      <PolarPricingTable />
+      <PolarPricingTable /> 
 
       <div className="space-y-6">
         <div className="text-center">

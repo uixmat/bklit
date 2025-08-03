@@ -57,21 +57,21 @@ export const POST = Webhooks({
     }
 
     try {
-      // Find team by customer email (assuming customer email matches team owner)
+      // Find organization by customer email (assuming customer email matches organization owner)
       if (subscription.customer?.email) {
         const user = await prisma.user.findUnique({
           where: { email: subscription.customer.email },
           include: {
-            teamMemberships: {
+            organizationMemberships: {
               where: { role: "owner" },
-              include: { team: true },
+              include: { organization: true },
             },
           },
         });
 
-        if (user?.teamMemberships?.[0]?.team) {
-          const team = user.teamMemberships[0].team;
-          await syncSubscriptionFromPolar(subscription.id, team.id);
+        if (user?.organizationMemberships?.[0]?.organization) {
+          const organization = user.organizationMemberships[0].organization;
+          await syncSubscriptionFromPolar(subscription.id, organization.id);
         }
       }
     } catch (error) {
@@ -91,29 +91,29 @@ export const POST = Webhooks({
     }
 
     try {
-      // Find team by subscription ID first, then by customer email
-      let team = await prisma.team.findFirst({
+      // Find organization by subscription ID first, then by customer email
+      let organization = await prisma.organization.findFirst({
         where: { polarSubscriptionId: subscription.id },
       });
 
-      if (!team && subscription.customer?.email) {
+      if (!organization && subscription.customer?.email) {
         const user = await prisma.user.findUnique({
           where: { email: subscription.customer.email },
           include: {
-            teamMemberships: {
+            organizationMemberships: {
               where: { role: "owner" },
-              include: { team: true },
+              include: { organization: true },
             },
           },
         });
 
-        if (user?.teamMemberships?.[0]?.team) {
-          team = user.teamMemberships[0].team;
+        if (user?.organizationMemberships?.[0]?.organization) {
+          organization = user.organizationMemberships[0].organization;
         }
       }
 
-      if (team) {
-        await syncSubscriptionFromPolar(subscription.id, team.id);
+      if (organization) {
+        await syncSubscriptionFromPolar(subscription.id, organization.id);
       }
     } catch (error) {
       console.error("Webhook: Error in onSubscriptionUpdated:", error);

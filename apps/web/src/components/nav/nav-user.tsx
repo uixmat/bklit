@@ -2,7 +2,7 @@
 
 import { CreditCard, LayoutDashboard, LogOut, User } from "lucide-react";
 import Link from "next/link";
-import { signOut } from "next-auth/react";
+import { authClient } from "@/auth/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useTeams } from "@/contexts/teams-provider";
+import { useWorkspace } from "@/contexts/workspace-provider";
 import { ThemeToggle } from "../theme-toggle";
 
 export function NavUser({
@@ -27,10 +27,10 @@ export function NavUser({
     id?: string;
   };
 }) {
-  const { currentTeamId, currentTeam } = useTeams();
+  const { activeOrganization } = useWorkspace();
 
-  const billingHref = `/${currentTeamId}/billing`;
-  const dashboardHref = currentTeamId ? `/${currentTeamId}` : "/";
+  const billingHref = `/${activeOrganization?.id}/billing`;
+  const dashboardHref = activeOrganization?.id ? `/${activeOrganization?.id}` : "/";
 
   return (
     <DropdownMenu>
@@ -83,12 +83,12 @@ export function NavUser({
           <DropdownMenuItem asChild>
             <Link href={billingHref}>
               <CreditCard className="mr-2 h-4 w-4" />
-              Billing for {currentTeam?.name}
+              Billing for {activeOrganization?.name}
             </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })}>
+          <DropdownMenuItem onClick={() => authClient.signOut()}>
           <LogOut className="mr-2 h-4 w-4" />
           Log out
         </DropdownMenuItem>

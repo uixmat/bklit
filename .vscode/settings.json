@@ -1,4 +1,7 @@
 {
+  "cSpell.words": [
+    "bklit"
+  ],
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[javascript][typescript][javascriptreact][typescriptreact][json][jsonc][css][graphql]": {
     "editor.defaultFormatter": "biomejs.biome"

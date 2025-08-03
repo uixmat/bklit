@@ -15,8 +15,16 @@ export const env = createEnv({
    * This way you can ensure the app isn't built with invalid env vars.
    */
   server: {
-    GITHUB_ID: z.string().min(1),
-    GITHUB_SECRET: z.string().min(1),
+    /**
+     * BetterAuth
+     */
+    AUTH_GITHUB_ID: z.string().min(1),
+    AUTH_GITHUB_SECRET: z.string().min(1),
+    AUTH_SECRET: z.string().min(1),
+
+    /**
+     * Polar
+     */
     POLAR_SERVER_MODE: z.string().min(1),
     POLAR_ORGANIZATION_ID: z.string().min(1),
     POLAR_ACCESS_TOKEN: z.string().min(1),

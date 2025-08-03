@@ -1,6 +1,6 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import { useSession } from "next-auth/react";
+import { authClient } from "@/auth/client";
 import { Cell, Pie, PieChart } from "recharts";
 import { getMobileDesktopStats } from "@/actions/analytics-actions";
 import {
@@ -35,7 +35,7 @@ const chartConfig = {
 
 export function MobileDesktopCard() {
   const { currentSiteId } = useProject();
-  const { data: session } = useSession();
+  const { data: session } = authClient.useSession();
 
   const { data: stats, isLoading } = useQuery({
     queryKey: ["mobile-desktop-stats", currentSiteId],

@@ -5,7 +5,8 @@
   "module": true,
   "exports": {
     ".": "./db.ts",
-    "./env": "./env.ts"
+    "./env": "./env.ts",
+    "./queries/*": "./src/queries/*.ts"
   },
   "scripts": {
     "clean": "git clean -xdf .cache .turbo dist node_modules",

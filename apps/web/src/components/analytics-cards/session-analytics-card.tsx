@@ -26,7 +26,7 @@ function formatDuration(seconds: number | null): string {
 
 async function SessionAnalyticsContent({
   siteId,
-  teamId,
+  organizationId, 
 }: SessionAnalyticsCardProps) {
   const sessions = await getRecentSessions(siteId, 5);
 
@@ -40,7 +40,7 @@ async function SessionAnalyticsContent({
         sessions.map((session) => (
           <Link
             key={session.id}
-            href={`/${teamId || ""}/${siteId}/analytics/session/${session.id}`}
+            href={`/${organizationId || ""}/${siteId}/analytics/session/${session.id}`}
             className="block"
           >
             <div className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors group">
@@ -74,7 +74,7 @@ export function SessionAnalyticsCard(props: SessionAnalyticsCardProps) {
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle>Recent Sessions</CardTitle>
         <Link
-          href={`/${props.teamId || ""}/${props.siteId}/analytics/sessions`}
+          href={`/${props.organizationId || ""}/${props.siteId}/analytics/sessions`}
           className="text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           View All

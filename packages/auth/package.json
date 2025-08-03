@@ -1,0 +1,36 @@
+{
+  "name": "@bklit/auth",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./middleware": "./src/middleware.ts",
+    "./client": "./src/client.ts",
+    "./env": "./env.ts"
+  },
+  "license": "MIT",
+  "scripts": {
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "generate": "dotenv -e ../../.env -- pnpx @better-auth/cli generate --config ../../apps/web/src/auth/server.ts --output ../db/prisma/schema.prisma",
+    "migrate": "dotenv -e ../../.env -- pnpx @better-auth/cli migrate --config ../../apps/web/src/auth/server.ts --output ../db/prisma/schema.prisma"
+  },
+  "dependencies": {
+    "@better-auth/expo": "1.2.12",
+    "@bklit/db": "workspace:*",
+    "@polar-sh/better-auth": "^1.0.8",
+    "@polar-sh/sdk": "^0.29.3",
+    "@t3-oss/env-nextjs": "^0.13.6",
+    "better-auth": "1.2.12",
+    "next": "catalog:",
+    "react": "catalog:react19",
+    "react-dom": "catalog:react19",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@better-auth/cli": "1.2.12",
+    "@bklit/tsconfig": "workspace:*",
+    "@types/react": "catalog:react19",
+    "typescript": "catalog:"
+  }
+}
