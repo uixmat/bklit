@@ -1,15 +1,11 @@
 "use client";
-import { useQuery } from "@tanstack/react-query";
-import { Cell, Pie, PieChart } from "recharts";
-import { getMobileDesktopStats } from "@/actions/analytics-actions";
-import { authClient } from "@/auth/client";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@bklit/ui/components/card";
 import {
   type ChartConfig,
   ChartContainer,
@@ -17,8 +13,12 @@ import {
   ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart";
-import { Skeleton } from "@/components/ui/skeleton";
+} from "@bklit/ui/components/chart";
+import { Skeleton } from "@bklit/ui/components/skeleton";
+import { useQuery } from "@tanstack/react-query";
+import { Cell, Pie, PieChart } from "recharts";
+import { getMobileDesktopStats } from "@/actions/analytics-actions";
+import { authClient } from "@/auth/client";
 import { useProject } from "@/contexts/project-context";
 import type { PieChartData } from "@/types/analytics-cards";
 

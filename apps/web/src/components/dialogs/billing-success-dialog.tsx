@@ -1,15 +1,15 @@
 "use client";
 
-import { CheckCircle } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@bklit/ui/components/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@bklit/ui/components/dialog";
+import { CheckCircle } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface BillingSuccessDialogProps {
   isOpenInitially: boolean;

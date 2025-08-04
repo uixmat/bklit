@@ -1,18 +1,23 @@
-import { GeistMono as geistMonoFont } from "geist/font/mono";
-import { GeistSans as geistSansFont } from "geist/font/sans";
+import { Toaster } from "@bklit/ui/components/sonner";
+import "@bklit/ui/globals.css";
 import type { Metadata } from "next";
-import "./globals.css";
-import { QueryClientProvider } from "@/components/providers/query-provider";
-import { ThemeProvider } from "@/components/theme-provider";
-import { Toaster } from "@/components/ui/sonner";
-
-const geistSans = geistSansFont;
-const geistMono = geistMonoFont;
+import { Geist, Geist_Mono } from "next/font/google";
+import { Providers } from "@/components/providers";
 
 export const metadata: Metadata = {
   title: "Bklit Analytics",
   description: "Track your website analytics",
 };
+
+const fontSans = Geist({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
+
+const fontMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+});
 
 export default async function RootLayout({
   children,
@@ -22,19 +27,12 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased `}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <QueryClientProvider>
-            {children}
-            <Toaster />
-          </QueryClientProvider>
-        </ThemeProvider>
+        <Providers>
+          {children}
+          <Toaster />
+        </Providers>
       </body>
     </html>
   );

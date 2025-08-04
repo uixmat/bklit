@@ -1,9 +1,11 @@
 "use client";
 
+import {
+  ToggleGroup,
+  ToggleGroupItem,
+} from "@bklit/ui/components/toggle-group";
 import { Monitor, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();

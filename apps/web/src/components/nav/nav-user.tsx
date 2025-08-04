@@ -1,9 +1,10 @@
 "use client";
 
-import { CreditCard, LayoutDashboard, LogOut, User } from "lucide-react";
-import Link from "next/link";
-import { authClient } from "@/auth/client";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@bklit/ui/components/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,7 +13,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@bklit/ui/components/dropdown-menu";
+import { CreditCard, LayoutDashboard, LogOut, User } from "lucide-react";
+import Link from "next/link";
+import { authClient } from "@/auth/client";
 import { useWorkspace } from "@/contexts/workspace-provider";
 import { ThemeToggle } from "../theme-toggle";
 

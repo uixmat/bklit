@@ -1,5 +1,13 @@
 "use client";
 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@bklit/ui/components/card";
+import { Skeleton } from "@bklit/ui/components/skeleton";
 import { useQuery } from "@tanstack/react-query";
 import { getBrowserStats } from "@/actions/analytics-actions";
 import { authClient } from "@/auth/client";
@@ -8,14 +16,6 @@ import { ChromeIcon } from "@/components/icons/chrome";
 import { EdgeIcon } from "@/components/icons/edge";
 import { FirefoxIcon } from "@/components/icons/firefox";
 import { SafariIcon } from "@/components/icons/safari";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useProject } from "@/contexts/project-context";
 import type { BrowserStats } from "@/types/analytics";
 

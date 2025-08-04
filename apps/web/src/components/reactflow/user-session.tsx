@@ -18,11 +18,16 @@ import ReactFlow, {
   useNodesState,
 } from "reactflow";
 import "reactflow/dist/style.css";
+import { Badge } from "@bklit/ui/components/badge";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@bklit/ui/components/card";
 import dagre from "dagre";
 import { format } from "date-fns";
 import { Clock, TrendingDown, Users } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 // Types for session data
 interface PageViewEvent {

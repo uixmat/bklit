@@ -1,11 +1,8 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { AlertCircle, Check, Crown, Star } from "lucide-react";
-import Link from "next/link";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@bklit/ui/components/alert";
+import { Badge } from "@bklit/ui/components/badge";
+import { Button } from "@bklit/ui/components/button";
 import {
   Card,
   CardContent,
@@ -13,8 +10,12 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+} from "@bklit/ui/components/card";
+
+import { Skeleton } from "@bklit/ui/components/skeleton";
+import { useQuery } from "@tanstack/react-query";
+import { AlertCircle, Check, Crown, Star } from "lucide-react";
+import Link from "next/link";
 import type { SubscriptionPlanData } from "@/lib/polar/types";
 
 interface PolarPricingTableProps {

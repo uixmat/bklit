@@ -1,13 +1,11 @@
 "use client";
-import { useQuery } from "@tanstack/react-query";
-import { Cell, Pie, PieChart } from "recharts";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@bklit/ui/components/card";
 import {
   type ChartConfig,
   ChartContainer,
@@ -15,7 +13,9 @@ import {
   ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart";
+} from "@bklit/ui/components/chart";
+import { useQuery } from "@tanstack/react-query";
+import { Cell, Pie, PieChart } from "recharts";
 import { useProject } from "@/contexts/project-context";
 import type { BounceRateData, PieChartData } from "@/types/analytics-cards";
 

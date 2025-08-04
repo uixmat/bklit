@@ -1,19 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import {
-  getAnalyticsStats,
-  getLiveUsers,
-  getSessionAnalytics,
-} from "@/actions/analytics-actions";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+} from "@bklit/ui/components/card";
+import { Skeleton } from "@bklit/ui/components/skeleton";
+import { useEffect, useState } from "react";
+import {
+  getAnalyticsStats,
+  getLiveUsers,
+  getSessionAnalytics,
+} from "@/actions/analytics-actions";
 import { useProject } from "@/contexts/project-context";
 import type { AnalyticsStats } from "@/types/analytics";
 import type { SessionAnalyticsSummary } from "@/types/analytics-cards";

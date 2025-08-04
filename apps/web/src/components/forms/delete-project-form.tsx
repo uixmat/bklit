@@ -1,13 +1,6 @@
 "use client";
 
-import { useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useState, useTransition } from "react";
-import { toast } from "sonner";
-import { deleteProjectAction, type FormState } from "@/actions/project-actions";
-import { authClient } from "@/auth/client";
-
-import { Button } from "@/components/ui/button";
+import { Button } from "@bklit/ui/components/button";
 import {
   Dialog,
   DialogClose,
@@ -17,9 +10,15 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from "@bklit/ui/components/dialog";
+import { Input } from "@bklit/ui/components/input";
+import { Label } from "@bklit/ui/components/label";
+import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { useActionState, useEffect, useState, useTransition } from "react";
+import { toast } from "sonner";
+import { deleteProjectAction, type FormState } from "@/actions/project-actions";
+import { authClient } from "@/auth/client";
 
 interface DeleteProjectFormProps {
   siteId: string;
