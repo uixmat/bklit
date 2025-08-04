@@ -1,6 +1,6 @@
 "use server";
 
-import { prisma } from "@bklit/db";
+import { prisma } from "@bklit/db/client";
 import { unstable_cache as cache } from "next/cache";
 import { z } from "zod";
 import { cleanupStaleSessions } from "@/actions/session-actions";

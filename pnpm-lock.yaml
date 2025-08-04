@@ -338,9 +338,6 @@ importers:
         specifier: 'catalog:'
         version: 3.25.76
     devDependencies:
-      '@biomejs/biome':
-        specifier: ^2.1.2
-        version: 2.1.2
       '@bklit/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/tsconfig

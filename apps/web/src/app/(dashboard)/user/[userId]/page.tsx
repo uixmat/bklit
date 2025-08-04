@@ -1,4 +1,4 @@
-import { prisma } from "@bklit/db";
+import { prisma } from "@bklit/db/client";
 import { Badge } from "@bklit/ui/components/badge";
 import { Button } from "@bklit/ui/components/button";
 import {
