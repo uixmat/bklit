@@ -9,10 +9,9 @@
     "build": {
       "env": [
         "DATABASE_URL",
-        "NEXTAUTH_SECRET",
-        "NEXTAUTH_URL",
-        "GITHUB_ID",
-        "GITHUB_SECRET",
+        "AUTH_SECRET",
+        "AUTH_GITHUB_ID",
+        "AUTH_GITHUB_SECRET",
         "POLAR_SERVER_MODE",
         "POLAR_ORGANIZATION_ID",
         "POLAR_ACCESS_TOKEN",
