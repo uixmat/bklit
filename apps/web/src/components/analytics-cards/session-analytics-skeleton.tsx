@@ -1,4 +1,4 @@
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@bklit/ui/components/skeleton";
 
 export function SessionAnalyticsSkeleton() {
   return (

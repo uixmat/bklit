@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@bklit/ui/lib/utils";
 
 interface IconProps {
   className?: string;

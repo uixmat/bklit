@@ -1,7 +1,7 @@
 "use client";
 
+import { Button } from "@bklit/ui/components/button";
 import { authClient } from "@/auth/client";
-import { Button } from "@/components/ui/button";
 
 export function SignInButton() {
   return (

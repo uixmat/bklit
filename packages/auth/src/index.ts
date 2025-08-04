@@ -1,5 +1,5 @@
 import { expo } from "@better-auth/expo";
-import { prisma } from "@bklit/db";
+import { prisma } from "@bklit/db/client";
 import {
   checkout,
   polar,

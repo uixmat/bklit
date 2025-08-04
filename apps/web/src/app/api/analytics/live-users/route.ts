@@ -1,4 +1,4 @@
-import { prisma } from "@bklit/db";
+import { prisma } from "@bklit/db/client";
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {

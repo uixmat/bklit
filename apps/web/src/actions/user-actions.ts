@@ -1,6 +1,6 @@
 "use server";
 
-import { prisma } from "@bklit/db";
+import { prisma } from "@bklit/db/client";
 import { auth } from "@/auth/server";
 import { authenticated } from "@/lib/auth";
 

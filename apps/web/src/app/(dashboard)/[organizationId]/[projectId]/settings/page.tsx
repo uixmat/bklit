@@ -1,14 +1,14 @@
-import { prisma } from "@bklit/db";
-import { redirect } from "next/navigation";
-import { DeleteProjectForm } from "@/components/forms/delete-project-form";
-import { PageHeader } from "@/components/page-header";
+import { prisma } from "@bklit/db/client";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@bklit/ui/components/card";
+import { redirect } from "next/navigation";
+import { DeleteProjectForm } from "@/components/forms/delete-project-form";
+import { PageHeader } from "@/components/page-header";
 import { authenticated } from "@/lib/auth";
 
 async function getSiteData(

@@ -1,14 +1,14 @@
-import { CircleFlag } from "react-circle-flags";
-import { getTopCountries } from "@/actions/analytics-actions";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@bklit/ui/components/badge";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+} from "@bklit/ui/components/card";
+import { Skeleton } from "@bklit/ui/components/skeleton";
+import { CircleFlag } from "react-circle-flags";
+import { getTopCountries } from "@/actions/analytics-actions";
 import type { AnalyticsCardProps } from "@/types/analytics-cards";
 
 type TopCountriesCardProps = AnalyticsCardProps;

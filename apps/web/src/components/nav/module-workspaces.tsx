@@ -1,9 +1,6 @@
 "use client";
 
-import { Plus, Users } from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@bklit/ui/components/badge";
 import {
   Command,
   CommandEmpty,
@@ -11,7 +8,10 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command";
+} from "@bklit/ui/components/command";
+import { Plus, Users } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 import { useWorkspace } from "@/contexts/workspace-provider";
 
 export const ModuleWorkspaces = () => {

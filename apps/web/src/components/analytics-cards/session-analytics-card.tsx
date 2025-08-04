@@ -1,9 +1,14 @@
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@bklit/ui/components/card";
 import { formatDistanceToNow } from "date-fns";
 import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 import { getRecentSessions } from "@/actions/session-actions";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { SessionAnalyticsCardProps } from "@/types/analytics-cards";
 import { SessionAnalyticsSkeleton } from "./skeletons";
 

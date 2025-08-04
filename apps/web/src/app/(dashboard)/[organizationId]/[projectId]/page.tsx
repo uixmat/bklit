@@ -1,15 +1,15 @@
-import { prisma } from "@bklit/db";
-import Link from "next/link";
-import { redirect } from "next/navigation";
-import { PageHeader } from "@/components/page-header";
-import { Button } from "@/components/ui/button";
+import { prisma } from "@bklit/db/client";
+import { Button } from "@bklit/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@bklit/ui/components/card";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { PageHeader } from "@/components/page-header";
 import { authenticated } from "@/lib/auth";
 
 async function getSiteData(

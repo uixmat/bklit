@@ -1,14 +1,14 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { AddOrganizationForm } from "@/components/forms/add-organization-form";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@bklit/ui/components/dialog";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { AddOrganizationForm } from "@/components/forms/add-organization-form";
 
 export default function Modal() {
   console.log("Rendered Modal (modal.tsx).");

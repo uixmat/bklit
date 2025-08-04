@@ -1,4 +1,4 @@
-import { prisma } from "@bklit/db";
+import { prisma } from "@bklit/db/client";
 import { Webhooks } from "@polar-sh/nextjs";
 import { syncSubscriptionFromPolar } from "@/lib/polar/subscriptions";
 

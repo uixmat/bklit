@@ -1,0 +1,27 @@
+{
+  "name": "@bklit/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "clean": "git clean -xdf .cache .turbo dist node_modules"
+  },
+  "dependencies": {
+    "@bklit/auth": "workspace:*",
+    "@bklit/db": "workspace:*",
+    "@bklit/validators": "workspace:*",
+    "@trpc/server": "catalog:",
+    "superjson": "2.2.2",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@bklit/tsconfig": "workspace:*",
+    "typescript": "catalog:"
+  }
+}

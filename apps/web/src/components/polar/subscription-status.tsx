@@ -1,8 +1,13 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@bklit/ui/components/badge";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@bklit/ui/components/card";
+import { Skeleton } from "@bklit/ui/components/skeleton";
 import { useTeamPlanStatusWithSubscription } from "@/hooks/polar-hooks";
 
 interface TeamSubscriptionStatusProps {

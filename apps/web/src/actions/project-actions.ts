@@ -1,7 +1,7 @@
 "use server";
 
 // import { z } from 'zod'; // Unused, schema is imported directly
-import { prisma } from "@bklit/db";
+import { prisma } from "@bklit/db/client";
 import { revalidatePath } from "next/cache";
 import { authenticated } from "@/lib/auth";
 

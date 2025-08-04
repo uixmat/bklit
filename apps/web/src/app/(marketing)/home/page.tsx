@@ -1,5 +1,5 @@
+import { buttonVariants } from "@bklit/ui/components/button";
 import Link from "next/link";
-import { buttonVariants } from "@/components/ui/button";
 
 export default function MarketingHomePage() {
   return (

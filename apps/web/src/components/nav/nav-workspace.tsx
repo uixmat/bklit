@@ -1,18 +1,18 @@
-import { ChevronsUpDown, Users } from "lucide-react";
-import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@bklit/ui/components/badge";
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
-} from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
+} from "@bklit/ui/components/breadcrumb";
+import { Button } from "@bklit/ui/components/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@bklit/ui/components/popover";
+import { ChevronsUpDown, Users } from "lucide-react";
+import Link from "next/link";
 import { useWorkspace } from "@/contexts/workspace-provider";
 import { ModuleWorkspaces } from "./module-workspaces";
 

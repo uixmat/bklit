@@ -1,15 +1,15 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import { authClient } from "@/auth/client";
-import { Button } from "@/components/ui/button";
+import { Button } from "@bklit/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@bklit/ui/components/card";
+import { useSearchParams } from "next/navigation";
+import { authClient } from "@/auth/client";
 
 export default function LoginPage() {
   const searchParams = useSearchParams();

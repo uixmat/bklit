@@ -1,15 +1,16 @@
 "use client";
 
+import { Separator } from "@bklit/ui/components/separator";
 import { authClient } from "@/auth/client";
 import { ProjectLimitBanner } from "@/components/banners/project-limit-banner";
 import { BklitLogo } from "@/components/icons/bklit";
 import { DashboardNavigation } from "@/components/nav/dashboard-navigation";
 import { NavUser } from "@/components/nav/nav-user";
 import { NavWorkspace } from "@/components/nav/nav-workspace";
-import { Separator } from "@/components/ui/separator";
 
 export function SiteHeader() {
   const { data: clientSession } = authClient.useSession();
+
   return (
     <header className="flex flex-col w-full">
       <div className="flex w-full items-center justify-between px-4 lg:px-6 border-b py-4">

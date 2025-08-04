@@ -1,15 +1,15 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import {
   NavigationMenu,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-} from "@/components/ui/navigation-menu";
+} from "@bklit/ui/components/navigation-menu";
+import { cn } from "@bklit/ui/lib/utils";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { getNavigationItems, replaceDynamicParams } from "@/lib/navigation";
-import { cn } from "@/lib/utils";
 
 export function DashboardNavigation() {
   const pathname = usePathname();

@@ -1,4 +1,4 @@
-import { prisma } from "@bklit/db";
+import { prisma } from "@bklit/db/client";
 import { type NextRequest, NextResponse } from "next/server";
 import { authenticated } from "@/lib/auth";
 import { getOrganizationSubscription } from "@/lib/polar/subscriptions";

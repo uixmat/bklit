@@ -1,7 +1,7 @@
-import { getUserOrganizations } from "@bklit/db/queries/user";
 import { SiteHeader } from "@/components/site-header";
 import { WorkspaceProvider } from "@/contexts/workspace-provider";
 import { authenticated } from "@/lib/auth";
+import { api } from "@/trpc/server";
 
 export default async function DashboardLayout({
   children,
@@ -11,7 +11,7 @@ export default async function DashboardLayout({
   modal: React.ReactNode;
 }) {
   const session = await authenticated();
-  const organizations = await getUserOrganizations(session.user.id);
+  const organizations = await api.organization.list();
 
   return (
     <WorkspaceProvider session={session} organizations={organizations}>

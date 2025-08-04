@@ -1,20 +1,20 @@
 "use client";
 
-import * as d3 from "d3";
-import { Monitor, Smartphone } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { CircleFlag } from "react-circle-flags";
-import * as topojson from "topojson-client";
-import { getCountryVisitStats } from "@/actions/analytics-actions";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@bklit/ui/components/badge";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+} from "@bklit/ui/components/card";
+import { Separator } from "@bklit/ui/components/separator";
+import * as d3 from "d3";
+import { Monitor, Smartphone } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { CircleFlag } from "react-circle-flags";
+import * as topojson from "topojson-client";
+import { getCountryVisitStats } from "@/actions/analytics-actions";
 
 interface CountryVisitData {
   country: string;

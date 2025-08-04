@@ -1,9 +1,14 @@
+import { Badge } from "@bklit/ui/components/badge";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@bklit/ui/components/card";
 import { format, formatDistanceToNow } from "date-fns";
 import { ArrowLeft, Clock, MapPin, Monitor } from "lucide-react";
 import Link from "next/link";
 import { getRecentSessions } from "@/actions/session-actions";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { authenticated } from "@/lib/auth";
 
 interface SessionsPageProps {

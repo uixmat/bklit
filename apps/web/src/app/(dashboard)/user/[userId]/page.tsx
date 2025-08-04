@@ -1,17 +1,17 @@
-import { prisma } from "@bklit/db";
-import { Plus, Users } from "lucide-react";
-import Link from "next/link";
-import { redirect } from "next/navigation";
-import { PageHeader } from "@/components/page-header";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { prisma } from "@bklit/db/client";
+import { Badge } from "@bklit/ui/components/badge";
+import { Button } from "@bklit/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@bklit/ui/components/card";
+import { Plus, Users } from "lucide-react";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { PageHeader } from "@/components/page-header";
 import { authenticated } from "@/lib/auth";
 
 async function getUserOrganizations(userId: string) {
