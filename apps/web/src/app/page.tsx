@@ -1,15 +1,23 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth/server";
+import { api } from "@/trpc/server";
 
 export default async function RootPage() {
-  const member = await auth.api.getActiveMember({
+  const session = await auth.api.getSession({
     headers: await headers(),
   });
 
-  if (member?.organizationId) {
-    return redirect(`/${member.organizationId}`);
+  console.log(session);
+  if (!session) {
+    return redirect("/signin");
   }
 
-  redirect("/organizations/create");
+  const organizations = await api.organization.list();
+
+  if (organizations.length === 0) {
+    return redirect("/organizations/create");
+  }
+
+  return redirect(`/${organizations[0].id}`);
 }

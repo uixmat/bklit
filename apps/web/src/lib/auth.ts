@@ -5,7 +5,7 @@ import { auth } from "@/auth/server";
 export const authenticated = async (options?: { callbackUrl?: string }) => {
   const { callbackUrl } = options ?? {};
 
-  const session = await auth.api.getActiveMember({
+  const session = await auth.api.getSession({
     headers: await headers(),
   });
 
