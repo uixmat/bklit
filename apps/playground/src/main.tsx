@@ -5,7 +5,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import routes from "./routes";
 import "./index.css";
 
-const YOUR_SITE_ID = "cmcuk7myh00022k0xgh1kh599";
+const YOUR_PROJECT_ID = "cmdvv8os200037mlxq1ypkm27";
 
 // Get the ngrok URL from environment variable
 const NGROK_URL = import.meta.env.VITE_NGROK_URL;
@@ -20,15 +20,15 @@ console.log("🔍 Playground: SDK import test", {
 });
 
 // Initialize Bklit SDK
-if (YOUR_SITE_ID) {
+if (YOUR_PROJECT_ID) {
   console.log("🎯 Playground: Initializing Bklit SDK...", {
-    siteId: YOUR_SITE_ID,
+    projectId: YOUR_PROJECT_ID,
     apiHost: API_HOST,
   });
 
   try {
     initBklit({
-      siteId: YOUR_SITE_ID,
+      projectId: YOUR_PROJECT_ID,
       apiHost: API_HOST,
     });
     console.log("✅ Playground: Bklit SDK initialized successfully");

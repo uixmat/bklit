@@ -7,6 +7,10 @@
     "pnpm": ">=9.6.0"
   },
   "packageManager": "pnpm@10.11.1",
+  "prisma": {
+    "schema": "packages/db/prisma/schema.prisma",
+    "seed": "tsx packages/db/src/seed.ts"
+  },
   "scripts": {
     "build": "turbo run build",
     "clean": "git clean -xdf node_modules",
@@ -26,6 +30,10 @@
     "@biomejs/biome": "^2.1.2",
     "@turbo/gen": "^2.5.4",
     "turbo": "^2.5.4",
+    "prisma": "catalog:prisma",
     "typescript": "catalog:"
+  },
+  "dependencies": {
+    "@prisma/client": "catalog:prisma"
   }
 }

@@ -12,7 +12,7 @@ import { getRecentSessions } from "@/actions/session-actions";
 import { authenticated } from "@/lib/auth";
 
 interface SessionsPageProps {
-  params: Promise<{ organizationId: string; siteId: string }>;
+  params: Promise<{ organizationId: string; projectId: string }>;
   searchParams: Promise<{ page?: string; limit?: string }>;
 }
 
@@ -57,7 +57,7 @@ export default async function SessionsPage({
   params,
   searchParams,
 }: SessionsPageProps) {
-  const { organizationId, siteId } = await params;
+  const { organizationId, projectId } = await params;
   const { page = "1", limit = "20" } = await searchParams;
   await authenticated();
 
@@ -67,7 +67,7 @@ export default async function SessionsPage({
 
   // For now, we'll get all sessions and paginate on the server side
   // In a real app, you'd want to implement proper pagination in the database query
-  const allSessions = await getRecentSessions(siteId, 1000); // Get a large number
+  const allSessions = await getRecentSessions(projectId, 1000); // Get a large number
   const totalSessions = allSessions.length;
   const sessions = allSessions.slice(offset, offset + limitNumber);
   const totalPages = Math.ceil(totalSessions / limitNumber);
@@ -78,7 +78,7 @@ export default async function SessionsPage({
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Link
-            href={`/${organizationId}/${siteId}/analytics`}
+            href={`/${organizationId}/${projectId}/analytics`}
             className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -167,7 +167,7 @@ export default async function SessionsPage({
               sessions.map((session) => (
                 <Link
                   key={session.id}
-                  href={`/${organizationId}/${siteId}/analytics/session/${session.id}`}
+                  href={`/${organizationId}/${projectId}/analytics/session/${session.id}`}
                   className="block"
                 >
                   <div className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors group">
@@ -216,7 +216,7 @@ export default async function SessionsPage({
         <div className="flex items-center justify-center space-x-2">
           {pageNumber > 1 && (
             <Link
-              href={`/${organizationId}/${siteId}/analytics/sessions?page=${
+              href={`/${organizationId}/${projectId}/analytics/sessions?page=${
                 pageNumber - 1
               }&limit=${limitNumber}`}
               className="px-3 py-2 text-sm border rounded-md hover:bg-accent transition-colors"
@@ -229,7 +229,7 @@ export default async function SessionsPage({
           </span>
           {pageNumber < totalPages && (
             <Link
-              href={`/${organizationId}/${siteId}/analytics/sessions?page=${
+              href={`/${organizationId}/${projectId}/analytics/sessions?page=${
                 pageNumber + 1
               }&limit=${limitNumber}`}
               className="px-3 py-2 text-sm border rounded-md hover:bg-accent transition-colors"

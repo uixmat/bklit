@@ -18,9 +18,9 @@ import { authenticated } from "@/lib/auth";
 export default async function AnalyticsPage({
   params,
 }: {
-  params: Promise<{ organizationId: string; siteId: string }>;
+  params: Promise<{ organizationId: string; projectId: string }>;
 }) {
-  const { organizationId, siteId } = await params;
+  const { organizationId, projectId } = await params;
   const session = await authenticated();
 
   return (
@@ -31,10 +31,10 @@ export default async function AnalyticsPage({
       >
         <ViewsCard userId={session.user.id} />
         <Suspense fallback={<TopCountriesCardSkeleton />}>
-          <TopCountriesCard siteId={siteId} userId={session.user.id} />
+          <TopCountriesCard projectId={projectId} userId={session.user.id} />
         </Suspense>
         <Suspense fallback={<RecentPageViewsCardSkeleton />}>
-          <RecentPageViewsCard siteId={siteId} userId={session.user.id} />
+          <RecentPageViewsCard projectId={projectId} userId={session.user.id} />
         </Suspense>
 
         <Suspense fallback={<MobileDesktopCardSkeleton />}>
@@ -49,7 +49,10 @@ export default async function AnalyticsPage({
         </Suspense>
       </div>
       <div className="grid gap-4 md:grid-cols-2">
-        <SessionAnalyticsCard siteId={siteId} organizationId={organizationId} />
+        <SessionAnalyticsCard
+          projectId={projectId}
+          organizationId={organizationId}
+        />
       </div>
     </div>
   );

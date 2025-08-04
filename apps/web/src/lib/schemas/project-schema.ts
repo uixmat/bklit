@@ -10,6 +10,7 @@ export const addProjectSchema = z.object({
     .url({ message: "Please enter a valid URL (e.g., https://example.com)" })
     .optional()
     .or(z.literal("")),
+  organizationId: z.string().min(1, { message: "Organization is required" }),
 });
 
 export type AddProjectFormValues = z.infer<typeof addProjectSchema>;

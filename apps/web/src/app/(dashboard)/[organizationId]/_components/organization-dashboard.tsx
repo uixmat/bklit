@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@bklit/ui/components/card";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { Globe, Plus, Settings, Users } from "lucide-react";
 import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
@@ -21,14 +21,11 @@ export const OrganizationDashboard = ({
   organizationId: string;
 }) => {
   const trpc = useTRPC();
-  const { data: organization, isLoading } = useQuery(
+  const { data: organization } = useSuspenseQuery(
     trpc.organization.fetch.queryOptions({
       id: organizationId,
     }),
   );
-
-  if (isLoading) return <div>Loading...</div>;
-  if (!organization) return <div>Organization not found</div>;
 
   return (
     <div className="space-y-6 prose dark:prose-invert max-w-none">

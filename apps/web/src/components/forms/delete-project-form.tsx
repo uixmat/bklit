@@ -21,7 +21,7 @@ import { deleteProjectAction, type FormState } from "@/actions/project-actions";
 import { authClient } from "@/auth/client";
 
 interface DeleteProjectFormProps {
-  siteId: string;
+  projectId: string;
   projectName: string;
 }
 
@@ -31,7 +31,7 @@ const initialState: FormState = {
 };
 
 export function DeleteProjectForm({
-  siteId,
+  projectId,
   projectName,
 }: DeleteProjectFormProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -67,7 +67,7 @@ export function DeleteProjectForm({
   const handleSubmitDeletion = () => {
     if (confirmationInput === projectName) {
       const formData = new FormData();
-      formData.append("siteId", siteId);
+      formData.append("projectId", projectId);
       formData.append("confirmedProjectName", confirmationInput);
       startTransition(() => {
         formAction(formData);

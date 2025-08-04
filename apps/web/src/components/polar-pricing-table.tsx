@@ -16,7 +16,6 @@ import { Skeleton } from "@bklit/ui/components/skeleton";
 import { useQuery } from "@tanstack/react-query";
 import { AlertCircle, Check, Crown, Star } from "lucide-react";
 import Link from "next/link";
-import type { SubscriptionPlanData } from "@/lib/polar/types";
 
 interface PolarPricingTableProps {
   currentTeamId?: string;
@@ -44,7 +43,7 @@ export function PolarPricingTable({
           errorData.error || "Failed to fetch subscription plans",
         );
       }
-      return response.json() as Promise<SubscriptionPlanData[]>;
+      return response.json() as Promise<any[]>;
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: 2,
@@ -63,7 +62,7 @@ export function PolarPricingTable({
     return planId === currentPlanId;
   };
 
-  const getActionButton = (plan: SubscriptionPlanData) => {
+  const getActionButton = (plan: any) => {
     const isCurrent = isCurrentPlan(plan.id);
 
     if (isCurrent) {

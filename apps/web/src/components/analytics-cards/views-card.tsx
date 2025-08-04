@@ -14,12 +14,12 @@ import {
   getLiveUsers,
   getSessionAnalytics,
 } from "@/actions/analytics-actions";
-import { useProject } from "@/contexts/project-context";
+import { useWorkspace } from "@/contexts/workspace-provider";
 import type { AnalyticsStats } from "@/types/analytics";
 import type { SessionAnalyticsSummary } from "@/types/analytics-cards";
 
 export function ViewsCard({ userId }: { userId: string }) {
-  const { currentSiteId } = useProject();
+  const { activeProject } = useWorkspace();
   const [stats, setStats] = useState<AnalyticsStats | null>(null);
   const [sessionStats, setSessionStats] =
     useState<SessionAnalyticsSummary | null>(null);
@@ -27,15 +27,15 @@ export function ViewsCard({ userId }: { userId: string }) {
   const [liveUsers, setLiveUsers] = useState(0);
 
   useEffect(() => {
-    if (!currentSiteId) return;
+    if (!activeProject?.id) return;
 
     const fetchStats = async () => {
       try {
         setLoading(true);
         const [data, sessionData, liveUsersData] = await Promise.all([
-          getAnalyticsStats({ siteId: currentSiteId, userId }),
-          getSessionAnalytics({ siteId: currentSiteId, userId }),
-          getLiveUsers({ siteId: currentSiteId, userId }),
+          getAnalyticsStats({ projectId: activeProject.id, userId }),
+          getSessionAnalytics({ projectId: activeProject.id, userId }),
+          getLiveUsers({ projectId: activeProject.id, userId }),
         ]);
         setStats(data);
         setSessionStats({
@@ -54,11 +54,11 @@ export function ViewsCard({ userId }: { userId: string }) {
 
     // Set up periodic refresh for live users count (every 30 seconds)
     const interval = setInterval(() => {
-      getLiveUsers({ siteId: currentSiteId, userId }).then(setLiveUsers);
+      getLiveUsers({ projectId: activeProject?.id, userId }).then(setLiveUsers);
     }, 30000);
 
     return () => clearInterval(interval);
-  }, [currentSiteId, userId]);
+  }, [activeProject?.id, userId]);
 
   if (loading || !stats || !sessionStats) {
     return <ViewsCardSkeleton />;

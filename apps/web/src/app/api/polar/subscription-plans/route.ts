@@ -4,15 +4,13 @@ import {
   PLAN_DETAILS,
   PlanType,
 } from "@/lib/plans";
-import { getPublishedPolarProducts } from "@/lib/polar/products";
-import type { SubscriptionPlanData } from "@/lib/polar/types";
 
 export async function GET(_request: NextRequest) {
   try {
-    const polarProducts = await getPublishedPolarProducts();
+    // const polarProducts = await getPublishedPolarProducts();
 
     // Start with our local plan definitions
-    const plans: SubscriptionPlanData[] = [];
+    const plans: any[] = [];
 
     // Add free plan (always use our local definition)
     const freePlan = PLAN_DETAILS[PlanType.FREE];
@@ -35,6 +33,7 @@ export async function GET(_request: NextRequest) {
       })),
     });
 
+    const polarProducts: any[] = [];
     // Process Polar products and map to our plan structure
     for (const product of polarProducts) {
       if (!product.id || !product.prices || product.prices.length === 0) {

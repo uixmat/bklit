@@ -95,6 +95,7 @@ export const ModuleWorkspaces = () => {
             >
               {hoveredOrganizationData?.projects.map((project) => (
                 <CommandItem
+                  value={project.id}
                   key={project.id}
                   onSelect={() =>
                     onChangeProject(hoveredOrganizationData.id, project.id)

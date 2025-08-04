@@ -5,7 +5,8 @@ import { headers } from "next/headers";
 import { z } from "zod";
 import { auth } from "@/auth/server";
 import { authenticated } from "@/lib/auth";
-import type { OrganizationFormState } from "@/types/user";
+
+// import type { OrganizationFormState } from "@/types/user";
 
 const createOrganizationSchema = z.object({
   name: z
@@ -20,12 +21,12 @@ const createOrganizationSchema = z.object({
     .optional(),
 });
 
-export type { OrganizationFormState };
+// export type { OrganizationFormState };
 
 export async function createOrganizationAction(
-  _prevState: OrganizationFormState,
+  _prevState: any,
   formData: FormData,
-): Promise<OrganizationFormState> {
+): Promise<any> {
   const session = await authenticated({ redirect: false });
 
   if (!session || !session.user || !session.user.id) {

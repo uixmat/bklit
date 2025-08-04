@@ -27,11 +27,11 @@ interface CountryVisitData {
 }
 
 interface WorldMapProps {
-  siteId: string;
+  projectId: string;
   userId: string;
 }
 
-export function WorldMap({ siteId, userId }: WorldMapProps) {
+export function WorldMap({ projectId, userId }: WorldMapProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -42,7 +42,7 @@ export function WorldMap({ siteId, userId }: WorldMapProps) {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const data = await getCountryVisitStats({ siteId, userId });
+        const data = await getCountryVisitStats({ projectId, userId });
         setVisitData(data);
       } catch (error) {
         console.error("Error loading visit data:", error);
@@ -50,7 +50,7 @@ export function WorldMap({ siteId, userId }: WorldMapProps) {
     };
 
     loadData();
-  }, [siteId, userId]);
+  }, [projectId, userId]);
 
   useEffect(() => {
     if (!svgRef.current || visitData.length === 0) return;

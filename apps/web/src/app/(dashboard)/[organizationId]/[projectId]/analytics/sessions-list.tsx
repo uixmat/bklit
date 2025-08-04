@@ -2,15 +2,15 @@ import { format } from "date-fns";
 import { getRecentSessions } from "@/actions/session-actions";
 
 interface SessionsListProps {
-  siteId: string;
+  projectId: string;
   limit?: number;
 }
 
 export default async function SessionsList({
-  siteId,
+  projectId,
   limit = 5,
 }: SessionsListProps) {
-  const sessions = await getRecentSessions(siteId, limit);
+  const sessions = await getRecentSessions(projectId, limit);
 
   return (
     <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>

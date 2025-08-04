@@ -108,7 +108,7 @@ export interface CountryCodeResult {
 // Session data with geo information
 export interface SessionData {
   sessionId: string;
-  siteId: string;
+  projectId: string;
   url: string;
   userAgent?: string;
   country?: string;

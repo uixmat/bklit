@@ -9,9 +9,10 @@ import {
   CardTitle,
 } from "@bklit/ui/components/card";
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import { authClient } from "@/auth/client";
 
-export default function LoginPage() {
+function LoginPage() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
 
@@ -41,5 +42,13 @@ export default function LoginPage() {
         </CardContent>
       </Card>
     </main>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense>
+      <LoginPage />
+    </Suspense>
   );
 }

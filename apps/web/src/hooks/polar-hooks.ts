@@ -2,7 +2,6 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getPlanDetails, PlanType } from "@/lib/plans";
-import type { SubscriptionData, SubscriptionPlanData } from "@/lib/polar/types";
 
 // Hook for team subscription data
 export function useTeamSubscription(teamId: string) {
@@ -15,7 +14,7 @@ export function useTeamSubscription(teamId: string) {
       if (!response.ok) {
         throw new Error("Failed to fetch team subscription");
       }
-      return response.json() as Promise<SubscriptionData | null>;
+      return response.json() as Promise<any | null>;
     },
     enabled: !!teamId,
     staleTime: 1000 * 60 * 5, // 5 minutes
@@ -31,7 +30,7 @@ export function useSubscriptionPlans() {
       if (!response.ok) {
         throw new Error("Failed to fetch subscription plans");
       }
-      return response.json() as Promise<SubscriptionPlanData[]>;
+      return response.json() as Promise<any[]>;
     },
     staleTime: 1000 * 60 * 30, // 30 minutes
   });

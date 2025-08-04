@@ -21,7 +21,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import {
   createOrganizationAction,
-  type OrganizationFormState,
+  // type OrganizationFormState,
 } from "@/actions/organization-actions";
 
 const createOrganizationSchema = z.object({
@@ -39,7 +39,7 @@ const createOrganizationSchema = z.object({
 
 type AddOrganizationFormValues = z.infer<typeof createOrganizationSchema>;
 
-const initialState: OrganizationFormState = {
+const initialState: any = {
   success: false,
   message: "",
   newOrganizationId: undefined,

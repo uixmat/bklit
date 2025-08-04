@@ -16,7 +16,7 @@ import {
 } from "@bklit/ui/components/chart";
 import { useQuery } from "@tanstack/react-query";
 import { Cell, Pie, PieChart } from "recharts";
-import { useProject } from "@/contexts/project-context";
+import { useWorkspace } from "@/contexts/workspace-provider";
 import type { BounceRateData, PieChartData } from "@/types/analytics-cards";
 
 const chartConfig = {
@@ -30,24 +30,24 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-function useBounceRate(siteId: string | undefined, days = 30) {
+function useBounceRate(projectId: string | undefined, days = 30) {
   return useQuery<BounceRateData | null>({
-    queryKey: ["bounce-rate", siteId],
+    queryKey: ["bounce-rate", projectId],
     queryFn: async () => {
-      if (!siteId) return null;
+      if (!projectId) return null;
       const res = await fetch(
-        `/api/session-analytics?siteId=${siteId}&days=${days}`,
+        `/api/session-analytics?projectId=${projectId}&days=${days}`,
       );
       if (!res.ok) throw new Error("Failed to fetch bounce rate");
       return res.json();
     },
-    enabled: !!siteId,
+    enabled: !!projectId,
   });
 }
 
 export function BounceRateCard() {
-  const { currentSiteId } = useProject();
-  const { data, isLoading } = useBounceRate(currentSiteId || undefined);
+  const { activeProject } = useWorkspace();
+  const { data, isLoading } = useBounceRate(activeProject?.id || undefined);
 
   if (isLoading || !data) {
     return (
@@ -100,7 +100,7 @@ export function BounceRateCard() {
                   />
                 ))}
               </Pie>
-              <ChartTooltip content={<ChartTooltipContent />} />
+              {/* <ChartTooltip content={<ChartTooltipContent />} /> */}
               <ChartLegend
                 content={<ChartLegendContent verticalAlign="horizontal" />}
               />

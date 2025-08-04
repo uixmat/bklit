@@ -18,7 +18,7 @@ export function DashboardNavigation() {
   // Extract dynamic parameters from the current path
   const organizationId =
     segments[0] !== "user" && segments.length > 0 ? segments[0] : undefined;
-  const siteId =
+  const projectId =
     segments.length > 1 &&
     segments[1] !== "billing" &&
     segments[1] !== "settings"
@@ -31,7 +31,7 @@ export function DashboardNavigation() {
   const resolvedItems = replaceDynamicParams(
     navigationItems,
     organizationId,
-    siteId,
+    projectId,
     userId,
   );
 

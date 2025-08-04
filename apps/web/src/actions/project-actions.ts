@@ -34,27 +34,13 @@ export async function createProjectAction(
     };
   }
 
-  const dbUser = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    include: { _count: { select: { projects: true } } },
-  });
-
-  if (!dbUser) {
-    return {
-      success: false,
-      message: "User not found.",
-    };
-  }
-
-  // For now, allow unlimited projects per user (team-based limits will be enforced elsewhere)
-  const _projectCount = dbUser._count.sites;
-
   try {
     const newSite = await prisma.project.create({
       data: {
         name: validatedFields.data.name,
         domain: validatedFields.data.domain || null,
-        userId: session.user.id,
+        organizationId: validatedFields.data.organizationId,
+        // userId: session.user.id,
       },
     });
 
@@ -63,7 +49,7 @@ export async function createProjectAction(
     return {
       success: true,
       message: "Project created successfully!",
-      newSiteId: newSite.id,
+      newprojectId: newSite.id,
     };
   } catch (error) {
     console.error("Error creating project:", error);
@@ -79,7 +65,7 @@ export async function deleteProjectAction(
   _prevState: FormState,
   formData: FormData,
 ): Promise<FormState> {
-  const session = await getServerSession(authOptions);
+  const session = await authenticated();
 
   if (!session || !session.user || !session.user.id) {
     return {
@@ -88,10 +74,10 @@ export async function deleteProjectAction(
     };
   }
 
-  const siteId = formData.get("siteId") as string;
+  const projectId = formData.get("projectId") as string;
   const confirmedProjectName = formData.get("confirmedProjectName") as string;
 
-  if (!siteId || !confirmedProjectName) {
+  if (!projectId || !confirmedProjectName) {
     return {
       success: false,
       message: "Missing site ID or project name for confirmation.",
@@ -101,8 +87,7 @@ export async function deleteProjectAction(
   try {
     const project = await prisma.project.findUnique({
       where: {
-        id: siteId,
-        userId: session.user.id, // Ensure the user owns this project
+        id: projectId,
       },
     });
 
@@ -123,7 +108,7 @@ export async function deleteProjectAction(
 
     await prisma.project.delete({
       where: {
-        id: siteId,
+        id: projectId,
       },
     });
 
@@ -134,7 +119,7 @@ export async function deleteProjectAction(
     return {
       success: true,
       message: `Project \"${project.name}\" deleted successfully.`,
-      // newSiteId is not relevant here, but FormState includes it as optional
+      // newprojectId is not relevant here, but FormState includes it as optional
     };
   } catch (error) {
     console.error("Error deleting project:", error);

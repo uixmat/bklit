@@ -1,6 +1,5 @@
 import { prisma } from "@bklit/db/client";
 import { Webhooks } from "@polar-sh/nextjs";
-import { syncSubscriptionFromPolar } from "@/lib/polar/subscriptions";
 
 // Define webhook payload types
 interface WebhookPayload {
@@ -71,7 +70,7 @@ export const POST = Webhooks({
 
         if (user?.organizationMemberships?.[0]?.organization) {
           const organization = user.organizationMemberships[0].organization;
-          await syncSubscriptionFromPolar(subscription.id, organization.id);
+          // await syncSubscriptionFromPolar(subscription.id, organization.id);
         }
       }
     } catch (error) {

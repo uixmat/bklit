@@ -25,23 +25,23 @@ export const navigationConfig: NavigationConfig = {
     },
   ],
 
-  // Site level navigation (when at /[teamId]/[siteId])
+  // Site level navigation (when at /[teamId]/[projectId])
   site: [
     {
       title: "Overview",
-      href: "/[teamId]/[siteId]",
+      href: "/[teamId]/[projectId]",
     },
     {
       title: "Analytics",
-      href: "/[teamId]/[siteId]/analytics",
+      href: "/[teamId]/[projectId]/analytics",
     },
     {
       title: "Sessions",
-      href: "/[teamId]/[siteId]/analytics/sessions",
+      href: "/[teamId]/[projectId]/analytics/sessions",
     },
     {
       title: "Settings",
-      href: "/[teamId]/[siteId]/settings",
+      href: "/[teamId]/[projectId]/settings",
     },
   ],
 
@@ -62,7 +62,7 @@ export function getNavigationItems(pathname: string): NavigationItem[] {
     return navigationConfig.user;
   }
 
-  // Site level: /[teamId]/[siteId]/... (but not billing, settings)
+  // Site level: /[teamId]/[projectId]/... (but not billing, settings)
   if (
     segments.length >= 2 &&
     segments[1] !== "billing" &&
@@ -82,14 +82,14 @@ export function getNavigationItems(pathname: string): NavigationItem[] {
 export function replaceDynamicParams(
   items: NavigationItem[],
   teamId?: string,
-  siteId?: string,
+  projectId?: string,
   userId?: string,
 ): NavigationItem[] {
   return items.map((item) => ({
     ...item,
     href: item.href
       .replace("[teamId]", teamId || "")
-      .replace("[siteId]", siteId || "")
+      .replace("[projectId]", projectId || "")
       .replace("[userId]", userId || ""),
   }));
 }

@@ -46,5 +46,5 @@ export interface ProjectFormState {
   success: boolean;
   message: string;
   errors?: Record<string, string[] | undefined>;
-  newSiteId?: string;
+  newprojectId?: string;
 }

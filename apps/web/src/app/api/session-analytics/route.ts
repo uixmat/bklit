@@ -3,13 +3,13 @@ import { getSessionAnalytics } from "@/actions/session-actions";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const siteId = searchParams.get("siteId");
+  const projectId = searchParams.get("projectId");
   const days = Number(searchParams.get("days") || 30);
 
-  if (!siteId) {
-    return NextResponse.json({ error: "Missing siteId" }, { status: 400 });
+  if (!projectId) {
+    return NextResponse.json({ error: "Missing projectId" }, { status: 400 });
   }
 
-  const data = await getSessionAnalytics(siteId, days);
+  const data = await getSessionAnalytics(projectId, days);
   return NextResponse.json(data);
 }
