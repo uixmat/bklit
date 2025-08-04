@@ -4,9 +4,9 @@ import type { Metadata } from "next";
 import Modal from "./_modal";
 
 export const metadata: Metadata = {
-  title: "Create project",
+  title: "Create organization",
 };
 
-export default function CreateProjectModal() {
+export default function CreateOrganizationModal() {
   return <Modal />;
 }

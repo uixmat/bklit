@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
     "dev": "BKLIT_ENVIRONMENT=development BKLIT_DEBUG=true vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview"

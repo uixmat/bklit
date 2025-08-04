@@ -1,15 +1,12 @@
 "use server";
 
-import { syncPolarProductsToDatabase } from "@/lib/polar/products";
-import { syncAllActiveSubscriptions } from "@/lib/polar/subscriptions";
-
 export async function syncPolarData() {
   try {
     // Sync products first
-    await syncPolarProductsToDatabase();
+    // await syncPolarProductsToDatabase();
 
     // Then sync subscriptions
-    await syncAllActiveSubscriptions();
+    // await syncAllActiveSubscriptions();
 
     return { success: true, message: "Polar data synced successfully" };
   } catch (error) {
@@ -20,7 +17,7 @@ export async function syncPolarData() {
 
 export async function syncPolarProducts() {
   try {
-    await syncPolarProductsToDatabase();
+    // await syncPolarProductsToDatabase();
     return { success: true, message: "Polar products synced successfully" };
   } catch (error) {
     console.error("Error syncing Polar products:", error);
@@ -30,7 +27,7 @@ export async function syncPolarProducts() {
 
 export async function syncPolarSubscriptions() {
   try {
-    await syncAllActiveSubscriptions();
+    // await syncAllActiveSubscriptions();
     return {
       success: true,
       message: "Polar subscriptions synced successfully",

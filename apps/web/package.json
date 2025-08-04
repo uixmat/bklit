@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "clean": "git clean -xdf .cache .turbo .next dist node_modules",
     "dev": "pnpm with-env next dev --turbopack",
     "build": "pnpm with-env next build",
     "start": "pnpm with-env next start",
@@ -49,8 +50,8 @@
     "@tailwindcss/postcss": "^4",
     "@types/d3": "^7.4.3",
     "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/react": "catalog:react19",
+    "@types/react-dom": "catalog:react19",
     "@types/topojson-client": "^3.1.5",
     "dotenv-cli": "catalog:",
     "prisma": "^6.8.2",

@@ -29,6 +29,7 @@
         ".expo/**",
         "dist/**",
         "build/**",
+        "generated/**",
         "lib/**"
       ]
     },
@@ -38,8 +39,13 @@
     "test": {
       "cache": false
     },
+    "clean": {
+      "cache": false
+    },
+    "//#clean": {
+      "cache": false
+    },
     "dev": {
-      "dependsOn": ["^db:generate"],
       "inputs": ["$TURBO_DEFAULT$", ".env"],
       "persistent": true,
       "cache": false

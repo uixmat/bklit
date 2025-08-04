@@ -8,7 +8,9 @@
     "./client": "./src/client.ts"
   },
   "scripts": {
-    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "clean": "git clean -xdf generated .cache .turbo dist node_modules",
+    "build": "pnpm generate",
+    "dev": "pnpm generate",
     "generate": "pnpm with-env prisma generate --no-engine --schema=./prisma/schema.prisma",
     "migrate": "pnpm with-env prisma migrate dev --schema=./prisma/schema.prisma",
     "studio": "pnpm with-env prisma studio --schema=./prisma/schema.prisma",
@@ -16,14 +18,14 @@
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
+    "@prisma/client": "catalog:prisma",
     "@t3-oss/env-nextjs": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@prisma/client": "^6.8.2",
     "@bklit/tsconfig": "workspace:*",
     "dotenv-cli": "^10.0.0",
-    "prisma": "^6.8.2",
+    "prisma": "catalog:prisma",
     "typescript": "catalog:"
   }
 }
