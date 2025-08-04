@@ -1,16 +1,18 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { z } from "zod";
+import { auth } from "@/auth/server";
 import { authenticated } from "@/lib/auth";
 import type { OrganizationFormState } from "@/types/user";
-import { auth } from "@/auth/server";
-import { headers } from "next/headers";
 
 const createOrganizationSchema = z.object({
   name: z
     .string()
-    .min(2, { message: "Organization name must be at least 2 characters long." })
+    .min(2, {
+      message: "Organization name must be at least 2 characters long.",
+    })
     .max(50, { message: "Organization name must be 50 characters or less." }),
   description: z
     .string()
@@ -107,7 +109,9 @@ export async function deleteOrganizationAction(
   }
 
   const organizationId = formData.get("organizationId") as string;
-  const confirmedOrganizationName = formData.get("confirmedOrganizationName") as string;
+  const confirmedOrganizationName = formData.get(
+    "confirmedOrganizationName",
+  ) as string;
 
   if (!organizationId || !confirmedOrganizationName) {
     return {
@@ -132,7 +136,7 @@ export async function deleteOrganizationAction(
     console.error("Error deleting organization:", error);
     return {
       success: false,
-      message: "Failed to delete organization. Please try again.", 
+      message: "Failed to delete organization. Please try again.",
     };
   }
 }

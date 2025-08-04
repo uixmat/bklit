@@ -2,10 +2,13 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { authClient } from "@/auth/client";
 import { useActionState, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { deleteOrganizationAction, type OrganizationFormState } from "@/actions/organization-actions";
+import {
+  deleteOrganizationAction,
+  type OrganizationFormState,
+} from "@/actions/organization-actions";
+import { authClient } from "@/auth/client";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -31,10 +34,16 @@ const initialState: OrganizationFormState = {
   message: "",
 };
 
-export function DeleteOrganizationForm({ organizationId, organizationName }: DeleteOrganizationFormProps) {
+export function DeleteOrganizationForm({
+  organizationId,
+  organizationName,
+}: DeleteOrganizationFormProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [confirmationInput, setConfirmationInput] = useState("");
-  const [state, formAction] = useActionState(deleteOrganizationAction, initialState);
+  const [state, formAction] = useActionState(
+    deleteOrganizationAction,
+    initialState,
+  );
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -94,9 +103,10 @@ export function DeleteOrganizationForm({ organizationId, organizationName }: Del
         <DialogHeader>
           <DialogTitle>Delete Organization: {organizationName}</DialogTitle>
           <DialogDescription>
-            To permanently delete this organization and all associated data, please
-            enter &quot;
-            <span className="font-semibold">{organizationName}</span>&quot; below.
+            To permanently delete this organization and all associated data,
+            please enter &quot;
+            <span className="font-semibold">{organizationName}</span>&quot;
+            below.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">

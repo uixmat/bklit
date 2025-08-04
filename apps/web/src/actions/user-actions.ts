@@ -1,9 +1,8 @@
 "use server";
 
 import { prisma } from "@bklit/db";
-import { authenticated } from "@/lib/auth";
-
 import { auth } from "@/auth/server";
+import { authenticated } from "@/lib/auth";
 
 export async function getUserProjectCount(): Promise<number | null> {
   const session = await authenticated();

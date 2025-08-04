@@ -1,5 +1,4 @@
 import { prisma } from "@bklit/db";
-import { redirect } from "next/navigation";
 import { BillingSuccessDialog } from "@/components/dialogs/billing-success-dialog";
 import { PageHeader } from "@/components/page-header";
 import { PolarPricingTable } from "@/components/polar-pricing-table";
@@ -32,7 +31,7 @@ export default async function BillingPage({
 }) {
   const { organizationId } = await params;
   const resolvedSearchParams = await searchParams;
-  const session = await authenticated({
+  const _session = await authenticated({
     callbackUrl: `/${organizationId}/billing`,
   });
 

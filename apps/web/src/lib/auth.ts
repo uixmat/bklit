@@ -1,12 +1,9 @@
-import { auth } from "@/auth/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { auth } from "@/auth/server";
 
-export const authenticated = async (options?: {
-  callbackUrl?: string;
-  redirect?: boolean;
-}) => {
-  const { callbackUrl, redirect: shouldRedirect = true } = options ?? {};
+export const authenticated = async (options?: { callbackUrl?: string }) => {
+  const { callbackUrl } = options ?? {};
 
   const session = await auth.api.getActiveMember({
     headers: await headers(),

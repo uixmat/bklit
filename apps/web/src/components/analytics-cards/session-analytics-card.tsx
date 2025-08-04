@@ -26,7 +26,7 @@ function formatDuration(seconds: number | null): string {
 
 async function SessionAnalyticsContent({
   siteId,
-  organizationId, 
+  organizationId,
 }: SessionAnalyticsCardProps) {
   const sessions = await getRecentSessions(siteId, 5);
 

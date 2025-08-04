@@ -40,7 +40,10 @@ export default async function OrganizationSettingsPage({
     redirect("/signin");
   }
 
-  const organizationData = await getOrganizationData(organizationId, session.user.id);
+  const organizationData = await getOrganizationData(
+    organizationId,
+    session.user.id,
+  );
 
   if (!organizationData) {
     redirect("/");
@@ -63,7 +66,10 @@ export default async function OrganizationSettingsPage({
         </CardHeader>
         <CardContent className="space-y-6">
           {userMembership.role === "owner" && (
-            <DeleteOrganizationForm organizationId={organization.id} organizationName={organization.name} />
+            <DeleteOrganizationForm
+              organizationId={organization.id}
+              organizationName={organization.name}
+            />
           )}
         </CardContent>
       </Card>

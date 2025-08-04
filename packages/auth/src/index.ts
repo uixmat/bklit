@@ -1,21 +1,20 @@
-import type { BetterAuthOptions } from "better-auth";
 import { expo } from "@better-auth/expo";
-import { betterAuth } from "better-auth";
-import { prismaAdapter } from "better-auth/adapters/prisma";
-import { oAuthProxy } from "better-auth/plugins";
+import { prisma } from "@bklit/db";
 import {
-  polar,
   checkout,
+  polar,
   portal,
   usage,
   webhooks,
 } from "@polar-sh/better-auth";
-import { organization } from "better-auth/plugins"
-
-import { prisma } from "@bklit/db";
 import { Polar } from "@polar-sh/sdk";
+import type { BetterAuthOptions } from "better-auth";
+import { betterAuth } from "better-auth";
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import { oAuthProxy, organization } from "better-auth/plugins";
 
 import { authEnv } from "../env";
+
 const env = authEnv();
 
 const polarClient = new Polar({
@@ -64,9 +63,9 @@ export function initAuth(options: {
           usage(),
           webhooks({
             secret: env.POLAR_WEBHOOK_SECRET,
-            onCustomerStateChanged: async (payload) => {},
-            onOrderPaid: async (payload) => {},
-            onPayload: async (payload) => {},
+            onCustomerStateChanged: async (_payload) => {},
+            onOrderPaid: async (_payload) => {},
+            onPayload: async (_payload) => {},
           }),
         ],
       }),

@@ -12,7 +12,7 @@ export function PricingComparison({ currentPlan }: PricingComparisonProps) {
 
   // Define all features for comparison
   const allFeatures = [
-    { name: "Projects", key: "projectLimit" },  
+    { name: "Projects", key: "projectLimit" },
     { name: "Organization Members", key: "organizationMemberLimit" },
     { name: "Page View Tracking", key: "pageViews" },
     { name: "Custom Event Tracking", key: "customEvents" },

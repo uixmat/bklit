@@ -91,7 +91,7 @@ export function AddOrganizationForm({ onSuccess }: { onSuccess?: () => void }) {
     } else if (state.message && !state.success) {
       toast.error(state.message);
     }
-  }, [state, form, router]);
+  }, [state, form, router, onSuccess]);
 
   const onSubmit = (data: AddOrganizationFormValues) => {
     const formData = new FormData();

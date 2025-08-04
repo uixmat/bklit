@@ -29,13 +29,16 @@ export async function GET(request: NextRequest) {
     });
 
     if (!organizationMembership) {
-      return NextResponse.json({ error: "Organization not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Organization not found" },
+        { status: 404 },
+      );
     }
 
     const subscription = await getOrganizationSubscription(organizationId);
 
     return NextResponse.json(subscription);
-  } catch (error) { 
+  } catch (error) {
     console.error("Error fetching organization subscription:", error);
     return NextResponse.json(
       { error: "Internal server error" },
