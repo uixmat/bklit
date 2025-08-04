@@ -1,8 +1,8 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { authClient } from "@/auth/client";
 import { getUserProjectCount } from "@/actions/user-actions";
+import { authClient } from "@/auth/client";
 import { getPlanDetails, type PlanDetails, PlanType } from "@/lib/plans";
 
 interface UserPlanStatus {

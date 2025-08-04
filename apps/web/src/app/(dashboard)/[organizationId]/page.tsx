@@ -14,8 +14,7 @@ import {
 } from "@/components/ui/card";
 import { authenticated } from "@/lib/auth";
 
-async function getOrganizationData(organizationId: string, userId: string) {
-
+async function getOrganizationData(organizationId: string, _userId: string) {
   const organization = await prisma.organization.findUnique({
     where: { id: organizationId },
     include: {
@@ -54,7 +53,10 @@ export default async function OrganizationDashboardPage({
     redirect("/signin");
   }
 
-  const organizationData = await getOrganizationData(organizationId, session.user.id);
+  const organizationData = await getOrganizationData(
+    organizationId,
+    session.user.id,
+  );
 
   if (!organizationData) {
     redirect("/");
@@ -66,7 +68,9 @@ export default async function OrganizationDashboardPage({
     <div className="space-y-6 prose dark:prose-invert max-w-none">
       <PageHeader
         title={organization.name}
-        description={organization.metadata?.description || "Organization dashboard"}
+        description={
+          organization.metadata?.description || "Organization dashboard"
+        }
       />
 
       {/* Team Overview */}
@@ -154,10 +158,14 @@ export default async function OrganizationDashboardPage({
                 <CardContent>
                   <div className="flex gap-2">
                     <Button asChild size="sm" variant="outline">
-                      <Link href={`/${organizationId}/${site.id}`}>View Project</Link>
+                      <Link href={`/${organizationId}/${site.id}`}>
+                        View Project
+                      </Link>
                     </Button>
                     <Button asChild size="sm">
-                      <Link href={`/${organizationId}/${site.id}/setup`}>Setup</Link>
+                      <Link href={`/${organizationId}/${site.id}/setup`}>
+                        Setup
+                      </Link>
                     </Button>
                   </div>
                 </CardContent>
@@ -176,7 +184,7 @@ export default async function OrganizationDashboardPage({
           </h2>
           {userMembership.role === "owner" && (
             <Button asChild>
-            <Link href={`/${organizationId}/members/invite`}>
+              <Link href={`/${organizationId}/members/invite`}>
                 <Plus className="mr-2 size-4" />
                 Invite Member
               </Link>

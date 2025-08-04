@@ -30,7 +30,9 @@ export function NavUser({
   const { activeOrganization } = useWorkspace();
 
   const billingHref = `/${activeOrganization?.id}/billing`;
-  const dashboardHref = activeOrganization?.id ? `/${activeOrganization?.id}` : "/";
+  const dashboardHref = activeOrganization?.id
+    ? `/${activeOrganization?.id}`
+    : "/";
 
   return (
     <DropdownMenu>
@@ -88,7 +90,7 @@ export function NavUser({
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => authClient.signOut()}>
+        <DropdownMenuItem onClick={() => authClient.signOut()}>
           <LogOut className="mr-2 h-4 w-4" />
           Log out
         </DropdownMenuItem>

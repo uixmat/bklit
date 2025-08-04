@@ -10,7 +10,7 @@ export default function PricingPage() {
         description="Choose the perfect plan for your organization. All plans include a 14-day free trial."
       />
 
-      <PolarPricingTable /> 
+      <PolarPricingTable />
 
       <div className="space-y-6">
         <div className="text-center">

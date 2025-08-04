@@ -6,7 +6,7 @@ export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ organizationId: string }> },
 ) {
-  try { 
+  try {
     const { organizationId } = await params;
     const session = await authenticated({ redirect: false });
 
@@ -23,7 +23,10 @@ export async function GET(
     });
 
     if (!organizationMembership) {
-      return NextResponse.json({ error: "Organization not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Organization not found" },
+        { status: 404 },
+      );
     }
 
     // Get organization data
@@ -32,7 +35,10 @@ export async function GET(
     });
 
     if (!organization) {
-      return NextResponse.json({ error: "Organization not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Organization not found" },
+        { status: 404 },
+      );
     }
 
     return NextResponse.json(organization);

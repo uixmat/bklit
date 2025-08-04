@@ -67,7 +67,7 @@ export default async function UserPage({
         description="Manage your organizations and projects."
       />
 
-    {/* Organizations Section */}
+      {/* Organizations Section */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold flex items-center gap-2">
@@ -75,7 +75,7 @@ export default async function UserPage({
             Organizations
           </h2>
           <Button asChild>
-            	<Link href="/organizations/create">
+            <Link href="/organizations/create">
               <Plus className="mr-2 size-4" />
               Create Organization
             </Link>

@@ -1,12 +1,13 @@
 "use client";
 
-import { createContext, type ReactNode, useContext } from "react";
+import type { Session } from "@bklit/auth";
 import type { UserOrganizations } from "@bklit/db/queries/user";
 import { useParams, useRouter } from "next/navigation";
+import { createContext, type ReactNode, useContext } from "react";
 import { authClient } from "@/auth/client";
 
 interface WorkspaceContextType {
-  session: any; // TODO: fix this
+  session: Session;
   activeOrganization: UserOrganizations[number] | undefined;
   activeProject: UserOrganizations[number]["projects"][number] | undefined;
   onChangeOrganization: (organizationId: string) => void;
@@ -14,12 +15,12 @@ interface WorkspaceContextType {
   organizations: UserOrganizations;
 }
 
-const WorkspaceContext = createContext<
-  WorkspaceContextType | undefined
->(undefined);
+const WorkspaceContext = createContext<WorkspaceContextType | undefined>(
+  undefined,
+);
 
 export const WorkspaceProvider: React.FC<{
-  session: any;
+  session: Session;
   organizations: UserOrganizations;
   children: ReactNode;
 }> = ({ children, session, organizations }) => {
@@ -69,9 +70,7 @@ export const WorkspaceProvider: React.FC<{
 export const useWorkspace = (): WorkspaceContextType => {
   const context = useContext(WorkspaceContext);
   if (context === undefined) {
-    throw new Error(
-      "useWorkspace must be used within a WorkspaceProvider",
-    );
+    throw new Error("useWorkspace must be used within a WorkspaceProvider");
   }
   return context;
 };

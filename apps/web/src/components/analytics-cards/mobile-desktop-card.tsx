@@ -1,8 +1,8 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import { authClient } from "@/auth/client";
 import { Cell, Pie, PieChart } from "recharts";
 import { getMobileDesktopStats } from "@/actions/analytics-actions";
+import { authClient } from "@/auth/client";
 import {
   Card,
   CardContent,

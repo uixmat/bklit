@@ -12,7 +12,11 @@ import {
 } from "@/components/ui/card";
 import { authenticated } from "@/lib/auth";
 
-async function getSiteData(siteId: string, organizationId: string, userId: string) {
+async function getSiteData(
+  siteId: string,
+  organizationId: string,
+  userId: string,
+) {
   const site = await prisma.project.findFirst({
     where: {
       id: siteId,

@@ -1,8 +1,8 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { authClient } from "@/auth/client";
 import { getBrowserStats } from "@/actions/analytics-actions";
+import { authClient } from "@/auth/client";
 import { BrowserIcon } from "@/components/icons/browser";
 import { ChromeIcon } from "@/components/icons/chrome";
 import { EdgeIcon } from "@/components/icons/edge";

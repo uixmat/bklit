@@ -2,10 +2,10 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { authClient } from "@/auth/client";
 import { useActionState, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { deleteProjectAction, type FormState } from "@/actions/project-actions";
+import { authClient } from "@/auth/client";
 
 import { Button } from "@/components/ui/button";
 import {

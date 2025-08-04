@@ -12,9 +12,12 @@ export function authEnv() {
           : z.string().min(1).optional(),
 
       POLAR_ACCESS_TOKEN: z.string().min(1),
-      POLAR_SERVER_MODE: z.enum(["sandbox", "production"]).optional().default("sandbox"),
+      POLAR_SERVER_MODE: z
+        .enum(["sandbox", "production"])
+        .optional()
+        .default("sandbox"),
       POLAR_WEBHOOK_SECRET: z.string().min(1),
-      
+
       NODE_ENV: z.enum(["development", "production"]).optional(),
     },
     experimental__runtimeEnv: {},

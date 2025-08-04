@@ -15,4 +15,6 @@ export const getUserOrganizations = (userId: string) => {
   });
 };
 
-export type UserOrganizations = Awaited<ReturnType<typeof getUserOrganizations>>;
+export type UserOrganizations = Awaited<
+  ReturnType<typeof getUserOrganizations>
+>;
