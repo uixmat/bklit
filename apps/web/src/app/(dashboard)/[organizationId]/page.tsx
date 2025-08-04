@@ -3,18 +3,18 @@ import { HydrateClient, prefetch, trpc } from "@/trpc/server";
 import { OrganizationDashboard } from "./_components/organization-dashboard";
 
 export default async function OrganizationDashboardPage({
-	params,
+  params,
 }: {
-	params: Promise<{ organizationId: string }>;
+  params: Promise<{ organizationId: string }>;
 }) {
-	await authenticated();
-	const { organizationId } = await params;
+  await authenticated();
+  const { organizationId } = await params;
 
-	prefetch(trpc.organization.fetch.queryOptions({ id: organizationId }));
+  prefetch(trpc.organization.fetch.queryOptions({ id: organizationId }));
 
-	return (
-		<HydrateClient>
-			<OrganizationDashboard organizationId={organizationId} />
-		</HydrateClient>
-	);
+  return (
+    <HydrateClient>
+      <OrganizationDashboard organizationId={organizationId} />
+    </HydrateClient>
+  );
 }

@@ -3,6 +3,7 @@
 @source "../../../components/**/*.{ts,tsx}";
 @source "../**/*.{ts,tsx}";
 
+/* biome-ignore lint/correctness/noInvalidPositionAtImportRule: Tailwind needs sources first */
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
