@@ -9,7 +9,7 @@
   },
   "scripts": {
     "clean": "git clean -xdf .cache .turbo dist node_modules",
-    "generate": "pnpm with-env prisma generate --schema=./prisma/schema.prisma",
+    "generate": "pnpm with-env prisma generate --no-engine --schema=./prisma/schema.prisma",
     "migrate": "pnpm with-env prisma migrate dev --schema=./prisma/schema.prisma",
     "studio": "pnpm with-env prisma studio --schema=./prisma/schema.prisma",
     "db:seed": "pnpm with-env tsx src/seed.ts",

@@ -7,10 +7,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@bklit/ui/components/card";
+import { Skeleton } from "@bklit/ui/components/skeleton";
 import { authClient } from "@/auth/client";
 import { useProject } from "@/contexts/project-context";
 import { WorldMap } from "../maps/world-map";
-import { Skeleton } from "../ui/skeleton";
 
 export function WorldMapCard() {
   const { currentSiteId } = useProject();

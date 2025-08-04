@@ -1,4 +1,4 @@
-import type { User } from "../generated/client";
+import type { User } from "../generated/prisma/client";
 import { prisma } from "./client";
 
 const DEFAULT_USERS = [
