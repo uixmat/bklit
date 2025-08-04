@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { AddTeamForm } from "@/components/forms/add-team-form";
+import { AddOrganizationForm } from "@/components/forms/add-organization-form";
 import {
   Dialog,
   DialogContent,
@@ -28,7 +28,7 @@ export default function Modal() {
         <DialogHeader>
           <DialogTitle>Add user</DialogTitle>
         </DialogHeader>
-        <AddTeamForm onSuccess={handleSuccess} />
+        <AddOrganizationForm onSuccess={handleSuccess} />
       </DialogContent>
     </Dialog>
   );

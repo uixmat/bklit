@@ -54,7 +54,7 @@ function SubmitButton() {
   );
 }
 
-export default function AddOrganizationForm() {
+export function AddOrganizationForm({ onSuccess }: { onSuccess?: () => void }) {
   const [state, formAction] = useActionState(
     createOrganizationAction,
     initialState,
@@ -74,6 +74,7 @@ export default function AddOrganizationForm() {
     if (state.success) {
       toast.success(state.message);
       form.reset();
+      onSuccess?.();
       if (state.newOrganizationId) {
         // Redirect to the new organization
         router.push(`/${state.newOrganizationId}`);
