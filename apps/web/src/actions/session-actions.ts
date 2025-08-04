@@ -18,7 +18,7 @@ export async function createOrUpdateSession(
   data: SessionData,
   prismaClient: typeof prisma = prisma,
 ) {
-  const { sessionId, siteId, url, userAgent, country, city } = data;
+  const { sessionId, projectId, url, userAgent, country, city } = data;
 
   try {
     // Check if session exists
@@ -44,7 +44,7 @@ export async function createOrUpdateSession(
         },
         create: {
           sessionId,
-          siteId,
+          projectId,
           entryPage: url,
           exitPage: url,
           userAgent,
@@ -92,14 +92,17 @@ export async function endSession(sessionId: string) {
 }
 
 // Get session analytics for a site
-export async function getSessionAnalytics(siteId: string, days: number = 30) {
+export async function getSessionAnalytics(
+  projectId: string,
+  days: number = 30,
+) {
   try {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
     const sessions = await prisma.trackedSession.findMany({
       where: {
-        siteId,
+        projectId,
         startedAt: {
           gte: startDate,
         },
@@ -146,10 +149,10 @@ export async function getSessionAnalytics(siteId: string, days: number = 30) {
 }
 
 // Get recent sessions with page flow
-export async function getRecentSessions(siteId: string, limit: number = 10) {
+export async function getRecentSessions(projectId: string, limit: number = 10) {
   try {
     return await prisma.trackedSession.findMany({
-      where: { siteId },
+      where: { projectId },
       include: {
         pageViewEvents: {
           orderBy: { timestamp: "asc" },
@@ -201,7 +204,7 @@ export async function getSessionById(sessionId: string) {
         pageViewEvents: {
           orderBy: { timestamp: "asc" },
         },
-        site: {
+        project: {
           select: {
             name: true,
             domain: true,

@@ -12,13 +12,13 @@ import { PageHeader } from "@/components/page-header";
 import { authenticated } from "@/lib/auth";
 
 async function getSiteData(
-  siteId: string,
+  projectId: string,
   organizationId: string,
   userId: string,
 ) {
   const site = await prisma.project.findFirst({
     where: {
-      id: siteId,
+      id: projectId,
       organizationId: organizationId,
     },
     include: {
@@ -42,12 +42,16 @@ async function getSiteData(
 export default async function ProjectDashboardPage({
   params,
 }: {
-  params: Promise<{ organizationId: string; siteId: string }>;
+  params: Promise<{ organizationId: string; projectId: string }>;
 }) {
-  const { organizationId, siteId } = await params;
+  const { organizationId, projectId } = await params;
   const session = await authenticated();
 
-  const siteData = await getSiteData(siteId, organizationId, session.user.id);
+  const siteData = await getSiteData(
+    projectId,
+    organizationId,
+    session.user.id,
+  );
 
   if (!siteData) {
     redirect("/");
@@ -66,7 +70,7 @@ export default async function ProjectDashboardPage({
         </CardHeader>
         <CardContent className="space-y-6">
           {userMembership?.role === "owner" && (
-            <DeleteProjectForm siteId={site.id} projectName={site.name} />
+            <DeleteProjectForm projectId={site.id} projectName={site.name} />
           )}
         </CardContent>
       </Card>

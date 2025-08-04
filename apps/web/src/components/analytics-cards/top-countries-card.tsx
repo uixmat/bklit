@@ -14,10 +14,10 @@ import type { AnalyticsCardProps } from "@/types/analytics-cards";
 type TopCountriesCardProps = AnalyticsCardProps;
 
 export async function TopCountriesCard({
-  siteId,
+  projectId,
   userId,
 }: TopCountriesCardProps) {
-  const topCountries = await getTopCountries({ siteId, userId });
+  const topCountries = await getTopCountries({ projectId, userId });
 
   return (
     <Card>

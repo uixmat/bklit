@@ -16,7 +16,7 @@ import { ChromeIcon } from "@/components/icons/chrome";
 import { EdgeIcon } from "@/components/icons/edge";
 import { FirefoxIcon } from "@/components/icons/firefox";
 import { SafariIcon } from "@/components/icons/safari";
-import { useProject } from "@/contexts/project-context";
+import { useWorkspace } from "@/contexts/workspace-provider";
 import type { BrowserStats } from "@/types/analytics";
 
 // Function to get the appropriate icon for each browser
@@ -36,17 +36,17 @@ function getBrowserIcon(browser: string) {
 }
 
 export function BrowserStatsCard() {
-  const { currentSiteId } = useProject();
+  const { activeProject } = useWorkspace();
   const { data: session } = authClient.useSession();
 
   const { data: browserStats, isLoading } = useQuery<BrowserStats[]>({
-    queryKey: ["browser-stats", currentSiteId],
+    queryKey: ["browser-stats", activeProject?.id],
     queryFn: () =>
       getBrowserStats({
-        siteId: currentSiteId || "",
+        projectId: activeProject?.id || "",
         userId: session?.user?.id || "",
       }),
-    enabled: !!currentSiteId && !!session?.user?.id,
+    enabled: !!activeProject?.id,
   });
 
   if (isLoading || !browserStats) {

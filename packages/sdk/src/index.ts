@@ -3,7 +3,7 @@
 import { type BklitConfig, getDefaultConfig, validateConfig } from "./config";
 
 interface BklitOptions {
-  siteId: string;
+  projectId: string;
   apiHost?: string;
   environment?: "development" | "production";
   debug?: boolean;
@@ -19,7 +19,7 @@ export function initBklit(options: BklitOptions): void {
     return;
   }
 
-  const { siteId, apiHost, environment, debug } = options;
+  const { projectId, apiHost, environment, debug } = options;
 
   // Get default configuration and merge with options
   const defaultConfig = getDefaultConfig(environment);
@@ -32,14 +32,14 @@ export function initBklit(options: BklitOptions): void {
   // Validate configuration
   validateConfig(finalConfig);
 
-  if (!siteId) {
-    console.error("❌ Bklit SDK: siteId is required for initialization.");
+  if (!projectId) {
+    console.error("❌ Bklit SDK: projectId is required for initialization.");
     return;
   }
 
   if (finalConfig.debug) {
     console.log("🎯 Bklit SDK: Initializing with configuration", {
-      siteId,
+      projectId,
       apiHost: finalConfig.apiHost,
       environment: finalConfig.environment,
       debug: finalConfig.debug,
@@ -48,7 +48,7 @@ export function initBklit(options: BklitOptions): void {
   }
 
   // Store configuration globally for manual tracking
-  window.bklitSiteId = siteId;
+  window.bklitprojectId = projectId;
   window.bklitApiHost = finalConfig.apiHost;
   window.bklitEnvironment = finalConfig.environment;
   window.bklitDebug = finalConfig.debug;
@@ -93,7 +93,7 @@ export function initBklit(options: BklitOptions): void {
       const data = {
         url: currentUrl,
         timestamp: new Date().toISOString(),
-        siteId: siteId,
+        projectId: projectId,
         userAgent: navigator.userAgent,
         sessionId: currentSessionId,
         referrer: document.referrer || undefined,
@@ -104,7 +104,7 @@ export function initBklit(options: BklitOptions): void {
         console.log("🚀 Bklit SDK: Tracking page view...", {
           url: data.url,
           sessionId: data.sessionId,
-          siteId: data.siteId,
+          projectId: data.projectId,
           environment: data.environment,
         });
       }
@@ -131,12 +131,12 @@ export function initBklit(options: BklitOptions): void {
         }
       } else {
         console.error(
-          `❌ Bklit SDK: Failed to track page view for site ${siteId}. Status: ${response.statusText}`,
+          `❌ Bklit SDK: Failed to track page view for site ${projectId}. Status: ${response.statusText}`,
         );
       }
     } catch (error) {
       console.error(
-        `❌ Bklit SDK: Error tracking page view for site ${siteId}:`,
+        `❌ Bklit SDK: Error tracking page view for site ${projectId}:`,
         error,
       );
     }
@@ -156,7 +156,7 @@ export function initBklit(options: BklitOptions): void {
         if (debug) {
           console.log("🔄 Bklit SDK: Ending session on page unload...", {
             sessionId: currentSessionId,
-            siteId: siteId,
+            projectId: projectId,
           });
         }
 
@@ -168,7 +168,7 @@ export function initBklit(options: BklitOptions): void {
           },
           body: JSON.stringify({
             sessionId: currentSessionId,
-            siteId: siteId,
+            projectId: projectId,
             environment: environment,
           }),
           keepalive: true, // Important for sending data before page unloads
@@ -270,7 +270,7 @@ export function trackPageView() {
   const data = {
     url: window.location.href,
     timestamp: new Date().toISOString(),
-    siteId: window.bklitSiteId || "unknown",
+    projectId: window.bklitprojectId || "unknown",
     userAgent: navigator.userAgent,
     sessionId: currentSessionId,
     referrer: document.referrer || undefined,
@@ -281,7 +281,7 @@ export function trackPageView() {
     console.log("🚀 Bklit SDK: Manual page view tracking...", {
       url: data.url,
       sessionId: data.sessionId,
-      siteId: data.siteId,
+      projectId: data.projectId,
       environment: data.environment,
     });
   }
@@ -322,7 +322,7 @@ export function trackPageView() {
 declare global {
   interface Window {
     trackPageView?: () => void;
-    bklitSiteId?: string;
+    bklitprojectId?: string;
     bklitApiHost?: string;
     bklitEnvironment?: "development" | "production";
     bklitDebug?: boolean;

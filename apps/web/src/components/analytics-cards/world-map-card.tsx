@@ -9,14 +9,14 @@ import {
 } from "@bklit/ui/components/card";
 import { Skeleton } from "@bklit/ui/components/skeleton";
 import { authClient } from "@/auth/client";
-import { useProject } from "@/contexts/project-context";
+import { useWorkspace } from "@/contexts/workspace-provider";
 import { WorldMap } from "../maps/world-map";
 
 export function WorldMapCard() {
-  const { currentSiteId } = useProject();
+  const { activeProject } = useWorkspace();
   const { data: session } = authClient.useSession();
 
-  if (!currentSiteId || !session?.user?.id) {
+  if (!activeProject?.id || !session?.user?.id) {
     return <WorldMapCardSkeleton />;
   }
 
@@ -29,7 +29,7 @@ export function WorldMapCard() {
         </CardDescription>
       </CardHeader>
       <CardContent className="h-[400px] w-full">
-        <WorldMap siteId={currentSiteId} userId={session.user.id} />
+        <WorldMap projectId={activeProject.id} userId={session.user.id} />
       </CardContent>
     </Card>
   );

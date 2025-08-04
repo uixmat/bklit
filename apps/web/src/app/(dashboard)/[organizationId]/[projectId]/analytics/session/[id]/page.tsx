@@ -14,7 +14,7 @@ import { UserSession } from "@/components/reactflow/user-session";
 import { authenticated } from "@/lib/auth";
 
 interface SessionPageProps {
-  params: Promise<{ organizationId: string; siteId: string; id: string }>;
+  params: Promise<{ organizationId: string; projectId: string; id: string }>;
 }
 
 function formatDuration(seconds: number | null): string {
@@ -55,7 +55,7 @@ function getDeviceType(userAgent: string | null): string {
 }
 
 export default async function SessionPage({ params }: SessionPageProps) {
-  const { organizationId, siteId, id } = await params;
+  const { organizationId, projectId, id } = await params;
   await authenticated();
 
   let sessionData: Awaited<ReturnType<typeof getSessionById>>;
@@ -74,7 +74,7 @@ export default async function SessionPage({ params }: SessionPageProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Link
-            href={`/${organizationId}/${siteId}/analytics`}
+            href={`/${organizationId}/${projectId}/analytics`}
             className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -84,7 +84,7 @@ export default async function SessionPage({ params }: SessionPageProps) {
         <div className="text-right">
           <h1 className="text-2xl font-bold">Session Details</h1>
           <p className="text-sm text-muted-foreground">
-            {sessionData.site.name} • {sessionData.site.domain}
+            {sessionData.project.name} • {sessionData.project.domain}
           </p>
         </div>
       </div>

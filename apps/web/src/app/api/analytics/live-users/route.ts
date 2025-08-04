@@ -4,11 +4,11 @@ import { type NextRequest, NextResponse } from "next/server";
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const siteId = searchParams.get("siteId");
+    const projectId = searchParams.get("projectId");
 
-    if (!siteId) {
+    if (!projectId) {
       return NextResponse.json(
-        { error: "siteId parameter is required" },
+        { error: "projectId parameter is required" },
         { status: 400 },
       );
     }
@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     // Count active sessions (sessions that haven't ended)
     const liveUsers = await prisma.trackedSession.count({
       where: {
-        siteId: siteId,
+        projectId: projectId,
         endedAt: null, // Active sessions only
       },
     });

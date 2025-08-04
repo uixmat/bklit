@@ -7,7 +7,7 @@ import type { GeoLocation } from "@/types/geo";
 interface TrackingPayload {
   url: string;
   timestamp: string;
-  siteId: string;
+  projectId: string;
   userAgent?: string;
   sessionId?: string;
   referrer?: string;
@@ -35,13 +35,13 @@ export async function POST(request: NextRequest) {
     const payload: TrackingPayload = await request.json();
     console.log("📊 API: Page view tracking request received", {
       url: payload.url,
-      siteId: payload.siteId,
+      projectId: payload.projectId,
       sessionId: payload.sessionId,
       timestamp: payload.timestamp,
     });
 
-    if (!payload.siteId) {
-      return createCorsResponse({ message: "siteId is required" }, 400);
+    if (!payload.projectId) {
+      return createCorsResponse({ message: "projectId is required" }, 400);
     }
 
     // Extract client IP and get location data
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
           "🔄 API: Updating session and saving page view in transaction...",
           {
             sessionId: payload.sessionId,
-            siteId: payload.siteId,
+            projectId: payload.projectId,
             url: payload.url,
           },
         );
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
           const session = await createOrUpdateSession(
             {
               sessionId: sessionId,
-              siteId: payload.siteId,
+              projectId: payload.projectId,
               url: payload.url,
               userAgent: payload.userAgent,
               country: locationData?.country,
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
           console.log("🔗 API: Session upserted successfully", {
             sessionId: session.sessionId,
             sessionDbId: session.id,
-            siteId: session.siteId,
+            projectId: session.projectId,
           });
 
           // DEDUPLICATION: Check for recent identical page view event
@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
             data: {
               url: payload.url,
               timestamp: new Date(payload.timestamp),
-              siteId: payload.siteId,
+              projectId: payload.projectId,
               userAgent: payload.userAgent,
               // Location data
               ip: locationData?.ip,
@@ -156,7 +156,7 @@ export async function POST(request: NextRequest) {
           "✅ API: Session updated and page view saved successfully",
           {
             sessionId: payload.sessionId,
-            siteId: payload.siteId,
+            projectId: payload.projectId,
           },
         );
       } catch (sessionError) {
@@ -171,13 +171,13 @@ export async function POST(request: NextRequest) {
       try {
         console.log("💾 API: Saving page view to database (no session)...", {
           url: payload.url,
-          siteId: payload.siteId,
+          projectId: payload.projectId,
         });
         await prisma.pageViewEvent.create({
           data: {
             url: payload.url,
             timestamp: new Date(payload.timestamp),
-            siteId: payload.siteId,
+            projectId: payload.projectId,
             userAgent: payload.userAgent,
             // Location data
             ip: locationData?.ip,
@@ -199,7 +199,7 @@ export async function POST(request: NextRequest) {
         console.log(
           "✅ API: Page view saved to database successfully (no session)",
           {
-            siteId: payload.siteId,
+            projectId: payload.projectId,
           },
         );
       } catch (dbError) {
@@ -212,7 +212,7 @@ export async function POST(request: NextRequest) {
     }
 
     console.log("✅ API: Page view tracking completed successfully", {
-      siteId: payload.siteId,
+      projectId: payload.projectId,
       sessionId: payload.sessionId,
     });
 

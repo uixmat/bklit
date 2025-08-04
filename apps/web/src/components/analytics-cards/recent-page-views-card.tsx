@@ -13,11 +13,11 @@ import type { AnalyticsCardProps } from "@/types/analytics-cards";
 type RecentPageViewsCardProps = AnalyticsCardProps;
 
 export async function RecentPageViewsCard({
-  siteId,
+  projectId,
   userId,
 }: RecentPageViewsCardProps) {
   const topPages = await getTopPages({
-    siteId,
+    projectId,
     userId,
     limit: 5,
   });

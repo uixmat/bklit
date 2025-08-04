@@ -17,7 +17,7 @@ import type {
 } from "@/types/geo";
 
 const getTopCountriesSchema = z.object({
-  siteId: z.string(),
+  projectId: z.string(),
   userId: z.string(),
 });
 
@@ -30,14 +30,14 @@ export async function getTopCountries(
     throw new Error(validation.error.message);
   }
 
-  const { siteId, userId } = validation.data;
+  const { projectId, userId } = validation.data;
 
   return await cache(
     async () => {
       const site = await prisma.project.findFirst({
         where: {
-          id: siteId,
-          userId: userId,
+          id: projectId,
+          // userId: userId,
         },
       });
 
@@ -48,7 +48,7 @@ export async function getTopCountries(
       const topCountries = await prisma.pageViewEvent.groupBy({
         by: ["country", "countryCode"],
         where: {
-          siteId,
+          projectId,
           country: { not: null },
           countryCode: { not: null },
         },
@@ -71,16 +71,16 @@ export async function getTopCountries(
         }),
       );
     },
-    [`${siteId}-top-countries`],
+    [`${projectId}-top-countries`],
     {
       revalidate: 300, // 5 minutes
-      tags: [`${siteId}-analytics`],
+      tags: [`${projectId}-analytics`],
     },
   )();
 }
 
 const getAnalyticsStatsSchema = z.object({
-  siteId: z.string(),
+  projectId: z.string(),
   userId: z.string(),
   days: z.number().default(7),
 });
@@ -94,14 +94,14 @@ export async function getAnalyticsStats(
     throw new Error(validation.error.message);
   }
 
-  const { siteId, userId, days } = validation.data;
+  const { projectId, userId, days } = validation.data;
 
   return await cache(
     async () => {
       const site = await prisma.project.findFirst({
         where: {
-          id: siteId,
-          userId: userId,
+          id: projectId,
+          // userId: userId,
         },
       });
 
@@ -115,24 +115,24 @@ export async function getAnalyticsStats(
       const [totalViews, recentViews, uniquePages, uniqueVisits] =
         await Promise.all([
           prisma.pageViewEvent.count({
-            where: { siteId },
+            where: { projectId },
           }),
           prisma.pageViewEvent.count({
             where: {
-              siteId,
+              projectId,
               timestamp: {
                 gte: startDate,
               },
             },
           }),
           prisma.pageViewEvent.findMany({
-            where: { siteId },
+            where: { projectId },
             distinct: ["url"],
             select: { url: true },
           }),
           prisma.pageViewEvent.findMany({
             where: {
-              siteId,
+              projectId,
               ip: { not: null },
             },
             distinct: ["ip"],
@@ -147,16 +147,16 @@ export async function getAnalyticsStats(
         uniqueVisits: uniqueVisits.length,
       };
     },
-    [`${siteId}-analytics-stats`],
+    [`${projectId}-analytics-stats`],
     {
       revalidate: 300, // 5 minutes
-      tags: [`${siteId}-analytics`],
+      tags: [`${projectId}-analytics`],
     },
   )();
 }
 
 const getRecentPageViewsSchema = z.object({
-  siteId: z.string(),
+  projectId: z.string(),
   userId: z.string(),
   limit: z.number().default(5),
 });
@@ -170,14 +170,14 @@ export async function getRecentPageViews(
     throw new Error(validation.error.message);
   }
 
-  const { siteId, userId, limit } = validation.data;
+  const { projectId, userId, limit } = validation.data;
 
   return await cache(
     async () => {
       const site = await prisma.project.findFirst({
         where: {
-          id: siteId,
-          userId: userId,
+          id: projectId,
+          // userId: userId,
         },
       });
 
@@ -187,7 +187,7 @@ export async function getRecentPageViews(
 
       const recentViews = await prisma.pageViewEvent.findMany({
         where: {
-          siteId,
+          projectId,
         },
         orderBy: {
           timestamp: "desc",
@@ -197,16 +197,16 @@ export async function getRecentPageViews(
 
       return recentViews;
     },
-    [`${siteId}-recent-page-views`],
+    [`${projectId}-recent-page-views`],
     {
       revalidate: 60, // 1 minute
-      tags: [`${siteId}-analytics`],
+      tags: [`${projectId}-analytics`],
     },
   )();
 }
 
 const getVisitsByCountrySchema = z.object({
-  siteId: z.string(),
+  projectId: z.string(),
   userId: z.string(),
 });
 
@@ -219,14 +219,14 @@ export async function getVisitsByCountry(
     throw new Error(validation.error.message);
   }
 
-  const { siteId, userId } = validation.data;
+  const { projectId, userId } = validation.data;
 
   return await cache(
     async () => {
       const site = await prisma.project.findFirst({
         where: {
-          id: siteId,
-          userId: userId,
+          id: projectId,
+          // userId: userId,
         },
       });
 
@@ -238,7 +238,7 @@ export async function getVisitsByCountry(
       const countriesWithVisits = await prisma.pageViewEvent.groupBy({
         by: ["country", "countryCode", "lat", "lon"],
         where: {
-          siteId,
+          projectId,
           country: { not: null },
           countryCode: { not: null },
         },
@@ -254,7 +254,7 @@ export async function getVisitsByCountry(
             const cities = await prisma.pageViewEvent.groupBy({
               by: ["city"],
               where: {
-                siteId,
+                projectId,
                 country: country.country,
                 city: { not: null },
               },
@@ -289,16 +289,16 @@ export async function getVisitsByCountry(
         (country) => country.coordinates !== null,
       );
     },
-    [`${siteId}-visits-by-country`],
+    [`${projectId}-visits-by-country`],
     {
       revalidate: 300, // 5 minutes
-      tags: [`${siteId}-analytics`],
+      tags: [`${projectId}-analytics`],
     },
   )();
 }
 
 const getCountryVisitStatsSchema = z.object({
-  siteId: z.string(),
+  projectId: z.string(),
   userId: z.string(),
 });
 
@@ -311,14 +311,14 @@ export async function getCountryVisitStats(
     throw new Error(validation.error.message);
   }
 
-  const { siteId, userId } = validation.data;
+  const { projectId, userId } = validation.data;
 
   return await cache(
     async () => {
       const site = await prisma.project.findFirst({
         where: {
-          id: siteId,
-          userId: userId,
+          id: projectId,
+          // userId: userId,
         },
       });
 
@@ -330,7 +330,7 @@ export async function getCountryVisitStats(
       const countriesWithVisits = await prisma.pageViewEvent.groupBy({
         by: ["country", "countryCode"],
         where: {
-          siteId,
+          projectId,
           country: { not: null },
           countryCode: { not: null },
         },
@@ -356,7 +356,7 @@ export async function getCountryVisitStats(
             // Get mobile vs desktop breakdown
             const mobileVisits = await prisma.pageViewEvent.count({
               where: {
-                siteId,
+                projectId,
                 country: country.country,
                 mobile: true,
               },
@@ -364,7 +364,7 @@ export async function getCountryVisitStats(
 
             const desktopVisits = await prisma.pageViewEvent.count({
               where: {
-                siteId,
+                projectId,
                 country: country.country,
                 mobile: false,
               },
@@ -374,7 +374,7 @@ export async function getCountryVisitStats(
             const uniqueVisits = await prisma.pageViewEvent.groupBy({
               by: ["ip"],
               where: {
-                siteId,
+                projectId,
                 country: country.country,
                 ip: { not: null },
               },
@@ -429,10 +429,10 @@ export async function getCountryVisitStats(
 
       return result;
     },
-    [`${siteId}-country-visit-stats`],
+    [`${projectId}-country-visit-stats`],
     {
       revalidate: 300, // 5 minutes
-      tags: [`${siteId}-analytics`],
+      tags: [`${projectId}-analytics`],
     },
   )();
 }
@@ -446,12 +446,12 @@ export async function debugCountryCodes(
     throw new Error(validation.error.message);
   }
 
-  const { siteId, userId } = validation.data;
+  const { projectId, userId } = validation.data;
 
   const site = await prisma.project.findFirst({
     where: {
-      id: siteId,
-      userId: userId,
+      id: projectId,
+      // userId: userId,
     },
   });
 
@@ -463,7 +463,7 @@ export async function debugCountryCodes(
   const uniqueCountryCodes = await prisma.pageViewEvent.groupBy({
     by: ["country", "countryCode"],
     where: {
-      siteId,
+      projectId,
       country: { not: null },
       countryCode: { not: null },
     },
@@ -485,7 +485,7 @@ export async function debugCountryCodes(
 }
 
 const getMobileDesktopStatsSchema = z.object({
-  siteId: z.string(),
+  projectId: z.string(),
   userId: z.string(),
 });
 
@@ -498,14 +498,14 @@ export async function getMobileDesktopStats(
     throw new Error(validation.error.message);
   }
 
-  const { siteId, userId } = validation.data;
+  const { projectId, userId } = validation.data;
 
   return await cache(
     async () => {
       const site = await prisma.project.findFirst({
         where: {
-          id: siteId,
-          userId: userId,
+          id: projectId,
+          // userId: userId,
         },
       });
 
@@ -517,7 +517,7 @@ export async function getMobileDesktopStats(
       const uniqueMobileVisits = await prisma.pageViewEvent.groupBy({
         by: ["ip"],
         where: {
-          siteId,
+          projectId,
           mobile: true,
           ip: { not: null },
         },
@@ -530,7 +530,7 @@ export async function getMobileDesktopStats(
       const uniqueDesktopVisits = await prisma.pageViewEvent.groupBy({
         by: ["ip"],
         where: {
-          siteId,
+          projectId,
           mobile: false,
           ip: { not: null },
         },
@@ -544,16 +544,16 @@ export async function getMobileDesktopStats(
         desktop: uniqueDesktopVisits.length,
       };
     },
-    [`${siteId}-mobile-desktop-stats`],
+    [`${projectId}-mobile-desktop-stats`],
     {
       revalidate: 300, // 5 minutes
-      tags: [`${siteId}-analytics`],
+      tags: [`${projectId}-analytics`],
     },
   )();
 }
 
 const getTopPagesSchema = z.object({
-  siteId: z.string(),
+  projectId: z.string(),
   userId: z.string(),
   limit: z.number().default(5),
 });
@@ -565,14 +565,14 @@ export async function getTopPages(params: z.input<typeof getTopPagesSchema>) {
     throw new Error(validation.error.message);
   }
 
-  const { siteId, userId, limit } = validation.data;
+  const { projectId, userId, limit } = validation.data;
 
   return await cache(
     async () => {
       const site = await prisma.project.findFirst({
         where: {
-          id: siteId,
-          userId: userId,
+          id: projectId,
+          // userId: userId,
         },
       });
 
@@ -582,7 +582,7 @@ export async function getTopPages(params: z.input<typeof getTopPagesSchema>) {
 
       // Fetch all page view events for the site
       const events = await prisma.pageViewEvent.findMany({
-        where: { siteId },
+        where: { projectId },
         select: { url: true },
       });
 
@@ -604,16 +604,16 @@ export async function getTopPages(params: z.input<typeof getTopPagesSchema>) {
 
       return topPages;
     },
-    [`${siteId}-top-pages`],
+    [`${projectId}-top-pages`],
     {
       revalidate: 60, // 1 minute
-      tags: [`${siteId}-analytics`],
+      tags: [`${projectId}-analytics`],
     },
   )();
 }
 
 const getBrowserStatsSchema = z.object({
-  siteId: z.string(),
+  projectId: z.string(),
   userId: z.string(),
 });
 
@@ -626,14 +626,14 @@ export async function getBrowserStats(
     throw new Error(validation.error.message);
   }
 
-  const { siteId, userId } = validation.data;
+  const { projectId, userId } = validation.data;
 
   return await cache(
     async () => {
       const site = await prisma.project.findFirst({
         where: {
-          id: siteId,
-          userId: userId,
+          id: projectId,
+          // userId: userId,
         },
       });
 
@@ -644,7 +644,7 @@ export async function getBrowserStats(
       // Get all page views with user agent data
       const pageViews = await prisma.pageViewEvent.findMany({
         where: {
-          siteId,
+          projectId,
           userAgent: { not: null },
         },
         select: {
@@ -690,16 +690,16 @@ export async function getBrowserStats(
 
       return browserData;
     },
-    [`${siteId}-browser-stats`],
+    [`${projectId}-browser-stats`],
     {
       revalidate: 300, // 5 minutes
-      tags: [`${siteId}-analytics`],
+      tags: [`${projectId}-analytics`],
     },
   )();
 }
 
 const getSessionAnalyticsSchema = z.object({
-  siteId: z.string(),
+  projectId: z.string(),
   userId: z.string(),
   days: z.number().default(30),
 });
@@ -713,14 +713,14 @@ export async function getSessionAnalytics(
     throw new Error(validation.error.message);
   }
 
-  const { siteId, userId, days } = validation.data;
+  const { projectId, userId, days } = validation.data;
 
   return await cache(
     async () => {
       const site = await prisma.project.findFirst({
         where: {
-          id: siteId,
-          userId: userId,
+          id: projectId,
+          // userId: userId,
         },
       });
 
@@ -733,7 +733,7 @@ export async function getSessionAnalytics(
 
       const sessions = await prisma.trackedSession.findMany({
         where: {
-          siteId,
+          projectId,
           startedAt: {
             gte: startDate,
           },
@@ -774,16 +774,16 @@ export async function getSessionAnalytics(
         recentSessions: sessions.slice(0, 5), // Return last 5 sessions for display
       };
     },
-    [`${siteId}-session-analytics`],
+    [`${projectId}-session-analytics`],
     {
       revalidate: 300, // 5 minutes
-      tags: [`${siteId}-analytics`],
+      tags: [`${projectId}-analytics`],
     },
   )();
 }
 
 const getLiveUsersSchema = z.object({
-  siteId: z.string(),
+  projectId: z.string(),
   userId: z.string(),
 });
 
@@ -794,14 +794,14 @@ export async function getLiveUsers(params: z.infer<typeof getLiveUsersSchema>) {
     throw new Error(validation.error.message);
   }
 
-  const { siteId, userId } = validation.data;
+  const { projectId, userId } = validation.data;
 
   return await cache(
     async () => {
       const site = await prisma.project.findFirst({
         where: {
-          id: siteId,
-          userId: userId,
+          id: projectId,
+          // userId: userId,
         },
       });
 
@@ -818,7 +818,7 @@ export async function getLiveUsers(params: z.infer<typeof getLiveUsersSchema>) {
 
       const liveUsers = await prisma.trackedSession.count({
         where: {
-          siteId,
+          projectId,
           endedAt: null, // Active sessions only
           startedAt: {
             gte: thirtyMinutesAgo, // Only count sessions started in last 30 minutes
@@ -828,10 +828,10 @@ export async function getLiveUsers(params: z.infer<typeof getLiveUsersSchema>) {
 
       return liveUsers;
     },
-    [`${siteId}-live-users`],
+    [`${projectId}-live-users`],
     {
       revalidate: 30, // 30 seconds - more frequent updates for live data
-      tags: [`${siteId}-analytics`],
+      tags: [`${projectId}-analytics`],
     },
   )();
 }

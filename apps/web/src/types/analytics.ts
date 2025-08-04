@@ -16,7 +16,7 @@ export interface BrowserStats {
 export interface SessionData {
   id: string;
   sessionId: string;
-  siteId: string;
+  projectId: string;
   startedAt: Date;
   endedAt: Date | null;
   duration: number | null;

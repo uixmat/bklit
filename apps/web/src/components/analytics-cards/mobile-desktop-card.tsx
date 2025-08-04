@@ -19,7 +19,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Cell, Pie, PieChart } from "recharts";
 import { getMobileDesktopStats } from "@/actions/analytics-actions";
 import { authClient } from "@/auth/client";
-import { useProject } from "@/contexts/project-context";
+import { useWorkspace } from "@/contexts/workspace-provider";
 import type { PieChartData } from "@/types/analytics-cards";
 
 const chartConfig = {
@@ -34,17 +34,17 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function MobileDesktopCard() {
-  const { currentSiteId } = useProject();
+  const { activeProject } = useWorkspace();
   const { data: session } = authClient.useSession();
 
   const { data: stats, isLoading } = useQuery({
-    queryKey: ["mobile-desktop-stats", currentSiteId],
+    queryKey: ["mobile-desktop-stats", activeProject?.id],
     queryFn: () =>
       getMobileDesktopStats({
-        siteId: currentSiteId || "",
+        projectId: activeProject?.id || "",
         userId: session?.user?.id || "",
       }),
-    enabled: !!currentSiteId && !!session?.user?.id,
+    enabled: !!activeProject?.id,
   });
 
   if (isLoading || !stats) {
@@ -86,7 +86,7 @@ export function MobileDesktopCard() {
                 />
               ))}
             </Pie>
-            <ChartTooltip content={<ChartTooltipContent />} />
+            {/* <ChartTooltip content={<ChartTooltipContent />} /> */}
             <ChartLegend
               content={<ChartLegendContent verticalAlign="horizontal" />}
             />

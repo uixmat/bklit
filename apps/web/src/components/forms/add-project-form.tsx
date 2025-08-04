@@ -17,19 +17,20 @@ import { useFormStatus } from "react-dom";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { createProjectAction, type FormState } from "@/actions/project-actions";
+import { authClient } from "@/auth/client";
 import {
   type AddProjectFormValues,
   addProjectSchema,
 } from "@/lib/schemas/project-schema";
 
 interface AddProjectFormProps {
-  onSuccess?: (newSiteId?: string) => void;
+  onSuccess?: (newprojectId?: string) => void;
 }
 
 const initialState: FormState = {
   success: false,
   message: "",
-  newSiteId: undefined,
+  newprojectId: undefined,
 };
 
 function SubmitButton() {
@@ -41,7 +42,9 @@ function SubmitButton() {
   );
 }
 
-export default function AddProjectForm({ onSuccess }: AddProjectFormProps) {
+export function AddProjectForm({ onSuccess }: AddProjectFormProps) {
+  const { data: activeOrganization } = authClient.useActiveOrganization();
+
   // Added onSuccess to props
   const [state, formAction] = useActionState(createProjectAction, initialState);
   const [, startTransition] = useTransition();
@@ -51,6 +54,7 @@ export default function AddProjectForm({ onSuccess }: AddProjectFormProps) {
     defaultValues: {
       name: "",
       domain: "",
+      organizationId: "wz9pOqI28qwu8XpB3AaAt5iMTbwNbTNE",
     },
   });
 
@@ -59,7 +63,7 @@ export default function AddProjectForm({ onSuccess }: AddProjectFormProps) {
       toast.success(state.message);
       form.reset(); // Reset form fields on successful submission
       if (onSuccess) {
-        onSuccess(state.newSiteId); // Call onSuccess callback with newSiteId
+        onSuccess(state.newprojectId); // Call onSuccess callback with newprojectId
       }
       // Optionally, you could redirect or close a modal here
     } else if (state.message && !state.success && state.errors) {
@@ -86,6 +90,7 @@ export default function AddProjectForm({ onSuccess }: AddProjectFormProps) {
         formData.append(key, String(value));
       }
     });
+    formData.append("organizationId", activeOrganization?.id);
     startTransition(() => {
       // Wrap formAction call in startTransition
       formAction(formData);
@@ -95,6 +100,7 @@ export default function AddProjectForm({ onSuccess }: AddProjectFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {activeOrganization?.id}
         <FormField
           control={form.control}
           name="name"
