@@ -7,7 +7,10 @@ import { useFormStatus } from "react-dom";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { createOrganizationAction, type OrganizationFormState } from "@/actions/organization-actions";
+import {
+  createOrganizationAction,
+  type OrganizationFormState,
+} from "@/actions/organization-actions";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -24,7 +27,9 @@ import { Textarea } from "@/components/ui/textarea";
 const createOrganizationSchema = z.object({
   name: z
     .string()
-    .min(2, { message: "Organization name must be at least 2 characters long." })
+    .min(2, {
+      message: "Organization name must be at least 2 characters long.",
+    })
     .max(50, { message: "Organization name must be 50 characters or less." }),
   description: z
     .string()
@@ -49,8 +54,11 @@ function SubmitButton() {
   );
 }
 
-export default function AddOrganizationForm() {
-  const [state, formAction] = useActionState(createOrganizationAction, initialState);
+export function AddOrganizationForm({ onSuccess }: { onSuccess?: () => void }) {
+  const [state, formAction] = useActionState(
+    createOrganizationAction,
+    initialState,
+  );
   const [, startTransition] = useTransition();
   const router = useRouter();
 
@@ -66,8 +74,9 @@ export default function AddOrganizationForm() {
     if (state.success) {
       toast.success(state.message);
       form.reset();
+      onSuccess?.();
       if (state.newOrganizationId) {
-            // Redirect to the new organization
+        // Redirect to the new organization
         router.push(`/${state.newOrganizationId}`);
       }
     } else if (state.message && !state.success && state.errors) {
