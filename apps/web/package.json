@@ -18,7 +18,7 @@
     "@bklit/ui": "workspace:*",
     "@hookform/resolvers": "^5.0.1",
     "@polar-sh/nextjs": "^0.4.0",
-    "@polar-sh/sdk": "^0.29.0",
+    "@polar-sh/sdk": "^0.34.9",
     "@tanstack/react-query": "catalog:",
     "@trpc/client": "catalog:",
     "@trpc/server": "catalog:",

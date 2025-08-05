@@ -13,9 +13,7 @@
         "AUTH_GITHUB_ID",
         "AUTH_GITHUB_SECRET",
         "POLAR_SERVER_MODE",
-        "POLAR_ORGANIZATION_ID",
         "POLAR_ACCESS_TOKEN",
-        "NEXT_PUBLIC_POLAR_PRO_PLAN_PRODUCT_ID",
         "POLAR_WEBHOOK_SECRET",
         "VITE_NGROK_URL"
       ],

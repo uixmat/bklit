@@ -12,8 +12,8 @@ import type { BetterAuthOptions } from "better-auth";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { oAuthProxy, organization } from "better-auth/plugins";
-
 import { authEnv } from "../env";
+import plans from "./pricing-plans.json";
 
 const env = authEnv();
 
@@ -50,13 +50,11 @@ export function initAuth(options: {
         createCustomerOnSignUp: true,
         use: [
           checkout({
-            products: [
-              {
-                productId: "5f77a503-6569-4f80-9736-57adefd3bba8",
-                slug: "pro",
-              },
-            ],
-            successUrl: "/success?checkout_id={CHECKOUT_ID}",
+            products: plans.map((plan) => ({
+              productId: plan.polarProductId,
+              slug: plan.slug,
+            })),
+            successUrl: "/",
             authenticatedUsersOnly: true,
           }),
           portal(),

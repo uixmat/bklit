@@ -152,10 +152,10 @@ importers:
         version: 5.1.1(react-hook-form@7.60.0(react@19.1.0))
       '@polar-sh/nextjs':
         specifier: ^0.4.0
-        version: 0.4.3(next@15.4.5(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(zod@3.25.76)
+        version: 0.4.3(next@15.4.5(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
       '@polar-sh/sdk':
-        specifier: ^0.29.0
-        version: 0.29.3(zod@3.25.76)
+        specifier: ^0.34.9
+        version: 0.34.9
       '@t3-oss/env-nextjs':
         specifier: 'catalog:'
         version: 0.13.8(typescript@5.8.3)(zod@3.25.76)
@@ -307,10 +307,10 @@ importers:
         version: link:../db
       '@polar-sh/better-auth':
         specifier: ^1.0.8
-        version: 1.0.8(@polar-sh/sdk@0.29.3(zod@3.25.76))(better-auth@1.2.12)
+        version: 1.0.8(@polar-sh/sdk@0.34.9)(better-auth@1.2.12)
       '@polar-sh/sdk':
-        specifier: ^0.29.3
-        version: 0.29.3(zod@3.25.76)
+        specifier: ^0.34.9
+        version: 0.34.9
       '@t3-oss/env-nextjs':
         specifier: ^0.13.6
         version: 0.13.8(typescript@5.8.3)(zod@3.25.76)
@@ -1256,22 +1256,11 @@ packages:
     peerDependencies:
       next: ^15.0.0 || ^15.2.0-canary.*
 
-  '@polar-sh/sdk@0.29.3':
-    resolution: {integrity: sha512-Tia7lAvp/8iULspCmO8ZzjbJlb06X3FAjk+fNp/fqRSmgrH1BC0Cy5q6qsEOX9lhsGZy0b+5AFJRUbYz4m1y3g==}
-    hasBin: true
-    peerDependencies:
-      '@modelcontextprotocol/sdk': ^1.5.0
-      zod: '>= 3'
-    peerDependenciesMeta:
-      '@modelcontextprotocol/sdk':
-        optional: true
-
-  '@polar-sh/sdk@0.34.5':
-    resolution: {integrity: sha512-9dDw5QSsl9NT/GB77cibRLjAT+qNkdavxCL7YOjBTuwThJb7qrzhV2EzAQ+uM8UvY3ZGptu2tGCODnRLRRvVCQ==}
+  '@polar-sh/sdk@0.34.9':
+    resolution: {integrity: sha512-+kzQ3IlO67+/eSC4kmbZbmqdPjmvAr8zjTsavyx/u5lqwrerutvhpDzCCBQMlFnEVgeXArF+Rf6FQKkqKrgpxA==}
     hasBin: true
     peerDependencies:
       '@modelcontextprotocol/sdk': '>=1.5.0 <1.10.0'
-      zod: ^3
     peerDependenciesMeta:
       '@modelcontextprotocol/sdk':
         optional: true
@@ -5539,34 +5528,27 @@ snapshots:
   '@pkgjs/parseargs@0.11.0':
     optional: true
 
-  '@polar-sh/adapter-utils@0.2.2(zod@3.25.76)':
+  '@polar-sh/adapter-utils@0.2.2':
     dependencies:
-      '@polar-sh/sdk': 0.34.5(zod@3.25.76)
+      '@polar-sh/sdk': 0.34.9
     transitivePeerDependencies:
       - '@modelcontextprotocol/sdk'
-      - zod
 
-  '@polar-sh/better-auth@1.0.8(@polar-sh/sdk@0.29.3(zod@3.25.76))(better-auth@1.2.12)':
+  '@polar-sh/better-auth@1.0.8(@polar-sh/sdk@0.34.9)(better-auth@1.2.12)':
     dependencies:
-      '@polar-sh/sdk': 0.29.3(zod@3.25.76)
+      '@polar-sh/sdk': 0.34.9
       better-auth: 1.2.12
       zod: 3.25.76
 
-  '@polar-sh/nextjs@0.4.3(next@15.4.5(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(zod@3.25.76)':
+  '@polar-sh/nextjs@0.4.3(next@15.4.5(react-dom@19.1.0(react@19.1.0))(react@19.1.0))':
     dependencies:
-      '@polar-sh/adapter-utils': 0.2.2(zod@3.25.76)
-      '@polar-sh/sdk': 0.34.5(zod@3.25.76)
+      '@polar-sh/adapter-utils': 0.2.2
+      '@polar-sh/sdk': 0.34.9
       next: 15.4.5(@babel/core@7.28.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
     transitivePeerDependencies:
       - '@modelcontextprotocol/sdk'
-      - zod
 
-  '@polar-sh/sdk@0.29.3(zod@3.25.76)':
-    dependencies:
-      standardwebhooks: 1.0.0
-      zod: 3.25.76
-
-  '@polar-sh/sdk@0.34.5(zod@3.25.76)':
+  '@polar-sh/sdk@0.34.9':
     dependencies:
       standardwebhooks: 1.0.0
       zod: 3.25.76
