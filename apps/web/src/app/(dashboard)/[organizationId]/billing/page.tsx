@@ -1,8 +1,12 @@
 import { prisma } from "@bklit/db/client";
+import { headers } from "next/headers";
+import { auth } from "@/auth/server";
 import { BillingSuccessDialog } from "@/components/dialogs/billing-success-dialog";
 import { PageHeader } from "@/components/page-header";
+import { PricingTable } from "@/components/plans/pricing-table";
 import { PolarPricingTable } from "@/components/polar-pricing-table";
 import { authenticated } from "@/lib/auth";
+import { api } from "@/trpc/server";
 
 async function getOrganizationPlan(organizationId: string) {
   const organization = await prisma.organization.findUnique({
@@ -10,14 +14,12 @@ async function getOrganizationPlan(organizationId: string) {
     select: {
       // plan: true,
       name: true,
-      polarSubscriptionId: true,
     },
   });
   return (
     organization || {
       plan: "free",
       name: "Unknown Organization",
-      polarSubscriptionId: null,
     }
   );
 }
@@ -35,8 +37,18 @@ export default async function BillingPage({
     callbackUrl: `/${organizationId}/billing`,
   });
 
-  const organization = await getOrganizationPlan(organizationId);
+  const organization = await api.organization.fetch({ id: organizationId });
   const showSuccessMessage = resolvedSearchParams?.purchase === "success";
+
+  const subscriptions = await auth.api.subscriptions({
+    query: {
+      page: 1,
+      limit: 10,
+      active: true,
+      referenceId: organizationId,
+    },
+    headers: await headers(),
+  });
 
   return (
     <div className="space-y-6 prose dark:prose-invert max-w-none">
@@ -44,18 +56,14 @@ export default async function BillingPage({
         title={`${organization.name} - Billing`}
         description={`Manage subscription and billing information for ${organization.name}.`}
       />
-      <BillingSuccessDialog isOpenInitially={showSuccessMessage} />
 
+      <BillingSuccessDialog isOpenInitially={showSuccessMessage} />
       <div className="mt-12">
         <div className="flex items-center justify-between mb-6">
           <h2>Available Plans</h2>
         </div>
         <div className="flex justify-center">
-          <PolarPricingTable
-            currentOrganizationId={organizationId}
-            // currentPlanId={organization.plan}
-            showCurrentPlan={true}
-          />
+          <PricingTable subscriptions={subscriptions.result.items} />
         </div>
       </div>
     </div>

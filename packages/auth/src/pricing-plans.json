@@ -1,0 +1,46 @@
+[
+  {
+    "name": "Free",
+    "description": "Free plan",
+    "price": 0,
+    "interval": "month",
+    "slug": "BKLIT-FREE",
+    "polarProductId": "9bace054-bb02-4b17-af9b-a57b444bda9c",
+    "benefits": [
+      { "id": "1", "name": "1000 messages", "description": "1000 messages" },
+      { "id": "2", "name": "1000 users", "description": "1000 users" },
+      {
+        "id": "3",
+        "name": "1000 organizations",
+        "description": "1000 organizations"
+      },
+      {
+        "id": "4",
+        "name": "1000 integrations",
+        "description": "1000 integrations"
+      }
+    ]
+  },
+  {
+    "name": "Pro",
+    "description": "Pro plan",
+    "slug": "BKLIT-PRO",
+    "price": 1000,
+    "interval": "month",
+    "polarProductId": "ade92922-11dd-4aa0-8a52-b343ec3fa014",
+    "benefits": [
+      { "id": "1", "name": "1000 messages", "description": "1000 messages" },
+      { "id": "2", "name": "1000 users", "description": "1000 users" },
+      {
+        "id": "3",
+        "name": "1000 organizations",
+        "description": "1000 organizations"
+      },
+      {
+        "id": "4",
+        "name": "1000 integrations",
+        "description": "1000 integrations"
+      }
+    ]
+  }
+]

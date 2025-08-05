@@ -18,13 +18,13 @@ import { AlertCircle, Check, Crown, Star } from "lucide-react";
 import Link from "next/link";
 
 interface PolarPricingTableProps {
-  currentTeamId?: string;
+  currentOrganizationId?: string;
   currentPlanId?: string;
   showCurrentPlan?: boolean;
 }
 
 export function PolarPricingTable({
-  currentTeamId,
+  currentOrganizationId,
   currentPlanId,
   showCurrentPlan = true,
 }: PolarPricingTableProps) {
@@ -98,7 +98,7 @@ export function PolarPricingTable({
     // Default case
     return (
       <Button asChild className="w-full">
-        <Link href={`/${currentTeamId}/billing`}>Get Started</Link>
+        <Link href={`/${currentOrganizationId}/billing`}>Get Started</Link>
       </Button>
     );
   };
