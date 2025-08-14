@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@bklit/ui/components/card";
-import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { Globe, Plus, Settings, Users } from "lucide-react";
 import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
