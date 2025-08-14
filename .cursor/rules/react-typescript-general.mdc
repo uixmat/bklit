@@ -1,9 +1,10 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: true
 ---
-- we use hooks and lib directories to organise our code see examples: [use-mobile.ts](mdc:apps/web/src/hooks/use-mobile.ts) and [utils.ts](mdc:apps/web/src/lib/utils.ts) - always create reusable functions, hooks and lib files to keep our code scalable and maintainable where possible.
+
+- we use hooks and lib directories to organise our code see examples: [use-mobile.ts](mdc:apps/dashboard/src/hooks/use-mobile.ts) and [utils.ts](mdc:apps/dashboard/src/lib/utils.ts) - always create reusable functions, hooks and lib files to keep our code scalable and maintainable where possible.
 - adhere to best & modern typescript /react practices.
 - when creating types use the interface method.
 - avoid using too much client side code where possible.
@@ -11,4 +12,4 @@ alwaysApply: true
 - organise our lib directory into sub folders when necessary - for example we use polar.sh for our payments and subscriptions, we should put any helpers and lib/hook functions into a polar sub directory.
 - keep code organised
 - keep comments to a minimum
-- generally import components like so `import { Component } from ...` 
+- generally import components like so `import { Component } from ...`

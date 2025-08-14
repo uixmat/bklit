@@ -1,0 +1,31 @@
+{
+  "name": "@bklit/website",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "clean": "git clean -xdf .cache .turbo .next dist node_modules",
+    "dev": "pnpm with-env next dev --port 3001 --turbopack",
+    "build": "pnpm with-env next build",
+    "start": "pnpm with-env next start",
+    "with-env": "dotenv -e ../../.env --"
+  },
+  "dependencies": {
+    "@bklit/ui": "workspace:*",
+    "@bklit/utils": "workspace:*",
+    "next": "catalog:",
+    "next-themes": "^0.4.6",
+    "react": "catalog:react19",
+    "react-dom": "catalog:react19"
+  },
+  "devDependencies": {
+    "@bklit/tsconfig": "workspace:*",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:react19",
+    "@types/react-dom": "catalog:react19",
+    "dotenv-cli": "catalog:",
+    "tailwindcss": "^4",
+    "typescript": "catalog:"
+  }
+}
