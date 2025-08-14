@@ -5,18 +5,21 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
+    "./client": "./src/client.ts",
+    "./server": "./src/server.ts",
     "./pricing-plans.json": "./src/pricing-plans.json",
     "./env": "./env.ts"
   },
   "license": "MIT",
   "scripts": {
     "clean": "git clean -xdf .cache .turbo dist node_modules",
-    "generate": "dotenv -e ../../.env -- pnpx @better-auth/cli generate --config ../../apps/web/src/auth/server.ts --output ../db/prisma/schema.prisma",
-    "migrate": "dotenv -e ../../.env -- pnpx @better-auth/cli migrate --config ../../apps/web/src/auth/server.ts --output ../db/prisma/schema.prisma"
+    "generate": "dotenv -e ../../.env -- pnpx @better-auth/cli generate --config ../../apps/dashboard/src/auth/server.ts --output ../db/prisma/schema.prisma",
+    "migrate": "dotenv -e ../../.env -- pnpx @better-auth/cli migrate --config ../../apps/dashboard/src/auth/server.ts --output ../db/prisma/schema.prisma"
   },
   "dependencies": {
     "@better-auth/expo": "1.2.12",
     "@bklit/db": "workspace:*",
+    "@bklit/utils": "workspace:*",
     "@polar-sh/better-auth": "^1.0.8",
     "@polar-sh/sdk": "^0.34.9",
     "@t3-oss/env-nextjs": "^0.13.6",
