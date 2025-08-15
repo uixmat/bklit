@@ -3,7 +3,7 @@ export function dashboardUrl() {
     process.env.VERCEL_ENV === "production" ||
     process.env.NODE_ENV === "production"
   ) {
-    return "https://bklit.com";
+    return "https://app.bklit.com";
   }
 
   if (process.env.VERCEL_ENV === "preview") {
