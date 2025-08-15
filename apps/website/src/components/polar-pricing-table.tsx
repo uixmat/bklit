@@ -13,42 +13,22 @@ import {
 } from "@bklit/ui/components/card";
 
 import { Skeleton } from "@bklit/ui/components/skeleton";
-import { useQuery } from "@tanstack/react-query";
 import { AlertCircle, Check, Crown, Star } from "lucide-react";
 import Link from "next/link";
 
 interface PolarPricingTableProps {
+  plans: any[];
   currentOrganizationId?: string;
   currentPlanId?: string;
   showCurrentPlan?: boolean;
 }
 
 export function PolarPricingTable({
+  plans,
   currentOrganizationId,
   currentPlanId,
   showCurrentPlan = true,
 }: PolarPricingTableProps) {
-  const {
-    data: plans,
-    isLoading,
-    error,
-    refetch,
-  } = useQuery({
-    queryKey: ["subscriptionPlans"],
-    queryFn: async () => {
-      const response = await fetch("/api/polar/subscription-plans");
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.error || "Failed to fetch subscription plans",
-        );
-      }
-      return response.json() as Promise<any[]>;
-    },
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    retry: 2,
-  });
-
   const formatPrice = (priceAmount: number, currency: string = "USD") => {
     if (priceAmount === 0) return "Free";
     return new Intl.NumberFormat("en-US", {
@@ -103,7 +83,8 @@ export function PolarPricingTable({
     );
   };
 
-  if (isLoading) {
+  // if (isLoading) {
+  if (false) {
     return (
       <div className="w-full max-w-4xl">
         <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
@@ -134,7 +115,8 @@ export function PolarPricingTable({
     );
   }
 
-  if (error || !plans || plans.length === 0) {
+  // if (error || !plans || plans.length === 0) {
+  if (false || !plans || plans.length === 0) {
     return (
       <div className="space-y-4">
         <Alert>

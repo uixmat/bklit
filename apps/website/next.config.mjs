@@ -7,8 +7,6 @@ await jiti.import("./src/env");
 
 /** @type {import("next").NextConfig} */
 const config = {
-  port: 3001,
-
   /** Enables hot reloading for local packages without a build step */
   transpilePackages: ["@bklit/auth", "@bklit/db", "@bklit/ui"],
 
