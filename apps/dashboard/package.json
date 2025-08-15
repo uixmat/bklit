@@ -16,6 +16,7 @@
     "@bklit/db": "workspace:*",
     "@bklit/validators": "workspace:*",
     "@bklit/ui": "workspace:*",
+    "@bklit/utils": "workspace:*",
     "@hookform/resolvers": "^5.0.1",
     "@polar-sh/nextjs": "^0.4.0",
     "@polar-sh/sdk": "^0.34.9",

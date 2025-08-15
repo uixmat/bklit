@@ -1,19 +1,12 @@
 import { initAuth } from "@bklit/auth";
+import { envs } from "@bklit/utils";
 import { headers } from "next/headers";
 import { cache } from "react";
-
 import { env } from "../env";
 
-const baseUrl =
-  env.VERCEL_ENV === "production"
-    ? `https://${env.VERCEL_PROJECT_PRODUCTION_URL}`
-    : env.VERCEL_ENV === "preview"
-      ? `https://${env.VERCEL_URL}`
-      : "http://localhost:3000";
-
 export const auth = initAuth({
-  baseUrl,
-  productionUrl: `https://${env.VERCEL_PROJECT_PRODUCTION_URL ?? "bklit.com"}`,
+  baseUrl: envs.dashboardUrl(),
+  productionUrl: envs.dashboardUrl(),
   secret: env.AUTH_SECRET,
   githubClientId: env.AUTH_GITHUB_ID,
   githubClientSecret: env.AUTH_GITHUB_SECRET,
