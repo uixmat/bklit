@@ -354,6 +354,9 @@ importers:
       '@bklit/db':
         specifier: workspace:*
         version: link:../db
+      '@bklit/utils':
+        specifier: workspace:*
+        version: link:../utils
       '@polar-sh/better-auth':
         specifier: ^1.0.8
         version: 1.0.8(@polar-sh/sdk@0.34.9)(better-auth@1.2.12)
