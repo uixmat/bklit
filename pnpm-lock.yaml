@@ -98,6 +98,9 @@ importers:
       '@bklit/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@bklit/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
       '@bklit/validators':
         specifier: workspace:*
         version: link:../../packages/validators
